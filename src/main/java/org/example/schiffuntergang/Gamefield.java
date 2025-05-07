@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+/*package org.example.schiffuntergang;
 
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
@@ -37,3 +37,4 @@ public class Gamefield extends Parent {
 
 
 }
+*/

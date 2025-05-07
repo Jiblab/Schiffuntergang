@@ -12,7 +12,6 @@ module org.example.schiffuntergang {
     requires com.almasb.fxgl.all;
 
     opens org.example.schiffuntergang to javafx.fxml;
-
-    exports org.example.schiffuntergang;
+    exports org.example.schiffuntergang to javafx.graphics;
 }
 
