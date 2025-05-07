@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+/*package org.example.schiffuntergang;
 
 import javafx.scene.Parent;
 
@@ -24,3 +24,4 @@ public class Ships extends Parent {
     }
 
 }
+*/
