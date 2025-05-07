@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+/*package org.example.schiffuntergang;
 
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
@@ -34,4 +34,4 @@ public class Cell extends Rectangle {
 
     }
 
-}
+}*/
