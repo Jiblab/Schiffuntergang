@@ -1,6 +1,5 @@
 package org.example.schiffuntergang;
 
-import javafx.scene.input.KeyCode;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Pos;
@@ -9,58 +8,70 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
 
-public class GameScreen {
+public class StartScreen {
     private final Stage stage;
-    private final boolean isSinglePlayer;
+    private final Label modeLabel;
+    private final boolean isSinglePlayer = true;
 
-    public GameScreen(Stage stage, boolean isSinglePlayer) {
+    public StartScreen(Stage stage) {
         this.stage = stage;
-        this.isSinglePlayer = isSinglePlayer;
-
+        this.modeLabel = new Label();
     }
 
     public void show() {
-        Button back = new Button("BACK TO START");
-        Button singleP = new Button("SINGLE PLAYER");
-        Button multiP = new Button("MULTIPLAYER");
+        Button start = new Button("START GAME");
+        Button load = new Button("LOAD GAME");
+        Button options = new Button("OPTIONS");
+        Button exit = new Button("EXIT");
 
+        // Initial Vollbild
+        stage.setFullScreen(true);
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
-        //Sound Effect by <a href="https://pixabay.com/users/driken5482-45721595/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=236677">Driken Stan</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=236677">Pixabay</a>
 
         stage.widthProperty().addListener((obs, oldVal, newVal) -> {
-            for (Button b: new Button[]{singleP,multiP,back}) {
+            for (Button b : new Button[]{start, load, options, exit}) {
                 adjustFontSize(b, 30);
             }
         });
 
-        VBox buttonBox = new VBox(15,singleP,multiP,back);
+        // Button-Verhalten
+        start.setOnAction(e -> {
+            GameScreen gameScreen = new GameScreen(stage, isSinglePlayer);
+            clickSound.play();
+            gameScreen.show();
+        });
+        load.setOnAction(e -> {
+            clickSound.play();
+        });
+        options.setOnAction(e -> {
+            Options options1 = new Options(stage);
+            clickSound.play();
+            options1.show();
+        });
+        exit.setOnAction(e -> {
+            clickSound.play();
+            System.exit(0);
+        });
+
+        // Layout für Buttons
+        VBox buttonBox = new VBox(15, modeLabel, start, load, options, exit);
         buttonBox.setAlignment(Pos.CENTER);
         StackPane.setAlignment(buttonBox, Pos.CENTER);
 
-        back.setOnAction(e ->{
-            StartScreen startScreen = new StartScreen(stage);
-            clickSound.play();
-            startScreen.show();
-        });
-
-        for (Button b : new Button[]{singleP,multiP,back}) {
+        // Dynamische Buttongröße
+        for (Button b : new Button[]{start, load, options, exit}) {
             b.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
             b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
         }
 
+        // Hintergrund + Parallax-Ebenen
         StackPane parallaxRoot = new StackPane();
-        parallaxRoot.setAlignment(Pos.CENTER);
-        //HINTERGRUND:
-        //Fest
         ImageView background = createFullscreenImageView("/images/0.png");
         ImageView ocean = createFullscreenImageView("/images/1.png");
         ImageView beach = createFullscreenImageView("/images/4.png");
@@ -68,14 +79,13 @@ public class GameScreen {
         ImageView rocks = createFullscreenImageView("/images/7.png");
         ImageView palm = createFullscreenImageView("/images/12.png");
 
-        //bewegend
-        ParallaxLayer ocean1 = new ParallaxLayer("/images/2.png",0.3, stage);
+        ParallaxLayer ocean1 = new ParallaxLayer("/images/2.png", 0.3, stage);
         ParallaxLayer ocean2 = new ParallaxLayer("/images/3.png", 0.4, stage);
         ParallaxLayer cloud1 = new ParallaxLayer("/images/9.png", 0.6, stage);
-        ParallaxLayer cloud2 = new ParallaxLayer("/images/10.png",0.8, stage);
+        ParallaxLayer cloud2 = new ParallaxLayer("/images/10.png", 0.8, stage);
         ParallaxLayer cloud3 = new ParallaxLayer("/images/11.png", 1.2, stage);
 
-        for (ImageView x : new ImageView[]{background, beach, ocean, white,rocks,palm}){
+        for (ImageView x : new ImageView[]{background, ocean, beach, white, rocks, palm}) {
             x.fitWidthProperty().bind(stage.widthProperty());
             x.setPreserveRatio(false);
         }
@@ -93,10 +103,11 @@ public class GameScreen {
                 palm,
                 rocks,
                 buttonBox
-                //label
         );
 
         Scene scene = new Scene(parallaxRoot);
+
+        // ESC → Fenster verkleinern
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
@@ -105,12 +116,15 @@ public class GameScreen {
                 stage.setHeight(300);
             }
         });
+
+        // Szene setzen
         stage.setScene(scene);
-        stage.setTitle("GameScreen");
         stage.setFullScreen(true);
+        stage.setTitle("Startbildschirm");
         stage.show();
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), e ->{
+        // Parallax-Aktualisierung
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
             ocean1.update();
             ocean2.update();
             cloud1.update();
@@ -125,6 +139,7 @@ public class GameScreen {
         double size = stage.getWidth() / baseWidth;
         button.setStyle("-fx-font-size:" + size + "px");
     }
+
     private ImageView createFullscreenImageView(String path) {
         Image image = new Image(getClass().getResourceAsStream(path));
         ImageView imageView = new ImageView(image);
@@ -132,6 +147,5 @@ public class GameScreen {
         imageView.fitWidthProperty().bind(stage.widthProperty());
         imageView.fitHeightProperty().bind(stage.heightProperty());
         return imageView;
-
     }
 }
