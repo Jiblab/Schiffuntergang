@@ -9,8 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -138,6 +137,8 @@ public class StartScreen {
     void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
         button.setStyle("-fx-font-size:" + size + "px");
+        BackgroundImage image = new BackgroundImage(new Image(getClass().getResourceAsStream("/images/button_texture.png")),BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,new BackgroundSize(button.getWidth(), button.getHeight(), false, false, false, true));
+        button.setBackground(new Background(image));
     }
 
     private ImageView createFullscreenImageView(String path) {

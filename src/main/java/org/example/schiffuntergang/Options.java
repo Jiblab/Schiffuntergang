@@ -1,10 +1,15 @@
 package org.example.schiffuntergang;
 
+import com.almasb.fxgl.audio.Sound;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
+import javafx.scene.control.Toggle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -12,6 +17,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.controlsfx.control.ToggleSwitch;
+
+import javax.swing.*;
 
 public class Options {
     private final Stage stage;
@@ -25,7 +33,13 @@ public class Options {
         //Buttons
         //Save game
         //Musik an aus
+        ToggleSwitch musictoggle = new ToggleSwitch("MUTE");
         //Lautstärke
+        Slider volume = new Slider(0,100,100);
+        volume.setBlockIncrement(1);
+        volume.valueProperty().addListener(((observableValue, number, t1) -> {
+            SoundEffect.setVolume(t1.doubleValue());
+        }));
         //BacktoStart
         Button back = new Button("BACK TO START");
         //Exitgame
@@ -38,7 +52,7 @@ public class Options {
             }
         });
 
-        VBox buttonBox = new VBox(15,back);
+        VBox buttonBox = new VBox(15,volume,musictoggle,back);
         buttonBox.setAlignment(Pos.CENTER);
         StackPane.setAlignment(buttonBox, Pos.CENTER);
 
@@ -52,6 +66,11 @@ public class Options {
             b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
         }
 
+        volume.setMaxWidth(200);
+        volume.setValue(SoundEffect.getVolume());
+        musictoggle.prefHeightProperty().bind(stage.heightProperty().multiply(0.7));
+        //musictoggle.prefWidthProperty().bind(stage.widthProperty().multiply(0.1));
+        musictoggle.setStyle("-fx-font-size: 40px;");
         StackPane parallaxRoot = new StackPane();
         parallaxRoot.setAlignment(Pos.CENTER);
         //HINTERGRUND:
