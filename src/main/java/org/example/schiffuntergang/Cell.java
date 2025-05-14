@@ -1,7 +1,9 @@
-/*package org.example.schiffuntergang;
+package org.example.schiffuntergang;
 
-import javafx.scene.shape.Rectangle;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import org.example.schiffuntergang.Gamefield;
 
 public class Cell extends Rectangle {
     private boolean shot = false;
@@ -16,8 +18,20 @@ public class Cell extends Rectangle {
         this.y = y;
         this.board = board;
 
+        setOnMouseClicked(event -> onCellClicked(event));
+
     }
 
+    public void onCellClicked(MouseEvent event){
+        if(board.getStatus()){
+            shoot();
+        }
+        else {
+            if(ship == null){
+                board.placeShip(ship, x, y, true);
+            }
+        }
+    }
     public void shoot(){
         shot = true;
         if(ship == null){
@@ -34,4 +48,15 @@ public class Cell extends Rectangle {
 
     }
 
-}*/
+
+    public void placeShip(){
+        if (ship == null){
+
+        }
+    }
+
+    public Gamefield getBoard(){
+        return board;
+    }
+
+}
