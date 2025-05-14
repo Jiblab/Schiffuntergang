@@ -1,4 +1,4 @@
-/*package org.example.schiffuntergang;
+package org.example.schiffuntergang;
 
 import javafx.scene.Parent;
 
@@ -8,8 +8,9 @@ public class Ships extends Parent {
 
 
 
-    public Ships(int l){
+    public Ships(int l, int h){
         length = l;
+        health = h;
     }
 
     public void hit(){
@@ -17,11 +18,10 @@ public class Ships extends Parent {
     }
 
     public boolean isAlive(){
-        if(health <= 0){
+        if(health == 0){
             return false;
         }
         return true;
     }
 
 }
-*/
