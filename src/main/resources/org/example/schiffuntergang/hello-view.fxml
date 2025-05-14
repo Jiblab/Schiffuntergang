@@ -4,14 +4,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="rootPane" alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.schiffuntergang.HelloController">
-
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-
-    <Label fx:id="welcomeText" />
-
-    <HBox fx:id="boxen" alignment="TOP_RIGHT" spacing="50" />
-
-</VBox>
+<AnchorPane fx:id="anker" prefHeight="632.0" prefWidth="829.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.schiffuntergang.HelloController">
+   <children>
+      <VBox fx:id="rootPane" alignment="CENTER" layoutX="14.0" layoutY="-1.0" prefHeight="632.0" prefWidth="402.0" spacing="20.0">
+      
+          <padding>
+              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+          </padding>
+      
+          <Label fx:id="welcomeText" />
+      
+          <HBox fx:id="boxen" alignment="TOP_RIGHT" spacing="50" />
+      
+      </VBox>
+      <VBox fx:id="boxenV" layoutX="701.0" layoutY="216.0" prefHeight="200.0" prefWidth="100.0" />
+   </children>
+</AnchorPane>

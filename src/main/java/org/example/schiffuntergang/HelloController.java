@@ -11,10 +11,16 @@ import javax.swing.*;
 
 public class HelloController {
     @FXML
+    private AnchorPane anker;
+
+    @FXML
     private VBox rootPane;
 
     @FXML
     private HBox boxen;
+
+    @FXML
+    VBox boxenV;
 
     @FXML
     public void initialize() {
@@ -23,9 +29,10 @@ public class HelloController {
 
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
-        Button bot = new Button();
-        bot.setPrefSize(100, 100);
-        boxen.getChildren().add(bot);
+        for (int i = 0; i < 5; i++){
+            Button b = new Button("hund");
+            boxenV.getChildren().add(b);
+        }
 
 
 
