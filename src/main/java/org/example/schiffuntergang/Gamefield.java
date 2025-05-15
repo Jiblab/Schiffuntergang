@@ -23,15 +23,17 @@ public class Gamefield extends GridPane {
     private boolean enemy;
     private Cell [][] cells = new Cell[10][10];
     private int count;
+    private HelloController control;
 
 
 
-    public Gamefield(boolean enemy){
+    public Gamefield(boolean enemy, HelloController controler){
         this.enemy = enemy;
+        this.control = controler;
         for (int i = 0; i < 10; i++){
 
             for(int j = 0; j < 10; j++){
-                Cell c = new Cell(j, i, this, lang, breit);
+                Cell c = new Cell(j, i, this, lang, breit, controler);
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
@@ -57,9 +59,49 @@ public class Gamefield extends GridPane {
 
     }
 
-    public boolean placeShip(Ships ship, int x, int y, boolean vertical){
-        return false;
-    }
+
+        public boolean placeShip(Ships ship, int x, int y, boolean vertical) {
+            int length = ship.getLength();
+
+            // 1. Randprüfung
+            if (vertical) {
+                if (y + length > 10) {
+                    System.out.println("Randüberschreitung (vertikal)");
+                    return false;
+                }
+            } else {
+                if (x + length > 10) {
+                    System.out.println("Randüberschreitung (horizontal)");
+                    return false;
+                }
+            }
+
+            // 2. Prüfen ob schon Schiffe dort liegen
+            for (int i = 0; i < length; i++) {
+                int xi = vertical ? x : x + i;
+                int yi = vertical ? y + i : y;
+                Cell cell = getCell(xi, yi);
+                if (cell.getShip() != null) {
+                    System.out.println("Zelle bereits belegt bei: " + xi + ", " + yi);
+                    return false;
+                }
+            }
+
+            // 3. Platzieren
+            for (int i = 0; i < length; i++) {
+                int xi = vertical ? x : x + i;
+                int yi = vertical ? y + i : y;
+                Cell cell = getCell(xi, yi);
+                cell.setShip(ship);
+
+                if (!enemy) {
+                    cell.setFill(Color.WHITE);
+                    cell.setStroke(Color.GREEN);
+                }
+            }
+
+            return true;
+        }
 
     public boolean isEnemy() {
         return enemy;

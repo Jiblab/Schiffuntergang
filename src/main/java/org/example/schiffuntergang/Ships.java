@@ -5,6 +5,8 @@ import javafx.scene.Parent;
 public class Ships extends Parent {
     private int length;
     private int health;
+    boolean vertical = true;
+
 
 
 
@@ -22,6 +24,14 @@ public class Ships extends Parent {
             return false;
         }
         return true;
+    }
+
+    public int getLength(){
+        return length;
+    }
+
+    public boolean getDirection(){
+        return vertical;
     }
 
 }

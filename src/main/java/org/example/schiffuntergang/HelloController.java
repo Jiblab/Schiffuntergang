@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javax.swing.*;
 
 public class HelloController {
+    private int length;
     @FXML
     private AnchorPane anker;
 
@@ -24,18 +25,34 @@ public class HelloController {
 
     @FXML
     public void initialize() {
-        Gamefield enemy = new Gamefield(true);
-        Gamefield player = new Gamefield(false);
+        Gamefield enemy = new Gamefield(true, this);
+        Gamefield player = new Gamefield(false, this);
 
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
-        for (int i = 0; i < 5; i++){
-            Button b = new Button("hund");
-            boxenV.getChildren().add(b);
-        }
+
+        Button b1 = new Button("1");
+        Button b2 = new Button("2");
+        Button b3 = new Button("3");
+        Button b4 = new Button("4");
+        Button b5 = new Button("5");
+
+        b1.setOnAction(e -> length = 1);
+        b2.setOnAction(e -> length = 2);
+        b3.setOnAction(e -> length = 3);
+        b4.setOnAction(e -> length = 4);
+        b5.setOnAction(e -> length = 5);
+
+        boxenV.getChildren().add(b1);
+        boxenV.getChildren().add(b2);
+        boxenV.getChildren().add(b3);
+        boxenV.getChildren().add(b4);
+        boxenV.getChildren().add(b5);
 
 
-
+    }
+    public int getLength(){
+        return length;
     }
 
 

@@ -11,12 +11,15 @@ public class Cell extends Rectangle {
     public int x;
     public int y;
     private Gamefield board;
+    private HelloController control;
 
-    public Cell(int x, int y, Gamefield board, int h, int w){
+    public Cell(int x, int y, Gamefield board, int h, int w, HelloController controler){
+
         super(h, w);
         this.x = x;
         this.y = y;
         this.board = board;
+        this.control = controler;
 
         setOnMouseClicked(event -> onCellClicked(event));
 
@@ -28,7 +31,7 @@ public class Cell extends Rectangle {
         }
         else {
             if(ship == null){
-                board.placeShip(ship, x, y, true);
+                board.placeShip(new Ships(control.getLength(), control.getLength()), x, y, true);
             }
         }
     }
@@ -36,6 +39,7 @@ public class Cell extends Rectangle {
         shot = true;
         if(ship == null){
             setFill(Color.BLACK);
+            System.out.println("Koordinaten x, dann y: "+x+" "+y);
         }
         else{
             ship.hit();
@@ -51,12 +55,20 @@ public class Cell extends Rectangle {
 
     public void placeShip(){
         if (ship == null){
-
+            System.out.println("ist es hier die ganze zeit null?");
         }
     }
 
     public Gamefield getBoard(){
         return board;
+    }
+
+    public void setShip(Ships ships){
+        ship = ships;
+        System.out.println("auf "+x+"und "+y+" liegt ein schiff");
+    }
+    public Ships getShip(){
+        return ship;
     }
 
 }
