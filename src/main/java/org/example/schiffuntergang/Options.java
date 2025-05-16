@@ -1,3 +1,4 @@
+//ZU FIXEN: DESIGN UND HINTERGRUNDMUSIK STARTET JEDES MAL NEU SOBALD MAN AUF OPTIONS DRÜCKT
 package org.example.schiffuntergang;
 
 import com.almasb.fxgl.audio.Sound;
