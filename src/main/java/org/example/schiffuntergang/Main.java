@@ -6,10 +6,16 @@ import javafx.scene.input.KeyCombination;
 
 
 public class Main extends Application {
+    private static BackgroundMusic bgMusic;
     public static void main(String[] args) {
-        BackgroundMusic bgMusic = new BackgroundMusic("/music/BGmusic1.mp3");
+        bgMusic = new BackgroundMusic("/music/BGmusic1.mp3");
         bgMusic.play(0.5);
+        SoundEffect.setVolume(50);
         launch(args);
+    }
+
+    public static BackgroundMusic getBGmusic() {
+        return bgMusic;
     }
 
     @Override

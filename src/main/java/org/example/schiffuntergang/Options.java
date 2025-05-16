@@ -13,6 +13,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -23,9 +24,11 @@ import javax.swing.*;
 
 public class Options {
     private final Stage stage;
-
+    private static BackgroundMusic bgMusic;
+    private double previousVolume;
     public Options(Stage stage) {
         this.stage = stage;
+        bgMusic = Main.getBGmusic();
 
     }
 
@@ -33,19 +36,49 @@ public class Options {
         //Buttons
         //Save game
         //Musik an aus
-        ToggleSwitch musictoggle = new ToggleSwitch("MUTE");
+        ToggleSwitch musictoggle = new ToggleSwitch("MUSIC ON/OFF");
         //Lautstärke
-        Slider volume = new Slider(0,100,100);
+        //Slider volume = new Slider(0,100, SoundEffect.getVolume());
+        double initialVolume = SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50;
+        Slider volume = new Slider(0, 100, initialVolume);
+
         volume.setBlockIncrement(1);
-        volume.valueProperty().addListener(((observableValue, number, t1) -> {
-            SoundEffect.setVolume(t1.doubleValue());
-        }));
+        volume.setMaxWidth(200);
+
+        SoundEffect.setVolume(volume.getValue());
+        bgMusic.setVolume(volume.getValue() / 100.0);
+        bgMusic.stop();
+        bgMusic.play(volume.getValue() / 100.0);
+
         //BacktoStart
         Button back = new Button("BACK TO START");
         //Exitgame
 
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
+        //bgMusic.play(SoundEffect.getVolume()/100);
 
+        volume.valueProperty().addListener((obs, oldVal, newVal) -> {
+            double vol = newVal.doubleValue();
+            SoundEffect.setVolume(vol);
+            bgMusic.setVolume(vol / 100.0);
+
+            if (vol > 0) {
+                previousVolume = vol;
+                musictoggle.setSelected(false);
+            } else {
+                musictoggle.setSelected(true); // Stumm schalten
+            }
+        });
+
+        //toggle
+        musictoggle.selectedProperty().addListener((obs, wasMuted, isNowMuted) -> {
+            if (isNowMuted) {
+                previousVolume = volume.getValue();
+                volume.setValue(0);
+            } else {
+                volume.setValue(previousVolume);
+            }
+        });
         stage.widthProperty().addListener((obs, oldVal, newVal) -> {
             for (Button b: new Button[]{back}) {
                 adjustFontSize(b, 30);
@@ -67,12 +100,12 @@ public class Options {
         }
 
         volume.setMaxWidth(200);
-        volume.setValue(SoundEffect.getVolume());
         musictoggle.prefHeightProperty().bind(stage.heightProperty().multiply(0.7));
         //musictoggle.prefWidthProperty().bind(stage.widthProperty().multiply(0.1));
         musictoggle.setStyle("-fx-font-size: 40px;");
         StackPane parallaxRoot = new StackPane();
         parallaxRoot.setAlignment(Pos.CENTER);
+
         //HINTERGRUND:
         //Fest
         ImageView background = createFullscreenImageView("/images/0.png");
