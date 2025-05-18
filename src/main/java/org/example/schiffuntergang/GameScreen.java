@@ -52,6 +52,50 @@ public class GameScreen {
             startScreen.show();
         });
 
+        singleP.setOnAction(e -> {
+            HelloController controller = new HelloController();
+            Gamefield playerfield = new Gamefield(false, controller);
+            Gamefield enemyfield = new Gamefield(true, controller);
+
+            HBox gamefieldbox = new HBox(50, playerfield, enemyfield);
+            gamefieldbox.setAlignment(Pos.CENTER);
+
+            Button backtogamescreen = new Button("Back to Menu");
+            backtogamescreen.setOnAction(ev -> {
+                GameScreen gameScreen = new GameScreen(stage, true);
+                clickSound.play();
+                gameScreen.show();
+            });
+            VBox gamebox = new VBox(15, gamefieldbox, backtogamescreen);
+            gamebox.setAlignment(Pos.CENTER);
+
+            Scene gamescene = new Scene(gamebox);
+            stage.setScene(gamescene);
+            stage.setFullScreen(true);
+        });
+
+        multiP.setOnAction(e -> {
+            HelloController controller = new HelloController();
+            Gamefield playerfield = new Gamefield(false, controller);
+            Gamefield enemyfield = new Gamefield(true, controller);
+
+            HBox gamefieldbox = new HBox(50, playerfield, enemyfield);
+            gamefieldbox.setAlignment(Pos.CENTER);
+
+            Button backtogamescreen = new Button("Back to Menu");
+            backtogamescreen.setOnAction(ev -> {
+                GameScreen gameScreen = new GameScreen(stage, true);
+                clickSound.play();
+                gameScreen.show();
+            });
+            VBox gamebox = new VBox(15, gamefieldbox, backtogamescreen);
+            gamebox.setAlignment(Pos.CENTER);
+
+            Scene gamescene = new Scene(gamebox);
+            stage.setScene(gamescene);
+            stage.setFullScreen(true);
+        });
+
         for (Button b : new Button[]{singleP,multiP,back}) {
             b.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
             b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
