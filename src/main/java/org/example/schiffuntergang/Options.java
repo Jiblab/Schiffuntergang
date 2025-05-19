@@ -1,4 +1,4 @@
-//ZU FIXEN: DESIGN UND HINTERGRUNDMUSIK STARTET JEDES MAL NEU SOBALD MAN AUF OPTIONS DRÜCKT
+//TODO: DESIGN STARTET JEDES MAL NEU SOBALD MAN AUF OPTIONS DRÜCKT
 package org.example.schiffuntergang;
 
 import com.almasb.fxgl.audio.Sound;
@@ -48,8 +48,8 @@ public class Options {
 
         SoundEffect.setVolume(volume.getValue());
         bgMusic.setVolume(volume.getValue() / 100.0);
-        bgMusic.stop();
-        bgMusic.play(volume.getValue() / 100.0);
+        //bgMusic.stop();
+        //bgMusic.play(volume.getValue() / 100.0);
 
         //BacktoStart
         Button back = new Button("BACK TO START");
