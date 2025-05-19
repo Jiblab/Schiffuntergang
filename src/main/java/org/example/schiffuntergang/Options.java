@@ -35,11 +35,11 @@ public class Options {
 
     public void show() {
         //Buttons
+        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
         //Save game
         //Musik an aus
         ToggleSwitch musictoggle = new ToggleSwitch("MUSIC ON/OFF");
         //Lautstärke
-        //Slider volume = new Slider(0,100, SoundEffect.getVolume());
         double initialVolume = SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50;
         Slider volume = new Slider(0, 100, initialVolume);
 
@@ -53,10 +53,13 @@ public class Options {
 
         //BacktoStart
         Button back = new Button("BACK TO START");
-        //Exitgame
+        back.setOnAction(e -> {
+            StartScreen startScreen = new StartScreen(stage);
+            clickSound.play();
+            startScreen.show();
+        });
+        //Exitgame -> warum hier?
 
-        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
-        //bgMusic.play(SoundEffect.getVolume()/100);
 
         volume.valueProperty().addListener((obs, oldVal, newVal) -> {
             double vol = newVal.doubleValue();
@@ -85,16 +88,10 @@ public class Options {
                 adjustFontSize(b, 30);
             }
         });
-
         VBox buttonBox = new VBox(15,volume,musictoggle,back);
         buttonBox.setAlignment(Pos.CENTER);
         StackPane.setAlignment(buttonBox, Pos.CENTER);
 
-        back.setOnAction(e ->{
-            StartScreen startScreen = new StartScreen(stage);
-            clickSound.play();
-            startScreen.show();
-        });
         for (Button b : new Button[]{back}) {
             b.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
             b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
