@@ -11,9 +11,17 @@ import java.io.File;
 import java.net.URL;
 
 public class BackgroundMusic {
+    private static BackgroundMusic instance;
     private MediaPlayer mediaPlayer;
     private Timeline fadeInTimeline;
     private Timeline fadeOutTimeline;
+
+    public static BackgroundMusic getInstance() {
+        if (instance == null){
+            instance = new BackgroundMusic("/music/BGMusic1.mp3");
+        }
+        return instance;
+    }
 
     public BackgroundMusic(String rPath) {
         try {

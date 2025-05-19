@@ -29,7 +29,7 @@ public class Options {
     private double previousVolume;
     public Options(Stage stage) {
         this.stage = stage;
-        bgMusic = Main.getBGmusic();
+        bgMusic = BackgroundMusic.getInstance();
 
     }
 

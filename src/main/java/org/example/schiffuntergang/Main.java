@@ -8,7 +8,11 @@ import javafx.scene.input.KeyCombination;
 public class Main extends Application {
     private static BackgroundMusic bgMusic;
     public static void main(String[] args) {
-        bgMusic = new BackgroundMusic("/music/BGmusic1.mp3");
+        try{
+            bgMusic = BackgroundMusic.getInstance();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         bgMusic.play(0.5);
         SoundEffect.setVolume(50);
         launch(args);
