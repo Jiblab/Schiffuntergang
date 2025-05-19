@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run Project" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="org.example.schiffuntergang.HelloApplication" />
+    <option name="MAIN_CLASS_NAME" value="org.example.schiffuntergang.Launcher" />
     <module name="SchiffUntergang" />
     <method v="2">
       <option name="Make" enabled="true" />

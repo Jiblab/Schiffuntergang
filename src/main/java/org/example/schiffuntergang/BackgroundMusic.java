@@ -18,7 +18,7 @@ public class BackgroundMusic {
 
     public static BackgroundMusic getInstance() {
         if (instance == null){
-            instance = new BackgroundMusic("/music/BGMusic1.mp3");
+            instance = new BackgroundMusic("/music/BGmusic1.mp3");
         }
         return instance;
     }

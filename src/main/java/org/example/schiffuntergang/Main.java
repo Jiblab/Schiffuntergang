@@ -8,18 +8,7 @@ import javafx.scene.input.KeyCombination;
 public class Main extends Application {
     private static BackgroundMusic bgMusic;
     public static void main(String[] args) {
-        try{
-            bgMusic = BackgroundMusic.getInstance();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        bgMusic.play(0.5);
-        SoundEffect.setVolume(50);
         launch(args);
-    }
-
-    public static BackgroundMusic getBGmusic() {
-        return bgMusic;
     }
 
     @Override
@@ -28,6 +17,9 @@ public class Main extends Application {
         primaryStage.setFullScreen(true);
         primaryStage.setFullScreenExitHint("");
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        SoundEffect.setVolume(50);
+        bgMusic = BackgroundMusic.getInstance();
+        bgMusic.play(0.5);
 
         StartScreen startScreen = new StartScreen(primaryStage);
         startScreen.show();
