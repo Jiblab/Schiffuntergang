@@ -21,19 +21,22 @@ public class Gamefield extends GridPane {
     private int lang = 30;
     private int breit = 30;
     private boolean enemy;
-    private Cell [][] cells = new Cell[10][10];
+    private Cell [][] cells;
     private int count;
     private HelloController control;
 
 
 
-    public Gamefield(boolean enemy, HelloController controler){
+    public Gamefield(boolean enemy, HelloController controler, int h, int b){
+        lang = h;
+        breit = b;
+        cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < h; i++){
 
-            for(int j = 0; j < 10; j++){
-                Cell c = new Cell(j, i, this, lang, breit, controler);
+            for(int j = 0; j < b; j++){
+                Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
@@ -45,7 +48,7 @@ public class Gamefield extends GridPane {
     }
 
     public Cell getCell(int x, int y){
-        return cells[x][y];
+        return cells[y][x];
     }
 
     public boolean getStatus(){
@@ -59,49 +62,68 @@ public class Gamefield extends GridPane {
 
     }
 
+    public boolean placeShip(Ships ship, int x, int y, boolean vertical) {
+        int length = ship.getLength();
 
-        public boolean placeShip(Ships ship, int x, int y, boolean vertical) {
-            int length = ship.getLength();
-
-            // 1. Randprüfung
-            if (vertical) {
-                if (y + length > 10) {
-                    System.out.println("Randüberschreitung (vertikal)");
-                    return false;
-                }
-            } else {
-                if (x + length > 10) {
-                    System.out.println("Randüberschreitung (horizontal)");
-                    return false;
-                }
+        // 1. Randüberprüfung
+        if (vertical) {
+            if (y + length > 10) {
+                System.out.println("Schiff geht vertikal über den Rand.");
+                return false;
             }
-
-            // 2. Prüfen ob schon Schiffe dort liegen
-            for (int i = 0; i < length; i++) {
-                int xi = vertical ? x : x + i;
-                int yi = vertical ? y + i : y;
-                Cell cell = getCell(xi, yi);
-                if (cell.getShip() != null) {
-                    System.out.println("Zelle bereits belegt bei: " + xi + ", " + yi);
-                    return false;
-                }
+        } else {
+            if (x + length > 10) {
+                System.out.println("Schiff geht horizontal über den Rand.");
+                return false;
             }
-
-            // 3. Platzieren
-            for (int i = 0; i < length; i++) {
-                int xi = vertical ? x : x + i;
-                int yi = vertical ? y + i : y;
-                Cell cell = getCell(xi, yi);
-                cell.setShip(ship);
-
-                if (!enemy) {
-                    cell.setFill(Color.WHITE);
-                    cell.setStroke(Color.GREEN);
-                }
-            }
-
-            return true;
         }
+
+        // 2. Überprüfung auf Kollisionen
+        for (int i = 0; i < length; i++) {
+            int xi;
+            int yi;
+
+            if (vertical) {
+                xi = x;
+                yi = y + i;
+            } else {
+                xi = x + i;
+                yi = y;
+            }
+
+            Cell c = getCell(xi, yi);
+            if (c.getShip() != null) {
+                System.out.println("Zelle (" + xi + ", " + yi + ") ist bereits belegt.");
+                return false;
+            }
+        }
+
+        // 3. Platzieren des Schiffs
+        for (int i = 0; i < length; i++) {
+            int xi;
+            int yi;
+
+            if (vertical) {
+                xi = x;
+                yi = y + i;
+            } else {
+                xi = x + i;
+                yi = y;
+            }
+
+            Cell c = getCell(xi, yi);
+            c.setShip(ship);
+
+            if (!enemy) {
+                c.setFill(Color.WHITE);
+                c.setStroke(Color.GREEN);
+            }
+        }
+
+        System.out.println("Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
+        return true;
+    }
+
 
     public boolean isEnemy() {
         return enemy;

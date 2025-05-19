@@ -1,5 +1,8 @@
 package org.example.schiffuntergang;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCode;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -18,9 +21,14 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class GameScreen {
     private final Stage stage;
     private final boolean isSinglePlayer;
+    private double x;
+    private double y;
+
 
     public GameScreen(Stage stage, boolean isSinglePlayer) {
         this.stage = stage;
@@ -53,31 +61,72 @@ public class GameScreen {
         });
 
         singleP.setOnAction(e -> {
-            HelloController controller = new HelloController();
-            Gamefield playerfield = new Gamefield(false, controller);
-            Gamefield enemyfield = new Gamefield(true, controller);
 
-            HBox gamefieldbox = new HBox(50, playerfield, enemyfield);
-            gamefieldbox.setAlignment(Pos.CENTER);
+            Stage sliderStage = new Stage();
+            sliderStage.setTitle("Slider-Fenster");
 
-            Button backtogamescreen = new Button("Back to Menu");
-            backtogamescreen.setOnAction(ev -> {
-                GameScreen gameScreen = new GameScreen(stage, true);
-                clickSound.play();
-                gameScreen.show();
+            Slider slider1 = new Slider(0, 30, 10);
+            slider1.setShowTickLabels(true);
+            slider1.setShowTickMarks(true);
+
+            Slider slider2 = new Slider(0, 30, 10);
+            slider2.setShowTickLabels(true);
+            slider2.setShowTickMarks(true);
+
+            Label label1 = new Label("Boardbreite: 10");
+            Label label2 = new Label("Boardlaenge: 10");
+
+            slider1.valueProperty().addListener((obs, oldVal, newVal) ->
+                    label1.setText("Boardbreite: " + String.format("%.0f", newVal.doubleValue()))
+            );
+
+            slider2.valueProperty().addListener((obs, oldVal, newVal) ->
+                    label2.setText("Boardlaenge: " + String.format("%.0f", newVal.doubleValue()))
+            );
+
+            Button start = new Button("Start Game");
+
+            start.setOnAction(e2->{
+                x = slider1.getValue();
+                y = slider2.getValue();
+
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
+                    Parent root = loader.load();
+                    HelloController controller = loader.getController();
+                    controller.setStage(stage);
+
+                    // Optional: controller.buildGamefield(); falls Gamefield erst hier erzeugt wird
+                    controller.setSize(x, y);
+                    controller.setup();
+
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.setFullScreen(true);
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+
             });
-            VBox gamebox = new VBox(15, gamefieldbox, backtogamescreen);
-            gamebox.setAlignment(Pos.CENTER);
 
-            Scene gamescene = new Scene(gamebox);
-            stage.setScene(gamescene);
-            stage.setFullScreen(true);
+            VBox layout = new VBox(15, label1, slider1, label2, slider2, start);
+            layout.setStyle("-fx-padding: 20px;");
+            layout.setAlignment(Pos.CENTER);
+
+            Scene scene = new Scene(layout, 300, 250);
+            sliderStage.setScene(scene);
+            sliderStage.show();
+
+
+
         });
 
         multiP.setOnAction(e -> {
             HelloController controller = new HelloController();
-            Gamefield playerfield = new Gamefield(false, controller);
-            Gamefield enemyfield = new Gamefield(true, controller);
+            Gamefield playerfield = new Gamefield(false, controller, (int) x, (int) y);
+            Gamefield enemyfield = new Gamefield(true, controller, (int) x, (int) y);
 
             HBox gamefieldbox = new HBox(50, playerfield, enemyfield);
             gamefieldbox.setAlignment(Pos.CENTER);
@@ -177,5 +226,14 @@ public class GameScreen {
         imageView.fitHeightProperty().bind(stage.heightProperty());
         return imageView;
 
+    }
+
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
     }
 }

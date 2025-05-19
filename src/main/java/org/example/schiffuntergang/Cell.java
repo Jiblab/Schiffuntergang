@@ -31,7 +31,7 @@ public class Cell extends Rectangle {
         }
         else {
             if(ship == null){
-                board.placeShip(new Ships(control.getLength(), control.getLength()), x, y, true);
+                board.placeShip(new Ships(control.getLength(), control.getLength()), x, y, control.getDirection());
             }
         }
     }
