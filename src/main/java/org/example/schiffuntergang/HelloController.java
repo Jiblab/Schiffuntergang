@@ -47,13 +47,13 @@ public class HelloController {
         player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
 
-        Button b1 = new Button("1");
-        Button b2 = new Button("2");
-        Button b3 = new Button("3");
-        Button b4 = new Button("4");
-        Button b5 = new Button("5");
-        Button d = new Button("vert");
-        Button d2 = new Button("diag");
+        Button b1 = new Button("Länge 1");
+        Button b2 = new Button("Länge 2");
+        Button b3 = new Button("Länge 3");
+        Button b4 = new Button("Länge 4");
+        Button b5 = new Button("Länge 5");
+        Button d = new Button("Vertikal");
+        Button d2 = new Button("Horizental");
 
         b1.setOnAction(e -> length = 1);
         b2.setOnAction(e -> length = 2);
