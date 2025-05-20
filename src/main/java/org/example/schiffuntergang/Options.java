@@ -98,7 +98,7 @@ public class Options {
         }
 
         volume.setMaxWidth(200);
-        musictoggle.prefHeightProperty().bind(stage.heightProperty().multiply(0.7));
+        musictoggle.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
         //musictoggle.prefWidthProperty().bind(stage.widthProperty().multiply(0.1));
         musictoggle.setStyle("-fx-font-size: 40px;");
         StackPane parallaxRoot = new StackPane();
