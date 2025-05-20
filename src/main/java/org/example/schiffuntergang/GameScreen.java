@@ -61,9 +61,10 @@ public class GameScreen {
         });
 
         singleP.setOnAction(e -> {
-
+            clickSound.play();
             Stage sliderStage = new Stage();
             sliderStage.setTitle("Slider-Fenster");
+            //sliderStage.setFullScreen(true);
 
             Slider slider1 = new Slider(0, 30, 10);
             slider1.setShowTickLabels(true);
@@ -87,6 +88,7 @@ public class GameScreen {
             Button start = new Button("Start Game");
 
             start.setOnAction(e2->{
+                clickSound.play();
                 x = slider1.getValue();
                 y = slider2.getValue();
 
@@ -102,16 +104,20 @@ public class GameScreen {
 
                     Scene scene = new Scene(root);
                     stage.setScene(scene);
-                    stage.setFullScreen(true);
+                    // stage.setFullScreen(true);
 
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-
-
+            });
+            Button backtostart = new Button("Back to Menu");
+            backtostart.setOnAction(e3 -> {
+                GameScreen gameScreen = new GameScreen(stage, isSinglePlayer);
+                clickSound.play();
+                gameScreen.show();
             });
 
-            VBox layout = new VBox(15, label1, slider1, label2, slider2, start);
+            VBox layout = new VBox(15, label1, slider1, label2, slider2, start, backtostart);
             layout.setStyle("-fx-padding: 20px;");
             layout.setAlignment(Pos.CENTER);
 
@@ -124,6 +130,7 @@ public class GameScreen {
         });
 
         multiP.setOnAction(e -> {
+            clickSound.play();
             HelloController controller = new HelloController();
             Gamefield playerfield = new Gamefield(false, controller, (int) x, (int) y);
             Gamefield enemyfield = new Gamefield(true, controller, (int) x, (int) y);
