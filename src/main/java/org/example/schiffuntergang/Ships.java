@@ -7,9 +7,6 @@ public class Ships extends Parent {
     private int health;
     boolean vertical = true;
 
-
-
-
     public Ships(int l, int h){
         length = l;
         health = h;
@@ -20,9 +17,8 @@ public class Ships extends Parent {
     }
 
     public boolean isAlive(){
-        if(health == 0){
+        if(health <= 0)
             return false;
-        }
         return true;
     }
 
@@ -33,5 +29,4 @@ public class Ships extends Parent {
     public boolean getDirection(){
         return vertical;
     }
-
 }

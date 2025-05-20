@@ -15,6 +15,14 @@
     </properties>
 
     <dependencies>
+        <!-- Gson für JSON-Verarbeitung -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10</version>
+        </dependency>
+
+        <!-- JavaFX Abhängigkeiten -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -40,6 +48,8 @@
             <artifactId>javafx-media</artifactId>
             <version>17.0.6</version>
         </dependency>
+
+        <!-- UI Bibliotheken -->
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
@@ -94,6 +104,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- JUnit für Tests -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -125,11 +137,9 @@
                 <version>0.0.8</version>
                 <executions>
                     <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>org.example.schiffuntergang/org.example.schiffuntergang.HelloApplication
-                            </mainClass>
+                            <mainClass>org.example.schiffuntergang/org.example.schiffuntergang.HelloApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

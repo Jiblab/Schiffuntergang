@@ -107,8 +107,6 @@ public class GameScreen {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-
-
             });
 
             VBox layout = new VBox(15, label1, slider1, label2, slider2, start);
@@ -118,9 +116,6 @@ public class GameScreen {
             Scene scene = new Scene(layout, 300, 250);
             sliderStage.setScene(scene);
             sliderStage.show();
-
-
-
         });
 
         multiP.setOnAction(e -> {
@@ -224,15 +219,12 @@ public class GameScreen {
         imageView.setPreserveRatio(false);
         imageView.fitWidthProperty().bind(stage.widthProperty());
         imageView.fitHeightProperty().bind(stage.heightProperty());
+
         return imageView;
-
     }
-
-
     public double getX() {
         return x;
     }
-
     public double getY() {
         return y;
     }

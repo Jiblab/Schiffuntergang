@@ -176,6 +176,5 @@ public class Options {
         imageView.fitWidthProperty().bind(stage.widthProperty());
         imageView.fitHeightProperty().bind(stage.heightProperty());
         return imageView;
-
     }
 }

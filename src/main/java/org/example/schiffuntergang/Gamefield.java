@@ -25,8 +25,6 @@ public class Gamefield extends GridPane {
     private int count;
     private HelloController control;
 
-
-
     public Gamefield(boolean enemy, HelloController controler, int h, int b){
         lang = h;
         breit = b;

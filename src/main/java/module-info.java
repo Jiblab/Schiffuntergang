@@ -12,7 +12,12 @@ module org.example.schiffuntergang {
     requires com.almasb.fxgl.all;
     requires java.desktop;
 
-    opens org.example.schiffuntergang to javafx.fxml;
+    // Gson-Modul einbinden
+    requires com.google.gson;
+
+    // Pakete für Reflection öffnen (z. B. für Gson und FXML)
+    opens org.example.schiffuntergang to javafx.fxml, com.google.gson;
+
+    // Export für JavaFX-Anwendung
     exports org.example.schiffuntergang to javafx.graphics;
 }
-
