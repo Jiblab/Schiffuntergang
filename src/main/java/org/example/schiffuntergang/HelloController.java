@@ -20,7 +20,7 @@ public class HelloController {
     private double y;
     private Stage stage;
     Random rand = new Random();
-    private int usedCells = 0;
+
     @FXML
     private AnchorPane anker;
 
@@ -46,7 +46,7 @@ public class HelloController {
         rootPane.setAlignment(Pos.CENTER);
         //TODO random platzieren der schiffe bei nicht quadratischer feldgröße muss noch gefixt werden
        //random platzieren der gegnerschiffe
-        while(usedCells <= enemy.maxShipsC()){
+        while(enemy.getUsedCells() <= enemy.maxShipsC()){
             int shipLength = 2 + rand.nextInt(4);
             boolean vertical = rand.nextBoolean();
 
@@ -60,7 +60,7 @@ public class HelloController {
             Ships ship = new Ships(shipLength, shipLength);
 
             if (enemy.placeShip(ship, x2, y2, vertical )){
-                usedCells += shipLength;
+                enemy.increaseCells(shipLength);
             }
 
         }

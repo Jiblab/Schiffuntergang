@@ -31,7 +31,17 @@ public class Cell extends Rectangle {
         }
         else {
             if(ship == null){
-                board.placeShip(new Ships(control.getLength(), control.getLength()), x, y, control.getDirection());
+                if (board.getUsedCells() <= board.maxShipsC()){
+                    Ships ship = new Ships(control.getLength(), control.getLength());
+                    if (board.placeShip(ship, x, y, control.getDirection())){
+                        board.addShip(ship);
+                        board.increaseCells(ship.getLength());
+                    }
+                }
+                else {
+                    System.out.println("Maximale anzahl an schiffen erreicht");
+                }
+
             }
         }
     }

@@ -21,9 +21,8 @@ public class Gamefield extends GridPane {
     private int breit;
     private boolean enemy;
     private Cell [][] cells;
-    private int count;
+    private int usedCells = 0;
     private HelloController control;
-
 
 
 
@@ -67,12 +66,12 @@ public class Gamefield extends GridPane {
 
         // 1. Randüberprüfung
         if (vertical) {
-            if (y + length > 10) {
+            if (y + length > lang) {
                 System.out.println("Schiff geht vertikal über den Rand.");
                 return false;
             }
         } else {
-            if (x + length > 10) {
+            if (x + length > breit) {
                 System.out.println("Schiff geht horizontal über den Rand.");
                 return false;
             }
@@ -138,5 +137,12 @@ public class Gamefield extends GridPane {
 
     public void addShip(Ships ship){
         placedShip.add(ship);
+    }
+
+    public int getUsedCells(){
+        return usedCells;
+    }
+    public void increaseCells(int laenge){
+        usedCells += laenge;
     }
 }
