@@ -16,14 +16,14 @@ import java.util.List;
 import javafx.event.Event;
 
 public class Gamefield extends GridPane {
-    private Ships ship [] = new Ships[3];
-    private int schiffe;
-    private int lang = 30;
-    private int breit = 30;
+    private List<Ships> placedShip = new ArrayList<>();
+    private int lang;
+    private int breit;
     private boolean enemy;
     private Cell [][] cells;
     private int count;
     private HelloController control;
+
 
 
 
@@ -55,12 +55,12 @@ public class Gamefield extends GridPane {
         return enemy;
     }
 
-    public Ships getShip(){
+    /*public Ships getShip(){
         Ships aktuelleship = ship[count];
         count++;
         return aktuelleship;
 
-    }
+    }*/
 
     public boolean placeShip(Ships ship, int x, int y, boolean vertical) {
         int length = ship.getLength();
@@ -118,6 +118,9 @@ public class Gamefield extends GridPane {
                 c.setFill(Color.WHITE);
                 c.setStroke(Color.GREEN);
             }
+            else{
+                c.setFill(Color.GRAY);
+            }
         }
 
         System.out.println("Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
@@ -127,5 +130,13 @@ public class Gamefield extends GridPane {
 
     public boolean isEnemy() {
         return enemy;
+    }
+
+    public double maxShipsC(){
+        return (double) lang * (double) breit * 0.3;
+    }
+
+    public void addShip(Ships ship){
+        placedShip.add(ship);
     }
 }

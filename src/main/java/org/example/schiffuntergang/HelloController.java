@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import javax.swing.*;
+import java.util.Random;
 
 public class HelloController {
     private int length;
@@ -18,6 +19,8 @@ public class HelloController {
     private double x;
     private double y;
     private Stage stage;
+    Random rand = new Random();
+    private int usedCells = 0;
     @FXML
     private AnchorPane anker;
 
@@ -41,6 +44,28 @@ public class HelloController {
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
         rootPane.setAlignment(Pos.CENTER);
+        //TODO random platzieren der schiffe bei nicht quadratischer feldgröße muss noch gefixt werden
+       //random platzieren der gegnerschiffe
+        while(usedCells <= enemy.maxShipsC()){
+            int shipLength = 2 + rand.nextInt(4);
+            boolean vertical = rand.nextBoolean();
+
+// ACHTUNG: Breite = x, Höhe = y
+            int xMax = (int) x - (vertical ? 1 : shipLength);
+            int yMax = (int) y - (vertical ? shipLength : 1);
+
+            int x2 = rand.nextInt(xMax + 1);
+            int y2 = rand.nextInt(yMax + 1);
+
+            Ships ship = new Ships(shipLength, shipLength);
+
+            if (enemy.placeShip(ship, x2, y2, vertical )){
+                usedCells += shipLength;
+            }
+
+        }
+
+
         VBox.setVgrow(enemy, Priority.ALWAYS);
         VBox.setVgrow(player, Priority.ALWAYS);
         enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);

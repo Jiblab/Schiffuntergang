@@ -17,6 +17,9 @@ public class Ships extends Parent {
 
     public void hit(){
         health--;
+        if(health == 0){
+            System.out.println("Schiff versenkt");
+        }
     }
 
     public boolean isAlive(){
