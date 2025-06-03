@@ -44,7 +44,6 @@ public class HelloController {
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
         rootPane.setAlignment(Pos.CENTER);
-        //TODO random platzieren der schiffe bei nicht quadratischer feldgröße muss noch gefixt werden
        //random platzieren der gegnerschiffe
         while(enemy.getUsedCells() <= enemy.maxShipsC()){
             int shipLength = 2 + rand.nextInt(4);
