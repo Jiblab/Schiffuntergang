@@ -3,6 +3,8 @@ package org.example.schiffuntergang;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -34,7 +36,7 @@ public class Options {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
         //Save game
         //Musik an aus
-        ToggleSwitch musictoggle = new ToggleSwitch("MUSIC ON/OFF");
+        ToggleSwitch musictoggle = new ToggleSwitch("MUTE MUSIC");
         //Lautstärke
         double initialVolume = SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50;
         Slider volume = new Slider(0, 100, initialVolume);
@@ -71,11 +73,13 @@ public class Options {
         });
 
         //toggle
-        musictoggle.selectedProperty().addListener((obs, wasMuted, isNowMuted) -> {
-            if (isNowMuted) {
+
+        musictoggle.selectedProperty().addListener((obs, before, after) -> {
+            if (after) {
                 previousVolume = volume.getValue();
                 volume.setValue(0);
             } else {
+
                 volume.setValue(previousVolume);
             }
         });
