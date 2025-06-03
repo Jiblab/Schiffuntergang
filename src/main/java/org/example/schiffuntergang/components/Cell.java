@@ -21,10 +21,11 @@ public class Cell extends Rectangle {
         this.board = board;
         this.control = controler;
 
-        setOnMouseClicked(event -> onCellClicked(event));
+        //setOnMouseClicked(event -> onCellClicked(event));
 
     }
 
+    // Nicht mehr in Nutzung! Wird im @Gamefield.java:40 behandelt
     public void onCellClicked(MouseEvent event){
         if(board.getStatus()){
             shoot();

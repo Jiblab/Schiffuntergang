@@ -72,7 +72,6 @@ public class HelloController {
         player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
 
-        Button b1 = new Button("Länge 1");
         Button b2 = new Button("Länge 2");
         Button b3 = new Button("Länge 3");
         Button b4 = new Button("Länge 4");
@@ -80,7 +79,6 @@ public class HelloController {
         Button d = new Button("Vertikal");
         Button d2 = new Button("Horizental");
 
-        b1.setOnAction(e -> length = 1);
         b2.setOnAction(e -> length = 2);
         b3.setOnAction(e -> length = 3);
         b4.setOnAction(e -> length = 4);
@@ -88,7 +86,6 @@ public class HelloController {
         d.setOnAction(e->direction = false);
         d2.setOnAction(e->direction = true);
 
-        boxenV.getChildren().add(b1);
         boxenV.getChildren().add(b2);
         boxenV.getChildren().add(b3);
         boxenV.getChildren().add(b4);

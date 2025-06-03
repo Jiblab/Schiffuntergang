@@ -1,5 +1,6 @@
 package org.example.schiffuntergang.components;
 
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.HelloController;
@@ -32,11 +33,24 @@ public class Gamefield extends GridPane {
 
                 c.setStroke(Color.BLACK);
                 c.setFill(Color.BLUE);
+                final int x = i;
+                final int y = j;
+                // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
+                // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
+                c.setOnMouseClicked(event -> {
+                    if(event.getButton() == MouseButton.PRIMARY && !enemy){
+                        placeShip(new Ships(control.getLength(), control.getLength()), x, y, control.getDirection());
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy){
+
+                    }
+                });
 
                 add(c, i, j);
             }
         }
     }
+
+
 
     public Cell getCell(int x, int y){
         return cells[x][y];
@@ -104,6 +118,9 @@ public class Gamefield extends GridPane {
 
             Cell c = getCell(xi, yi);
             c.setShip(ship);
+
+            addShip(ship);
+            increaseCells(length);
 
             if (!enemy) {
                 c.setFill(Color.WHITE);
