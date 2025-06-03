@@ -3,14 +3,14 @@ package org.example.schiffuntergang;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.example.schiffuntergang.components.Gamefield;
+import org.example.schiffuntergang.components.Ships;
 
-import javax.swing.*;
 import java.util.Random;
 
 public class HelloController {

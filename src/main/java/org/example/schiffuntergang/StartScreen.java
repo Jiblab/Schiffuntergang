@@ -12,6 +12,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.example.schiffuntergang.sounds.SoundEffect;
+import org.example.schiffuntergang.ui.ParallaxLayer;
 
 public class StartScreen {
     private final Stage stage;
@@ -41,7 +43,7 @@ public class StartScreen {
 
         // Button-Verhalten
         start.setOnAction(e -> {
-            GameScreen gameScreen = new GameScreen(stage, isSinglePlayer);
+            GameCreationScreen gameScreen = new GameCreationScreen(stage, isSinglePlayer);
             clickSound.play();
             gameScreen.show();
         });

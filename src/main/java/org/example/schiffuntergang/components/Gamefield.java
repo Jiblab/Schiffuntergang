@@ -1,26 +1,18 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.components;
 
-import javafx.event.EventHandler;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import org.w3c.dom.events.MouseEvent;
-import javafx.geometry.Point2D;
-import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
+import org.example.schiffuntergang.HelloController;
 
 import java.util.ArrayList;
 import java.util.List;
-import javafx.event.Event;
 
 public class Gamefield extends GridPane {
     private List<Ships> placedShip = new ArrayList<>();
     private int lang;
     private int breit;
     private boolean enemy;
-    private Cell [][] cells;
+    private Cell[][] cells;
     private int usedCells = 0;
     private HelloController control;
 
@@ -47,7 +39,7 @@ public class Gamefield extends GridPane {
     }
 
     public Cell getCell(int x, int y){
-        return cells[y][x];
+        return cells[x][y];
     }
 
     public boolean getStatus(){

@@ -1,9 +1,9 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.components;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import org.example.schiffuntergang.Gamefield;
+import org.example.schiffuntergang.HelloController;
 
 public class Cell extends Rectangle {
     private boolean shot = false;

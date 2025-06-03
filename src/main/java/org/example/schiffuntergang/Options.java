@@ -1,27 +1,23 @@
 //TODO: DESIGN STARTET JEDES MAL NEU SOBALD MAN AUF OPTIONS DRÜCKT
 package org.example.schiffuntergang;
 
-import com.almasb.fxgl.audio.Sound;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Toggle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.ToggleSwitch;
-
-import javax.swing.*;
+import org.example.schiffuntergang.sounds.BackgroundMusic;
+import org.example.schiffuntergang.sounds.SoundEffect;
+import org.example.schiffuntergang.ui.ParallaxLayer;
 
 public class Options {
     private final Stage stage;

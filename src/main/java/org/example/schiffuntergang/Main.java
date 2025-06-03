@@ -1,8 +1,9 @@
 package org.example.schiffuntergang;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.example.schiffuntergang.StartScreen;
 import javafx.scene.input.KeyCombination;
+import org.example.schiffuntergang.sounds.BackgroundMusic;
+import org.example.schiffuntergang.sounds.SoundEffect;
 
 
 public class Main extends Application {

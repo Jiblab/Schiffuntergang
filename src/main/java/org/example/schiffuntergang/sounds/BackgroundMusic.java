@@ -1,13 +1,11 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.sounds;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
-import java.net.URI;
 
-import java.io.File;
 import java.net.URL;
 
 public class BackgroundMusic {

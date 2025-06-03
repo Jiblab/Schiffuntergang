@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.ui;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
