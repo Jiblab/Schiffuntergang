@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
+import org.example.schiffuntergang.EnemyPlayer;
 
 import java.util.Random;
 
@@ -20,6 +21,7 @@ public class HelloController {
     private double y;
     private Stage stage;
     Random rand = new Random();
+    private boolean playerturn = true;
 
     @FXML
     private AnchorPane anker;
@@ -38,8 +40,12 @@ public class HelloController {
 
     }
     public void setup(){
-        Gamefield enemy = new Gamefield(true, this, (int) x, (int) y );
         Gamefield player = new Gamefield(false, this, (int) x, (int) y);
+        EnemyPlayer en = new EnemyPlayer(player, this);
+        Gamefield enemy = new Gamefield(true, this, (int) x, (int) y, en);
+
+
+
 
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
@@ -117,5 +123,16 @@ public class HelloController {
         });
     }
 
+    public boolean getPlayerturn(){
+        return playerturn;
+    }
 
+    public void setPlayerturn(){
+        if (!playerturn){
+            playerturn = true;
+        }
+        else {
+            playerturn = false;
+        }
+    }
 }
