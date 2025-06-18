@@ -41,7 +41,7 @@ public class HelloController {
     }
     public void setup(){
         Gamefield player = new Gamefield(false, this, (int) x, (int) y);
-        EnemyPlayer en = new EnemyPlayer(player, this);
+        EnemyPlayer en = new EnemyPlayer(player);
         Gamefield enemy = new Gamefield(true, this, (int) x, (int) y, en);
 
 

@@ -216,19 +216,23 @@ public class Gamefield extends GridPane {
             s.hit();
             c.setFill(Color.RED);
             System.out.println(control.getPlayerturn());
-            if (control.getPlayerturn()){
+            if (this.enemy){
                 System.out.println("nix hier in der if abfrage");
                 en.revenge();
+
             }
-            else {
-                control.setPlayerturn();
-            }
+
+
         }
         else {
             c.setFill(Color.BLACK);
             System.out.println("Koordinaten x, dann y: "+x+" "+y);
-            en.revenge();
+            if (this.enemy){
+                en.revenge();
+            }
+
         }
+
     }
 
 
