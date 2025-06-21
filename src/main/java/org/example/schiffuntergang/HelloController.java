@@ -8,6 +8,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.example.schiffuntergang.Multiplayer.Client;
+import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.EnemyPlayer;
@@ -22,6 +24,8 @@ public class HelloController {
     private Stage stage;
     Random rand = new Random();
     private boolean playerturn = true;
+    private Client c;
+    private Server s;
 
     @FXML
     private AnchorPane anker;
@@ -55,7 +59,7 @@ public class HelloController {
             int shipLength = 2 + rand.nextInt(4);
             boolean vertical = rand.nextBoolean();
 
-// ACHTUNG: Breite = x, Höhe = y
+            // ACHTUNG: Breite = x, Höhe = y
             int xMax = (int) x - (vertical ? 1 : shipLength);
             int yMax = (int) y - (vertical ? shipLength : 1);
 
@@ -99,6 +103,14 @@ public class HelloController {
         boxenV.getChildren().add(d2);
         boxenV.setAlignment(Pos.CENTER);
 
+
+    }
+
+    public void setupMultiC(){
+
+    }
+
+    public void setupMultiS(){
 
     }
 

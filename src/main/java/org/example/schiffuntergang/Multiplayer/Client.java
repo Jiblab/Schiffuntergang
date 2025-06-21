@@ -12,6 +12,7 @@ public class Client implements Network{
     private BufferedReader in;
     private PrintWriter out;
 
+
     public void connect(String ip, int port) throws IOException {
         clientSocket = new Socket(ip, port);
         System.out.println("Verbunden mit Server.");

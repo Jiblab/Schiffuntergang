@@ -13,6 +13,9 @@ public class Server implements Network{
     private BufferedReader in;
     private PrintWriter out;
 
+    public Server(){
+
+    }
     public void start(int port) throws IOException {
         s = new ServerSocket(port);
         System.out.println("Warte auf Verbindung...");
@@ -23,7 +26,7 @@ public class Server implements Network{
     }
 
     public void sendSize(int rows, int cols) {
-        out.println("size " + rows);
+        out.write("size" +rows+ cols);
     }
 
     public void sendShips(int[] lengths) {
@@ -35,7 +38,7 @@ public class Server implements Network{
     }
 
     public void sendShot(int row, int col) {
-        out.println("shot " + row + " " + col);
+
     }
 
     public void sendAnswer(int result) {
