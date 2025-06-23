@@ -5,6 +5,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
+import org.example.schiffuntergang.Logic;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class Gamefield extends GridPane {
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
+
         for (int i = 0; i < h; i++){
 
             for(int j = 0; j < b; j++){
@@ -77,6 +79,7 @@ public class Gamefield extends GridPane {
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
+
         for (int i = 0; i < h; i++){
 
             for(int j = 0; j < b; j++){
@@ -106,7 +109,7 @@ public class Gamefield extends GridPane {
 
 
 
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && turn){
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy){
                         shoot(x, y);
                     }
                 });
@@ -116,7 +119,7 @@ public class Gamefield extends GridPane {
         }
     }
 
-    /*public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l){
+    public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l){
         lang = h;
         breit = b;
         cells = new Cell[h][b];
@@ -154,6 +157,8 @@ public class Gamefield extends GridPane {
 
 
                     }else if(event.getButton() == MouseButton.PRIMARY && enemy){
+                        lo.setX((int) c.getX());
+                        lo.setY((int) c.getY());
                         shoot((int) c.getX(), (int) c.getY());
                     }
                 });
@@ -161,7 +166,7 @@ public class Gamefield extends GridPane {
                 add(c, i, j);
             }
         }
-    }*/
+    }
 
 
 
@@ -311,4 +316,8 @@ public class Gamefield extends GridPane {
     public void setTurn(boolean t){
         turn = t;
     }
+    public void setLogic(MultiplayerLogic l){
+        lo = l;
+    }
+
 }

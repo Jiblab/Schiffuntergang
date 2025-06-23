@@ -9,6 +9,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.schiffuntergang.Multiplayer.Client;
+import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
@@ -44,9 +45,11 @@ public class HelloController {
 
     }
     public void setup(){
+
         Gamefield player = new Gamefield(false, this, (int) x, (int) y);
         EnemyPlayer en = new EnemyPlayer(player);
         Gamefield enemy = new Gamefield(true, this, (int) x, (int) y, en);
+
 
 
 
@@ -107,6 +110,12 @@ public class HelloController {
     }
 
     public void setupMultiC(){
+        Client ce = new Client();
+        MultiplayerLogic mlp = new MultiplayerLogic(ce, true, (Gamefield) null, (Gamefield) null);
+        Gamefield player = new Gamefield(false, this, (int) x, (int) y);
+        Gamefield enemy = new Gamefield(true, this, (int) x, (int) y);
+        mlp.setEn(enemy);
+        mlp.setPl(player);
 
     }
 
