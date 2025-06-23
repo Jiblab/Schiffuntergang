@@ -10,9 +10,9 @@ module org.example.schiffuntergang {
     requires org.kordamp.bootstrapfx.core;
 
     requires com.almasb.fxgl.all;
+    requires java.desktop;
 
     opens org.example.schiffuntergang to javafx.fxml;
-
-    exports org.example.schiffuntergang;
+    exports org.example.schiffuntergang to javafx.graphics;
 }
 
