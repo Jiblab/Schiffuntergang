@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.sounds;
 import javafx.scene.media.AudioClip;
 import java.net.URL;
 

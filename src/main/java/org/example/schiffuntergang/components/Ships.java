@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.components;
 
 import javafx.scene.Parent;
 
@@ -7,6 +7,9 @@ public class Ships extends Parent {
     private int health;
     boolean vertical = true;
 
+
+
+
     public Ships(int l, int h){
         length = l;
         health = h;
@@ -14,11 +17,15 @@ public class Ships extends Parent {
 
     public void hit(){
         health--;
+        if(health == 0){
+            System.out.println("Schiff versenkt");
+        }
     }
 
     public boolean isAlive(){
-        if(health <= 0)
+        if(health == 0){
             return false;
+        }
         return true;
     }
 
@@ -29,4 +36,9 @@ public class Ships extends Parent {
     public boolean getDirection(){
         return vertical;
     }
+
+
+
+
+
 }

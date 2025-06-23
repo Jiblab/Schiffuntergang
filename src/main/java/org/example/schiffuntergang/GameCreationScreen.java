@@ -13,24 +13,22 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
+import org.example.schiffuntergang.components.Gamefield;
+import org.example.schiffuntergang.sounds.SoundEffect;
+import org.example.schiffuntergang.ui.ParallaxLayer;
 
 import java.io.IOException;
 
-public class GameScreen {
+public class GameCreationScreen {
     private final Stage stage;
     private final boolean isSinglePlayer;
     private double x;
     private double y;
 
 
-    public GameScreen(Stage stage, boolean isSinglePlayer) {
+    public GameCreationScreen(Stage stage, boolean isSinglePlayer) {
         this.stage = stage;
         this.isSinglePlayer = isSinglePlayer;
 
@@ -112,7 +110,7 @@ public class GameScreen {
             });
             Button backtostart = new Button("Back to Menu");
             backtostart.setOnAction(e3 -> {
-                GameScreen gameScreen = new GameScreen(stage, isSinglePlayer);
+                GameCreationScreen gameScreen = new GameCreationScreen(stage, isSinglePlayer);
                 clickSound.play();
                 gameScreen.show();
             });
@@ -140,7 +138,7 @@ public class GameScreen {
 
             Button backtogamescreen = new Button("Back to Menu");
             backtogamescreen.setOnAction(ev -> {
-                GameScreen gameScreen = new GameScreen(stage, true);
+                GameCreationScreen gameScreen = new GameCreationScreen(stage, true);
                 clickSound.play();
                 gameScreen.show();
             });
