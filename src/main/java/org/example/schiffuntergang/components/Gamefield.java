@@ -62,7 +62,7 @@ public class Gamefield extends GridPane {
 
 
 
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy){
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
                         shoot((int) c.getX(), (int) c.getY());
                     }
                 });
@@ -109,7 +109,7 @@ public class Gamefield extends GridPane {
 
 
 
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy){
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
                         shoot(x, y);
                     }
                 });
@@ -142,11 +142,15 @@ public class Gamefield extends GridPane {
                 c.setOnMouseClicked(event -> {
                     if(event.getButton() == MouseButton.PRIMARY && !enemy){
 
-                        if (getUsedCells() <= maxShipsC()){
-                            Ships ship = new Ships(control.getLength(), control.getLength());
-                            if (placeShip(ship, x, y, control.getDirection())){
-                                increaseCells(ship.getLength());
+                        int len = control.getLength();
+                        if (getUsedCells() <= maxShipsC() && len > 0 && control.canPlaceShipOfLength(len)) {
+                            Ships ship = new Ships(len, len);
+                            if (placeShip(ship, x, y, control.getDirection())) {
+                                increaseCells(len);
                                 addShip(ship);
+                                if (control.isClientMode()) {
+                                    control.shipPlaced(len);
+                                }
                             }
                         }
                         else {
@@ -156,7 +160,7 @@ public class Gamefield extends GridPane {
 
 
 
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy){
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
                         lo.setX((int) c.getX());
                         lo.setY((int) c.getY());
                         shoot((int) c.getX(), (int) c.getY());
@@ -319,5 +323,15 @@ public class Gamefield extends GridPane {
     public void setLogic(MultiplayerLogic l){
         lo = l;
     }
+    public HelloController getControl(){
+        return control;
+    }
 
+    public int[] getShipLengths() {
+        int[] lengths = new int[placedShip.size()];
+        for (int i = 0; i < placedShip.size(); i++) {
+            lengths[i] = placedShip.get(i).getLength();
+        }
+        return lengths;
+    }
 }

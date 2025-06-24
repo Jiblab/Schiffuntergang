@@ -3,6 +3,7 @@ package org.example.schiffuntergang;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -27,6 +28,11 @@ public class HelloController {
     private boolean playerturn = true;
     private Client c;
     private Server s;
+    private int maxPerShipLength = 3;
+    private int[] shipsPlaced = new int[6]; // Index = Schiffslänge
+    private Label[] shipCounters = new Label[6];
+    private boolean isClientMode = false;
+    private boolean readyToSendShips = false;
 
     @FXML
     private AnchorPane anker;
@@ -120,7 +126,42 @@ public class HelloController {
     }
 
     public void setupMultiS(){
+        isClientMode = true;
 
+        Client ce = new Client();
+        MultiplayerLogic mlp = new MultiplayerLogic(ce, true, null, null);
+        Gamefield player = new Gamefield(false, this, (int) x, (int) y);
+        Gamefield enemy = new Gamefield(true, this, (int) x, (int) y);
+        mlp.setEn(enemy);
+        mlp.setPl(player);
+
+        rootPane.getChildren().addAll(enemy, player);
+        rootPane.setAlignment(Pos.CENTER);
+
+        for (int i = 2; i <= 5; i++) {
+            int len = i;
+            Button b = new Button("Länge " + len);
+            b.setOnAction(e -> {
+                if (canPlaceShipOfLength(len)) {
+                    length = len;
+                }
+            });
+
+            Label counter = new Label("Verbleibend: " + maxPerShipLength);
+            shipCounters[len] = counter;
+
+            HBox row = new HBox(10, b, counter);
+            row.setAlignment(Pos.CENTER);
+            boxenV.getChildren().add(row);
+        }
+
+        Button vertikal = new Button("Vertikal");
+        Button horizontal = new Button("Horizontal");
+        vertikal.setOnAction(e -> direction = true);
+        horizontal.setOnAction(e -> direction = false);
+
+        boxenV.getChildren().addAll(vertikal, horizontal);
+        boxenV.setAlignment(Pos.CENTER);
     }
 
     public int getLength(){
@@ -155,5 +196,43 @@ public class HelloController {
         else {
             playerturn = false;
         }
+    }
+
+    public boolean canPlaceShipOfLength(int len) {
+        return shipsPlaced[len] < maxPerShipLength;
+    }
+
+    public void shipPlaced(int len) {
+        shipsPlaced[len]++;
+        updateCounter(len);
+    }
+
+    private void updateCounter(int len) {
+        if (shipCounters[len] != null) {
+            int remaining = maxPerShipLength - shipsPlaced[len];
+            shipCounters[len].setText("Verbleibend: " + remaining);
+        }
+    }
+    public boolean isClientMode(){
+        return isClientMode;
+    }
+
+    public void setShipCountsFromNetwork(int[] lengths) {
+        for (int len : lengths) {
+            if (len >= 1 && len < shipsPlaced.length) {
+                shipsPlaced[len]++;
+                updateCounter(len);
+            }
+        }
+    }
+
+    public boolean getReady(){
+        return readyToSendShips;
+    }
+
+    @FXML
+    private void onReadyClicked() {
+        readyToSendShips = true;
+        System.out.println("Fertig gedrückt – bereit zum Senden der Schiffe");
     }
 }
