@@ -2,7 +2,9 @@ package org.example.schiffuntergang;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,6 +16,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.example.schiffuntergang.sounds.SoundEffect;
 import org.example.schiffuntergang.ui.ParallaxLayer;
+
+import javafx.stage.FileChooser;
+import org.example.schiffuntergang.StorageManager;
+import org.example.schiffuntergang.FullGameState;
+import org.example.schiffuntergang.components.Gamefield;
+import javafx.util.Pair;
+
 
 public class StartScreen {
     private final Stage stage;
@@ -49,6 +58,33 @@ public class StartScreen {
         });
         load.setOnAction(e -> {
             clickSound.play();
+
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Load Game");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+
+            java.io.File selectedFile = fileChooser.showOpenDialog(stage);
+            if (selectedFile != null) {
+                try {
+                    Pair<Gamefield, Gamefield> boards = StorageManager.loadFullGame(selectedFile.getAbsolutePath());
+                    Gamefield playerBoard = boards.getKey();
+                    Gamefield aiBoard = boards.getValue();
+
+                    // HelloController vorbereiten und laden
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HelloView.fxml")); // Pfad ggf. anpassen
+                    Parent root = loader.load();
+                    HelloController controller = loader.getController();
+                    controller.loadGame(playerBoard, aiBoard);  // eigene Methode
+
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.setFullScreen(true);
+                    stage.show();
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         });
         options.setOnAction(e -> {
             Options options1 = new Options(stage);

@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.EnemyPlayer;
+import org.example.schiffuntergang.sounds.*;
 
 import java.util.Random;
 
@@ -133,6 +134,27 @@ public class HelloController {
         }
         else {
             playerturn = false;
+        }
+    }
+    public void loadGame(Gamefield playerBoard, Gamefield aiBoard) {
+        this.rootPane.getChildren().clear();
+
+        // Boards zur Anzeige hinzufügen
+        rootPane.getChildren().add(aiBoard);
+        rootPane.getChildren().add(playerBoard);
+        rootPane.setAlignment(Pos.CENTER);
+
+        VBox.setVgrow(aiBoard, Priority.ALWAYS);
+        VBox.setVgrow(playerBoard, Priority.ALWAYS);
+        aiBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        playerBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        // Optional: Musik- und Soundeinstellungen anwenden
+        BackgroundMusic.getInstance().setVolume(playerBoard.getMusicVolume());
+        SoundEffect.setVolume(playerBoard.getMusicVolume());
+
+        if (!playerBoard.isMusicEnabled()) {
+            BackgroundMusic.getInstance().stop();
         }
     }
 }
