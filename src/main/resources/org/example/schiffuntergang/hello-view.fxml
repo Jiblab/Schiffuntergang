@@ -15,6 +15,7 @@
           <Label fx:id="welcomeText" />
       
           <HBox fx:id="boxen" alignment="TOP_RIGHT" spacing="50" />
+          <Button fx:id="readyButton" text="Fertig" onAction="#onReadyClicked" />
       
       </VBox>
       <VBox fx:id="boxenV" layoutX="701.0" layoutY="216.0" prefHeight="200.0" prefWidth="100.0" />
