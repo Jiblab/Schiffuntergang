@@ -2,8 +2,8 @@ package org.example.schiffuntergang;
 
 public class FullGameState {
 
-    public GameState player;
-    public GameState enemyPlayer;
+    private GameState player;
+    private GameState enemyPlayer;
 
     // @param player the player's game state
     // @param ai     the AI's game state
