@@ -20,7 +20,7 @@
       <element id="library" level="project" name="Maven: com.github.almasb:fxgl-entity:17.3" />
       <element id="library" level="project" name="Maven: org.openjfx:javafx-media:17.0.6" />
       <element id="library" level="project" name="Maven: org.openjfx:javafx-swing:win:17.0.6" />
-      <element id="library" level="project" name="Maven: com.dlsc.formsfx:formsfx-core:11.6.0" />
+      <element id="library" level="project" name="gson-2.10.jar" />
       <element id="library" level="project" name="Maven: eu.hansolo:toolbox:21.0.5" />
       <element id="library" level="project" name="Maven: com.github.almasb:fxgl-io:17.3" />
       <element id="library" level="project" name="Maven: eu.hansolo:toolboxfx:21.0.3" />

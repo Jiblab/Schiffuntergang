@@ -5,8 +5,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
+import org.example.schiffuntergang.Logic;
+import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
+import org.example.schiffuntergang.sounds.*;
+import org.example.schiffuntergang.GameState;
+import org.example.schiffuntergang.SerializableShip;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Gamefield extends GridPane {
@@ -18,6 +24,7 @@ public class Gamefield extends GridPane {
     private int usedCells = 0;
     private HelloController control;
     private EnemyPlayer en;
+    private MultiplayerLogic lo;
 
 
 
@@ -28,6 +35,7 @@ public class Gamefield extends GridPane {
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
+
         for (int i = 0; i < h; i++){
 
             for(int j = 0; j < b; j++){
@@ -57,7 +65,7 @@ public class Gamefield extends GridPane {
 
 
 
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy){
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
                         shoot((int) c.getX(), (int) c.getY());
                     }
                 });
@@ -74,6 +82,7 @@ public class Gamefield extends GridPane {
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
+
         for (int i = 0; i < h; i++){
 
             for(int j = 0; j < b; j++){
@@ -103,8 +112,61 @@ public class Gamefield extends GridPane {
 
 
 
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy){
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
                         shoot(x, y);
+                    }
+                });
+
+                add(c, i, j);
+            }
+        }
+    }
+
+    public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l){
+        lang = h;
+        breit = b;
+        cells = new Cell[h][b];
+        this.enemy = enemy;
+        this.control = controler;
+        this.lo = l;
+
+        for (int i = 0; i < h; i++){
+
+            for(int j = 0; j < b; j++){
+                Cell c = new Cell(j, i, this, 30, 30, controler);
+                cells[i][j] = c;
+
+                c.setStroke(Color.BLACK);
+                c.setFill(Color.BLUE);
+                final int x = i;
+                final int y = j;
+                // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
+                // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
+                c.setOnMouseClicked(event -> {
+                    if(event.getButton() == MouseButton.PRIMARY && !enemy){
+
+                        int len = control.getLength();
+                        if (getUsedCells() <= maxShipsC() && len > 0 && control.canPlaceShipOfLength(len)) {
+                            Ships ship = new Ships(len, len);
+                            if (placeShip(ship, x, y, control.getDirection())) {
+                                increaseCells(len);
+                                addShip(ship);
+                                if (control.isClientMode()) {
+                                    control.shipPlaced(len);
+                                }
+                            }
+                        }
+                        else {
+                            System.out.println(maxShipsC());
+                            System.out.println("Maximale Anzahl an schiffen erreicht");
+                        }
+
+
+
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
+                        lo.setX((int) c.getX());
+                        lo.setY((int) c.getY());
+                        shoot((int) c.getX(), (int) c.getY());
                     }
                 });
 
@@ -216,19 +278,23 @@ public class Gamefield extends GridPane {
             s.hit();
             c.setFill(Color.RED);
             System.out.println(control.getPlayerturn());
-            if (control.getPlayerturn()){
+            if (this.enemy){
                 System.out.println("nix hier in der if abfrage");
                 en.revenge();
+
             }
-            else {
-                control.setPlayerturn();
-            }
+
+
         }
         else {
             c.setFill(Color.BLACK);
             System.out.println("Koordinaten x, dann y: "+x+" "+y);
-            en.revenge();
+            if (this.enemy){
+                en.revenge();
+            }
+
         }
+
     }
 
 
@@ -243,4 +309,74 @@ public class Gamefield extends GridPane {
     public int getBreit(){
         return breit;
     }
+
+    public void deleteShip(){
+        Iterator<Ships> iterator = placedShip.listIterator();
+        while (iterator.hasNext()) {
+            Ships schiff = iterator.next();
+            if (!schiff.isAlive()) {
+                iterator.remove();
+            }
+        }
+    }
+    private boolean turn;
+    public void setTurn(boolean t){
+        turn = t;
+    }
+    public void setLogic(MultiplayerLogic l){
+        lo = l;
+    }
+    public HelloController getControl(){
+        return control;
+    }
+
+    public int[] getShipLengths() {
+        int[] lengths = new int[placedShip.size()];
+        for (int i = 0; i < placedShip.size(); i++) {
+            lengths[i] = placedShip.get(i).getLength();
+        }
+        return lengths;
+    }
+
+    public double getMusicVolume() {
+        return BackgroundMusic.getInstance().getVolume();
+    }
+    public boolean isMusicEnabled() {
+        return BackgroundMusic.getInstance().isPlaying();
+    }
+    public List<Ships> getShips() {
+        return placedShip;
+    }
+    public void increaseUsedCells(int length) {
+        this.usedCells += length;
+    }
+    public static Gamefield fromGameState(GameState state, boolean isEnemy) {
+        // Dummy-Controller, da dieser im Konstruktor benötigt wird
+        HelloController dummyController = new HelloController();
+
+        // Gamefield erzeugen (ohne AI, da Player)
+        Gamefield board = new Gamefield(isEnemy, dummyController,
+                state.getBoardHeight(), state.getBoardWidth());
+
+        // Schiffe rekonstruieren
+        for (SerializableShip s : state.getShips()) {
+            Ships ship = new Ships(s.getLength(), s.getHealth());
+            if (board.placeShip(ship, s.getStartX(), s.getStartY(), s.isVertical())) {
+                board.addShip(ship);
+                board.increaseUsedCells(ship.getLength());
+            }
+        }
+
+        // Getroffene Zellen wiederherstellen
+        for (Position p : state.getHitPositions()) {
+            Cell cell = board.getCell(p.getX(), p.getY());
+            cell.setShot(true);
+            cell.setFill(cell.getShip() != null
+                    ? javafx.scene.paint.Color.RED
+                    : javafx.scene.paint.Color.BLACK);
+        }
+
+        return board;
+    }
+
 }
