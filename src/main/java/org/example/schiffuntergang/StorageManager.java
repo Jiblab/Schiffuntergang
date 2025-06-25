@@ -73,12 +73,13 @@ public class StorageManager {
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
                     if (board.getCell(row, col).getShip() == ship) {
-                        shipList.add(new SerializableShip(row, col, ship.getLength(), ship.getDirection(), ship.isAlive() ? ship.getLength() : 0));
+                        shipList.add(new SerializableShip(row, col, ship.getLength(), ship.getDirection(), ship.isAlive() ? ship.getHealth() : 0));
                         break outer;
                     }
                 }
             }
         }
+
 
         List<Position> hits = new ArrayList<>();
         for (int row = 0; row < height; row++)

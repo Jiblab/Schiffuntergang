@@ -15,6 +15,7 @@ import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.EnemyPlayer;
+import org.example.schiffuntergang.sounds.*;
 
 import java.util.Random;
 
@@ -234,5 +235,25 @@ public class HelloController {
     private void onReadyClicked() {
         readyToSendShips = true;
         System.out.println("Fertig gedrückt – bereit zum Senden der Schiffe");
+    }
+    public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
+        this.rootPane.getChildren().clear();
+
+        // Boards zur Anzeige hinzufügen
+        rootPane.getChildren().add(enemyBoard);
+        rootPane.getChildren().add(playerBoard);
+        rootPane.setAlignment(Pos.CENTER);
+
+        VBox.setVgrow(enemyBoard, Priority.ALWAYS);
+        VBox.setVgrow(playerBoard, Priority.ALWAYS);
+        enemyBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        playerBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        // Optional: Musik- und Soundeinstellungen anwenden
+        BackgroundMusic.getInstance().setVolume(playerBoard.getMusicVolume());
+        SoundEffect.setVolume(playerBoard.getMusicVolume());
+
+        if (!playerBoard.isMusicEnabled())
+            BackgroundMusic.getInstance().stop();
     }
 }

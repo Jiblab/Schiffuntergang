@@ -7,6 +7,9 @@ import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.Logic;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
+import org.example.schiffuntergang.sounds.*;
+import org.example.schiffuntergang.GameState;
+import org.example.schiffuntergang.SerializableShip;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -334,4 +337,46 @@ public class Gamefield extends GridPane {
         }
         return lengths;
     }
+
+    public double getMusicVolume() {
+        return BackgroundMusic.getInstance().getVolume();
+    }
+    public boolean isMusicEnabled() {
+        return BackgroundMusic.getInstance().isPlaying();
+    }
+    public List<Ships> getShips() {
+        return placedShip;
+    }
+    public void increaseUsedCells(int length) {
+        this.usedCells += length;
+    }
+    public static Gamefield fromGameState(GameState state, boolean isEnemy) {
+        // Dummy-Controller, da dieser im Konstruktor benötigt wird
+        HelloController dummyController = new HelloController();
+
+        // Gamefield erzeugen (ohne AI, da Player)
+        Gamefield board = new Gamefield(isEnemy, dummyController,
+                state.getBoardHeight(), state.getBoardWidth());
+
+        // Schiffe rekonstruieren
+        for (SerializableShip s : state.getShips()) {
+            Ships ship = new Ships(s.getLength(), s.getHealth());
+            if (board.placeShip(ship, s.getStartX(), s.getStartY(), s.isVertical())) {
+                board.addShip(ship);
+                board.increaseUsedCells(ship.getLength());
+            }
+        }
+
+        // Getroffene Zellen wiederherstellen
+        for (Position p : state.getHitPositions()) {
+            Cell cell = board.getCell(p.getX(), p.getY());
+            cell.setShot(true);
+            cell.setFill(cell.getShip() != null
+                    ? javafx.scene.paint.Color.RED
+                    : javafx.scene.paint.Color.BLACK);
+        }
+
+        return board;
+    }
+
 }
