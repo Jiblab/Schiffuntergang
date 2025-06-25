@@ -59,7 +59,11 @@ public class HelloController {
 
 
 
-
+        Button saveBtn = new Button("Spiel speichern");
+        saveBtn.setOnAction(e -> {
+            StorageManager.saveFullGame(player, enemy, 0.8, true, true, "spielstand1");
+        });
+        boxenV.getChildren().add(saveBtn);
 
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);

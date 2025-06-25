@@ -64,8 +64,8 @@ public class StorageManager {
         }
     }
     private static GameState toGameState(Gamefield board, double volume, boolean music, boolean sound) {
-        int width = (int)board.getWidth();
-        int height = (int)board.getHeight();
+        int width = board.getBreit();
+        int height = board.getLang();
 
         List<SerializableShip> shipList = new ArrayList<>();
         for (Ships ship : board.getShips()) {
