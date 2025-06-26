@@ -1,3 +1,4 @@
+
 package org.example.schiffuntergang;
 
 import javafx.fxml.FXMLLoader;
@@ -60,75 +61,13 @@ public class GameCreationScreen {
 
         singleP.setOnAction(e -> {
             clickSound.play();
-            Stage sliderStage = new Stage();
-            sliderStage.setTitle("Slider-Fenster");
-            //sliderStage.setFullScreen(true);
-
-            Slider slider1 = new Slider(0, 30, 10);
-            slider1.setShowTickLabels(true);
-            slider1.setShowTickMarks(true);
-
-            Slider slider2 = new Slider(0, 30, 10);
-            slider2.setShowTickLabels(true);
-            slider2.setShowTickMarks(true);
-
-            Label label1 = new Label("Boardbreite: 10");
-            Label label2 = new Label("Boardlaenge: 10");
-
-            slider1.valueProperty().addListener((obs, oldVal, newVal) ->
-                    label1.setText("Boardbreite: " + String.format("%.0f", newVal.doubleValue()))
-            );
-
-            slider2.valueProperty().addListener((obs, oldVal, newVal) ->
-                    label2.setText("Boardlaenge: " + String.format("%.0f", newVal.doubleValue()))
-            );
-
-            Button start = new Button("Start Game");
-
-            start.setOnAction(e2->{
-                clickSound.play();
-                x = slider1.getValue();
-                y = slider2.getValue();
-
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
-                    Parent root = loader.load();
-                    HelloController controller = loader.getController();
-                    controller.setStage(stage);
-
-                    // Optional: controller.buildGamefield(); falls Gamefield erst hier erzeugt wird
-                    controller.setSize(x, y);
-                    controller.setup();
-
-                    Scene scene = new Scene(root);
-                    stage.setScene(scene);
-                    // stage.setFullScreen(true);
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            });
-            Button backtostart = new Button("Back to Menu");
-            backtostart.setOnAction(e3 -> {
-                GameCreationScreen gameScreen = new GameCreationScreen(stage, isSinglePlayer);
-                clickSound.play();
-                gameScreen.show();
-            });
-
-            VBox layout = new VBox(15, label1, slider1, label2, slider2, start, backtostart);
-            layout.setStyle("-fx-padding: 20px;");
-            layout.setAlignment(Pos.CENTER);
-
-            Scene scene = new Scene(layout, 300, 250);
-            sliderStage.setScene(scene);
-            sliderStage.show();
-
-
-
+            Boardsize boardsize = new Boardsize(stage, true);
+            boardsize.show();
         });
 
         multiP.setOnAction(e -> {
             clickSound.play();
+
             HelloController controller = new HelloController();
             Gamefield playerfield = new Gamefield(false, controller, (int) x, (int) y);
             Gamefield enemyfield = new Gamefield(true, controller, (int) x, (int) y);
@@ -142,7 +81,10 @@ public class GameCreationScreen {
                 clickSound.play();
                 gameScreen.show();
             });
-            VBox gamebox = new VBox(15, gamefieldbox, backtogamescreen);
+            Button searchgame = new Button("Search Game");
+            Button hostgame = new Button("Host Game");
+
+            VBox gamebox = new VBox(15, gamefieldbox, backtogamescreen, searchgame, hostgame);
             gamebox.setAlignment(Pos.CENTER);
 
             Scene gamescene = new Scene(gamebox);
@@ -231,14 +173,5 @@ public class GameCreationScreen {
         imageView.fitHeightProperty().bind(stage.heightProperty());
         return imageView;
 
-    }
-
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
     }
 }

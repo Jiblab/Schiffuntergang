@@ -1,4 +1,4 @@
-//TODO: DESIGN STARTET JEDES MAL NEU SOBALD MAN AUF OPTIONS DRÜCKT
+//TODO: DESIGN STARTET JEDES MAL NEU SOBALD MAN AUF OPTIONS DRÜCKT // --> fym?
 package org.example.schiffuntergang;
 
 import javafx.animation.KeyFrame;
@@ -43,6 +43,11 @@ public class Options {
 
         volume.setBlockIncrement(1);
         volume.setMaxWidth(200);
+        volume.setMajorTickUnit(100.0);
+        volume.setMinorTickCount(5);
+        volume.setSnapToTicks(true);
+        volume.setShowTickMarks(true);
+        volume.setShowTickLabels(true);
 
         SoundEffect.setVolume(volume.getValue());
         bgMusic.setVolume(volume.getValue() / 100.0);
@@ -56,7 +61,7 @@ public class Options {
             clickSound.play();
             startScreen.show();
         });
-        //Exitgame -> warum hier?
+        //exit brauchen wir hier doch nicht sorry
 
 
         volume.valueProperty().addListener((obs, oldVal, newVal) -> {

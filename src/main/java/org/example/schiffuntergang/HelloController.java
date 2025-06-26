@@ -15,7 +15,8 @@ import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.EnemyPlayer;
-import org.example.schiffuntergang.sounds.*;
+import org.example.schiffuntergang.sounds.BackgroundMusic;
+import org.example.schiffuntergang.sounds.SoundEffect;
 
 import java.util.Random;
 
@@ -29,9 +30,9 @@ public class HelloController {
     private boolean playerturn = true;
     private Client c;
     private Server s;
-    private int maxPerShipLength = 3;
-    private int[] shipsPlaced = new int[6]; // Index = Schiffslänge
-    private Label[] shipCounters = new Label[6];
+    private final int maxPerShipLength = 3;
+    private final int[] shipsPlaced = new int[6]; // Index = Schiffslänge
+    private final Label[] shipCounters = new Label[6];
     private boolean isClientMode = false;
     private boolean readyToSendShips = false;
 
@@ -97,6 +98,7 @@ public class HelloController {
         Button b5 = new Button("Länge 5");
         Button d = new Button("Vertikal");
         Button d2 = new Button("Horizental");
+        Button back = new Button("Back to Start");
 
         b2.setOnAction(e -> length = 2);
         b3.setOnAction(e -> length = 3);
@@ -104,6 +106,11 @@ public class HelloController {
         b5.setOnAction(e -> length = 5);
         d.setOnAction(e->direction = false);
         d2.setOnAction(e->direction = true);
+        back.setOnAction(e -> {
+                    StartScreen startScreen = new StartScreen(stage);
+                    startScreen.show();
+                }
+        );
 
         boxenV.getChildren().add(b2);
         boxenV.getChildren().add(b3);
@@ -111,6 +118,7 @@ public class HelloController {
         boxenV.getChildren().add(b5);
         boxenV.getChildren().add(d);
         boxenV.getChildren().add(d2);
+        boxenV.getChildren().add(back);
         boxenV.setAlignment(Pos.CENTER);
 
 
@@ -118,7 +126,7 @@ public class HelloController {
 
     public void setupMultiC(){
         Client ce = new Client();
-        MultiplayerLogic mlp = new MultiplayerLogic(ce, true, (Gamefield) null, (Gamefield) null);
+        MultiplayerLogic mlp = new MultiplayerLogic(ce, true, null, null);
         Gamefield player = new Gamefield(false, this, (int) x, (int) y);
         Gamefield enemy = new Gamefield(true, this, (int) x, (int) y);
         mlp.setEn(enemy);
@@ -179,6 +187,7 @@ public class HelloController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+
         stage.addEventHandler(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
@@ -191,12 +200,7 @@ public class HelloController {
     }
 
     public void setPlayerturn(){
-        if (!playerturn){
-            playerturn = true;
-        }
-        else {
-            playerturn = false;
-        }
+        playerturn = !playerturn;
     }
 
     public boolean canPlaceShipOfLength(int len) {

@@ -17,6 +17,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.example.schiffuntergang.sounds.SoundEffect;
 
 public class GameScreen {
     private final Stage stage;
