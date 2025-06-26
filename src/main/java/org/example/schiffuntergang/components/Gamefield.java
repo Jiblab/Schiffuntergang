@@ -1,5 +1,7 @@
 package org.example.schiffuntergang.components;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -159,6 +161,14 @@ public class Gamefield extends GridPane {
                         else {
                             System.out.println(maxShipsC());
                             System.out.println("Maximale Anzahl an schiffen erreicht");
+                            /*Platform.runLater(() -> {
+                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                alert.setTitle("Maximum erreicht");
+                                alert.setHeaderText(null);
+                                alert.setContentText("Maximale Anzahl an schiffen erreicht");
+                                alert.showAndWait();
+                            });*/
+
                         }
 
 
@@ -235,6 +245,7 @@ public class Gamefield extends GridPane {
 
             Cell c = getCell(xi, yi);
             c.setShip(ship);
+            placedShip.add(ship);
 
 
             if (!enemy) {
@@ -277,6 +288,9 @@ public class Gamefield extends GridPane {
         if (s != null){
             s.hit();
             c.setFill(Color.RED);
+            if (s.getHealth() == 0){
+                deleteShip();
+            }
             System.out.println(control.getPlayerturn());
             if (this.enemy){
                 System.out.println("nix hier in der if abfrage");
@@ -317,6 +331,22 @@ public class Gamefield extends GridPane {
             if (!schiff.isAlive()) {
                 iterator.remove();
             }
+        }
+
+        if (placedShip.isEmpty()) {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Spiel beendet");
+                alert.setHeaderText(null);
+                if (enemy){
+                    alert.setContentText("Du gewinnst");
+                }
+                else {
+                    alert.setContentText("Gegner gewinnt");
+                }
+
+                alert.showAndWait();
+            });
         }
     }
     private boolean turn;
