@@ -67,8 +67,8 @@ public class GameCreationScreen {
 
         multiP.setOnAction(e -> {
             clickSound.play();
-
-            HelloController controller = new HelloController();
+            showMultiplayerWindowAndCloseCurrent();
+            /*HelloController controller = new HelloController();
             Gamefield playerfield = new Gamefield(false, controller, (int) x, (int) y);
             Gamefield enemyfield = new Gamefield(true, controller, (int) x, (int) y);
 
@@ -89,7 +89,8 @@ public class GameCreationScreen {
 
             Scene gamescene = new Scene(gamebox);
             stage.setScene(gamescene);
-            stage.setFullScreen(true);
+            stage.setFullScreen(true);*/
+
         });
 
         for (Button b : new Button[]{singleP,multiP,back}) {
@@ -173,5 +174,46 @@ public class GameCreationScreen {
         imageView.fitHeightProperty().bind(stage.heightProperty());
         return imageView;
 
+    }
+
+    private void showMultiplayerWindowAndCloseCurrent() {
+        // Neues Fenster (Stage) erstellen
+        Stage multiplayerStage = new Stage();
+        multiplayerStage.setTitle("Multiplayer");
+
+        Button findGame = new Button("Game finden");
+        Button createGame = new Button("Spiel erstellen");
+        Button close = new Button("Schließen");
+
+        VBox vbox = new VBox(20, findGame, createGame, close);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPrefWidth(300);
+        vbox.setPrefHeight(200);
+
+        // Button-Logik
+        findGame.setOnAction(e -> {
+            //System.out.println("Game finden geklickt!");
+
+        });
+
+        createGame.setOnAction(e -> {
+            //System.out.println("Spiel erstellen geklickt!");
+            Boardsize boardsize = new Boardsize(stage, true);
+            boardsize.showMulti();
+        });
+
+        close.setOnAction(e -> multiplayerStage.close());
+
+        Scene scene = new Scene(vbox);
+        multiplayerStage.setScene(scene);
+
+        // Direkt im Vollbild öffnen
+        multiplayerStage.setFullScreen(true);
+
+        // Multiplayer-Fenster öffnen
+        multiplayerStage.show();
+
+        // Altes Fenster schließen
+        stage.close();
     }
 }
