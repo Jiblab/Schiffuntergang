@@ -118,6 +118,7 @@ public class MultiplayerLogic {
 
         }
         else {// man ist client und joined
+            cl.connect(contr.getIP(), contr.getPort());
             boolean temp = true;
             String m1 = cl.receiveMessage();
             String [] p1 = m1.split(" ");

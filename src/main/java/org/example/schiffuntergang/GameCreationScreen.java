@@ -4,6 +4,7 @@ package org.example.schiffuntergang;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -180,7 +181,7 @@ public class GameCreationScreen {
         // Neues Fenster (Stage) erstellen
         Stage multiplayerStage = new Stage();
         multiplayerStage.setTitle("Multiplayer");
-
+        HelloController controller = new HelloController();
         Button findGame = new Button("Game finden");
         Button createGame = new Button("Spiel erstellen");
         Button close = new Button("Schließen");
@@ -193,6 +194,33 @@ public class GameCreationScreen {
         // Button-Logik
         findGame.setOnAction(e -> {
             //System.out.println("Game finden geklickt!");
+            Stage connectStage = new Stage();
+            connectStage.setTitle("Mit Server verbinden");
+
+            Label ipLabel = new Label("Server-IP:");
+            TextField ipField = new TextField();
+            ipField.setPromptText("z.B. 192.168.0.10");
+            Button connectButton = new Button("Verbinden");
+            Label statusLabel = new Label();
+
+            connectButton.setOnAction(ev -> {
+                String ip = ipField.getText();
+                int port = 5000; // Passe ggf. den Port an
+
+                    controller.setupMultiC(ip, port); // Deine Methode zur Verbindung
+                    connectStage.close();
+
+            });
+
+            VBox vbox2 = new VBox(15, ipLabel, ipField, connectButton, statusLabel);
+            vbox2.setAlignment(Pos.CENTER);
+            vbox2.setPrefWidth(350);
+            vbox2.setPrefHeight(200);
+
+            Scene scene = new Scene(vbox2);
+            connectStage.setScene(scene);
+            connectStage.setFullScreen(true); // Optional: im Vollbild öffnen
+            connectStage.show();
 
         });
 

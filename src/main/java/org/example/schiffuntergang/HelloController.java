@@ -39,6 +39,8 @@ public class HelloController {
     private Gamefield enemy;
     private Gamefield player;
     private boolean temp;
+    private String ipa;
+    private int porta;
 
     @FXML
     private AnchorPane anker;
@@ -100,7 +102,9 @@ public class HelloController {
 
     }
 
-    public void setupMultiC(){
+    public void setupMultiC(String ip, int port){
+        ipa = ip;
+        porta = port;
         Client ce = new Client();
         MultiplayerLogic mlp = new MultiplayerLogic(ce, true, null, null);
         mlp.setController(this);
@@ -326,5 +330,12 @@ public class HelloController {
 
         }
         return false;
+    }
+
+    public String getIP(){
+        return ipa;
+    }
+    public int getPort(){
+        return porta;
     }
 }
