@@ -31,7 +31,7 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendShips(int[] lengths) {
-        out.write("ships\n");
+        out.write("ships");
         out.flush();
         for (int l : lengths) {
             out.write(" " + l);

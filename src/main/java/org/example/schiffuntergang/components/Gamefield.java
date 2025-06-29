@@ -13,6 +13,7 @@ import org.example.schiffuntergang.sounds.*;
 import org.example.schiffuntergang.GameState;
 import org.example.schiffuntergang.SerializableShip;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -152,11 +153,10 @@ public class Gamefield extends GridPane {
                     if(event.getButton() == MouseButton.PRIMARY && !enemy){
 
                         int len = control.getLength();
-                        if (getUsedCells() <= maxShipsC() && len > 0 && control.canPlaceShipOfLength(len)) {
+                        if (getUsedCells() <= maxShipsC() && len > 0 ) {
                             Ships ship = new Ships(len, len);
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(len);
-                                addShip(ship);
                                 if (control.isClientMode()) {
                                     control.shipPlaced(len);
                                 }
@@ -178,9 +178,14 @@ public class Gamefield extends GridPane {
 
 
                     }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
-                        lo.setX((int) c.getX());
-                        lo.setY((int) c.getY());
-                        shoot((int) c.getX(), (int) c.getY());
+                        lo.setX(x);
+                        lo.setY(y);
+                        System.out.println(x+ " "+y);
+                        try {
+                            lo.startShoot();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
 
@@ -249,7 +254,9 @@ public class Gamefield extends GridPane {
 
             Cell c = getCell(xi, yi);
             c.setShip(ship);
-            placedShip.add(ship);
+
+
+
 
 
             if (!enemy) {
@@ -260,7 +267,7 @@ public class Gamefield extends GridPane {
                 c.setFill(Color.GRAY);
             }
         }
-
+        placedShip.add(ship);
         System.out.println("Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
@@ -412,6 +419,11 @@ public class Gamefield extends GridPane {
         }
 
         return board;
+    }
+
+    public void clearShips() {
+        placedShip.clear();
+        // ggf. auch das Spielfeld zurücksetzen, falls nötig
     }
 
 }

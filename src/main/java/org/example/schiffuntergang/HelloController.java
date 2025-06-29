@@ -1,5 +1,6 @@
 package org.example.schiffuntergang;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -41,6 +42,7 @@ public class HelloController {
     private boolean temp = true;
     private String ipa;
     private int porta;
+    private int[] shipsAllowed = new int[6];
 
     MultiplayerLogic mlp;
 
@@ -138,9 +140,9 @@ public class HelloController {
             int len = i;
             Button b = new Button("Länge " + len);
             b.setOnAction(e -> {
-                if (canPlaceShipOfLength(len)) {
+                //if (canPlaceShipOfLength(len)) {
                     length = len;
-                }
+                //}
             });
 
             Label counter = new Label("Verbleibend: " + maxPerShipLength);
@@ -191,9 +193,9 @@ public class HelloController {
         playerturn = !playerturn;
     }
 
-    public boolean canPlaceShipOfLength(int len) {
+    /*public boolean canPlaceShipOfLength(int len) {
         return shipsPlaced[len] < maxPerShipLength;
-    }
+    }*/
 
     public void shipPlaced(int len) {
         shipsPlaced[len]++;
@@ -212,14 +214,15 @@ public class HelloController {
     }
 
     public void setShipCountsFromNetwork(int[] lengths) {
-        for (int len : lengths) {
-            if (len >= 1 && len < shipsPlaced.length) {
-                shipsPlaced[len]++;
-                updateCounter(len);
-            }
+        for (int len = 1; len < lengths.length ; len++) {
+            shipsAllowed[len] = lengths[len];
+            final int lengleng = len;
+            Platform.runLater(() -> updateAllowedCounter(lengleng));
         }
     }
-
+    private void updateAllowedCounter(int len) {
+        //shipCounters[len].setText(shipsPlaced[len] + " / " + shipsAllowed[len]);
+    }
     public boolean getReady(){
         return readyToSendShips;
     }
