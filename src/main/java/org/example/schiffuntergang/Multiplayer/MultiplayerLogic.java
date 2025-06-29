@@ -35,42 +35,26 @@ public class MultiplayerLogic {
         client = client1;
     }
 
-    public void start() throws IOException {
-        if (!client){ //man selber ist host
-            s.start(5000);
-            System.out.println("Multiplayer connected!");
-            s.sendSize(player.getBreit(), player.getLang());
-            System.out.println("Server: Größen geschickt!");
-            String message = s.receiveMessage();
+    public void sendShips() throws IOException {
+        int[] shipLengths = player.getShipLengths();
+        //int[] shipLengths = {5,4,3};
+        s.sendShips(shipLengths);
+        System.out.println("Schiffe gesendet");
+        String messagedone = s.receiveMessage();
+        System.out.println(messagedone);
+        if (messagedone.contains("done")){
+            s.sendReady();
+            System.out.println("Ready sent!");
+        }
+        startGameFlow();
+    }
 
-            //hier sollen die platzierten schiffe dann rübergeschickt werden vielleicht am besten mit einem button oder so
-            //das thread ding von chat mal übernommen und ausprobiert aber funktioniert auch d
-            new Thread(() -> {
-                while (!player.getControl().getReady()) {
-                    try {
-                        Thread.sleep(100); // damit CPU nicht voll ausgelastet wird
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+    private void startGameFlow() throws IOException {
+        if(!client){
+            String yeye = s.receiveMessage();
+            System.out.println(yeye);
 
-                Platform.runLater(() -> {
-                    System.out.println("Spieler ist bereit");
-                    // evtl. UI-Änderung hier
-                });
-            }).start();
-            int[] shipLengths = player.getShipLengths();
-            s.sendShips(shipLengths);
-
-            while(true){
-                if (s.receiveMessage().equals("done")){
-                    s.sendReady();
-                    break;
-                }
-            }
-
-
-            if (s.receiveMessage().equals("ready")){
+            if (yeye.equals("ready")){
                 while(true){
                     String m = s.receiveMessage();
                     String [] p = m.split(" ");
@@ -128,6 +112,25 @@ public class MultiplayerLogic {
                     }
                 }
             }
+        }
+    }
+
+    public void start() throws IOException {
+        if (!client){ //man selber ist host
+            s.start(5000);
+            System.out.println("Multiplayer connected!");
+            s.sendSize(player.getBreit(), player.getLang());
+            System.out.println("Server: Größen geschickt mit Werten von: "+player.getBreit()+" "+player.getLang());
+            String message = s.receiveMessage();
+            System.out.println(message);
+            //hier sollen die platzierten schiffe dann rübergeschickt werden vielleicht am besten mit einem button oder so
+            //das thread ding von chat mal übernommen und ausprobiert aber funktioniert auch d
+
+            System.out.println("While schleife fürs warten verlassen");
+
+
+
+
 
         }
         else {// man ist client und joined

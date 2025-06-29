@@ -42,6 +42,8 @@ public class HelloController {
     private String ipa;
     private int porta;
 
+    MultiplayerLogic mlp;
+
     @FXML
     private AnchorPane anker;
 
@@ -106,7 +108,7 @@ public class HelloController {
         ipa = ip;
         porta = port;
         Client ce = new Client();
-        MultiplayerLogic mlp = new MultiplayerLogic(ce, true, null, null);
+        mlp = new MultiplayerLogic(ce, true, null, null);
         mlp.setController(this);
 
         try {
@@ -145,17 +147,11 @@ public class HelloController {
         isClientMode = true;
 
         Server se = new Server();
-        MultiplayerLogic mlp = new MultiplayerLogic(se, false, null, null);
+        mlp = new MultiplayerLogic(se, false, null, null);
         player = new Gamefield(false, this, (int) x, (int) y, mlp);
         enemy = new Gamefield(true, this, (int) x, (int) y, mlp);
         mlp.setEn(enemy);
         mlp.setPl(player);
-
-        try{
-            mlp.start();
-        } catch(IOException e){
-            System.out.println("IOException");
-        }
 
         setButtons();
 
@@ -175,17 +171,15 @@ public class HelloController {
             row.setAlignment(Pos.CENTER);
             boxenV.getChildren().add(row);
         }
-
-        new Thread(() -> {
+        rootPane.getChildren().add(player);
+        rootPane.getChildren().add(enemy);
+        new Thread(() ->{
             try {
                 mlp.start(); // alles Netzwerk-Zeug → eigener Thread
             } catch(IOException e){
                 System.out.println("IOException");
             }
         }).start();
-
-
-
     }
 
     public int getLength(){
@@ -252,8 +246,9 @@ public class HelloController {
     }
 
     @FXML
-    private void onReadyClicked() {
+    private void onReadyClicked() throws IOException {
         readyToSendShips = true;
+        mlp.sendShips();
         System.out.println("Fertig gedrückt – bereit zum Senden der Schiffe");
     }
     public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {

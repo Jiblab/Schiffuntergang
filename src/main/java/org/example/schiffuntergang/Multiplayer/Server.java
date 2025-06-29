@@ -26,7 +26,7 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendSize(int rows, int cols) {
-        out.write("size" +rows+ " " +cols);
+        out.write("size " +rows+ " " +cols + "\n");
         out.flush();
     }
 
@@ -46,7 +46,7 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendAnswer(int result) {
-        out.write("answer " + result);
+        out.write("answer " + result+"\n");
         out.flush();
     }
 
@@ -57,25 +57,24 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendReady() {
-        out.write("ready");
+        out.write("ready" + "\n");
         out.flush();
-
     }
 
     public void sendDone() {
-        out.write("done");
+        out.write("done" + "\n");
         out.flush();
 
     }
 
     public void sendSave(long id) {
-        out.write("save " + id);
+        out.write("save " + id+"\n");
         out.flush();
 
     }
 
     public void sendLoad(long id) {
-        out.write("load " + id);
+        out.write("load " + id + "\n");
         out.flush();
 
     }

@@ -28,6 +28,9 @@ public class Gamefield extends GridPane {
     private EnemyPlayer en;
     private MultiplayerLogic lo;
 
+    private boolean multiplayer = false;
+
+
 
 
 
@@ -127,6 +130,7 @@ public class Gamefield extends GridPane {
     public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l){
         lang = h;
         breit = b;
+        multiplayer = true;
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
@@ -281,6 +285,7 @@ public class Gamefield extends GridPane {
         usedCells += laenge;
     }
 
+
     public void shoot(int x, int y){
         Cell c = getCell(x, y);
         Ships s = c.getShip();
@@ -292,7 +297,7 @@ public class Gamefield extends GridPane {
                 deleteShip();
             }
             System.out.println(control.getPlayerturn());
-            if (this.enemy){
+            if (this.enemy && !multiplayer){
                 System.out.println("nix hier in der if abfrage");
                 en.revenge();
 
@@ -303,7 +308,7 @@ public class Gamefield extends GridPane {
         else {
             c.setFill(Color.BLACK);
             System.out.println("Koordinaten x, dann y: "+x+" "+y);
-            if (this.enemy){
+            if (this.enemy && !multiplayer){
                 en.revenge();
             }
 
