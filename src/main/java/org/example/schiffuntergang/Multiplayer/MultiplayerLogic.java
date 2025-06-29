@@ -7,7 +7,6 @@ import org.example.schiffuntergang.components.Cell;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 
-import javax.imageio.IIOException;
 import java.io.IOException;
 
 public class MultiplayerLogic {
@@ -39,10 +38,11 @@ public class MultiplayerLogic {
     public void start() throws IOException {
         if (!client){ //man selber ist host
             s.start(5000);
+            System.out.println("Multiplayer connected!");
             s.sendSize(player.getBreit(), player.getLang());
-            while(!s.receiveMessage().equals("done")){
+            System.out.println("Server: Größen geschickt!");
+            String message = s.receiveMessage();
 
-            }
             //hier sollen die platzierten schiffe dann rübergeschickt werden vielleicht am besten mit einem button oder so
             //das thread ding von chat mal übernommen und ausprobiert aber funktioniert auch d
             new Thread(() -> {

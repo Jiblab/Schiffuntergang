@@ -108,8 +108,11 @@ public class HelloController {
         Client ce = new Client();
         MultiplayerLogic mlp = new MultiplayerLogic(ce, true, null, null);
         mlp.setController(this);
-        while(temp){
 
+        try {
+            mlp.start(); // alles Netzwerk-Zeug → eigener Thread
+        } catch(IOException e){
+            System.out.println("IOException");
         }
 
         rootPane.getChildren().add(enemy);
@@ -133,13 +136,8 @@ public class HelloController {
             row.setAlignment(Pos.CENTER);
             boxenV.getChildren().add(row);
         }
-        new Thread(() -> {
-            try {
-                mlp.start(); // alles Netzwerk-Zeug → eigener Thread
-            } catch(IOException e){
-                System.out.println("IOException");
-            }
-        }).start();
+
+
 
     }
 
@@ -153,6 +151,11 @@ public class HelloController {
         mlp.setEn(enemy);
         mlp.setPl(player);
 
+        try{
+            mlp.start();
+        } catch(IOException e){
+            System.out.println("IOException");
+        }
 
         setButtons();
 
@@ -171,11 +174,6 @@ public class HelloController {
             HBox row = new HBox(10, b, counter);
             row.setAlignment(Pos.CENTER);
             boxenV.getChildren().add(row);
-            try{
-                mlp.start();
-            } catch(IOException e){
-                System.out.println("IOException");
-            }
         }
 
         new Thread(() -> {

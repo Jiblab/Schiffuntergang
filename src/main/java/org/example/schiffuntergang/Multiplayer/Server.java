@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server implements Network{
+public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     private ServerSocket s;
     private Socket cl;
     private BufferedReader in;

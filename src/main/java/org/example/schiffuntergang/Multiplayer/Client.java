@@ -4,10 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Client implements Network{
+public class Client implements Network {
     private Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
