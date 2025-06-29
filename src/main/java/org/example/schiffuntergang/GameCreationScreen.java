@@ -209,7 +209,24 @@ public class GameCreationScreen {
                 String ip = ipField.getText();
                 int port = 5000; // Passe ggf. den Port an
 
-                    controller.setupMultiC(ip, port); // Deine Methode zur Verbindung
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
+                    Parent root = loader.load();
+                    HelloController controller1 = loader.getController();
+                    controller1.setStage(stage);
+
+                    // Optional: controller.buildGamefield(); falls Gamefield erst hier erzeugt wird
+                    controller1.setSize(x, y);
+                    controller1.setupMultiC(ip, port);
+
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.setFullScreen(true);
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
                     connectStage.close();
 
             });

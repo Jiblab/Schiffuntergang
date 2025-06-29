@@ -110,34 +110,13 @@ public class HelloController {
         Client ce = new Client();
         mlp = new MultiplayerLogic(ce, true, null, null);
         mlp.setController(this);
-
-        try {
-            mlp.start(); // alles Netzwerk-Zeug → eigener Thread
-        } catch(IOException e){
-            System.out.println("IOException");
-        }
-
-        rootPane.getChildren().add(enemy);
-        rootPane.getChildren().add(player);
-        rootPane.setAlignment(Pos.CENTER);
-
-        VBox.setVgrow(enemy, Priority.ALWAYS);
-        VBox.setVgrow(player, Priority.ALWAYS);
-        enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-
-        setButtons();
-
-
-        for (int i = 2; i <= 5; i++) {
-            Label counter = new Label("Empfangen: 0");
-            shipCounters[i] = counter;
-
-            HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
-            row.setAlignment(Pos.CENTER);
-            boxenV.getChildren().add(row);
-        }
+        new Thread(() -> {
+            try {
+                mlp.start(); // alles Netzwerk-Zeug → eigener Thread
+            } catch(IOException e){
+                System.out.println("IOException");
+            }
+        }).start();
 
 
 
@@ -340,5 +319,29 @@ public class HelloController {
     }
     public int getPort(){
         return porta;
+    }
+
+    public void setupGameMult(Gamefield pl, Gamefield en){
+
+        rootPane.getChildren().add(en);
+        rootPane.getChildren().add(pl);
+        rootPane.setAlignment(Pos.CENTER);
+
+        VBox.setVgrow(en, Priority.ALWAYS);
+        VBox.setVgrow(pl, Priority.ALWAYS);
+        en.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        pl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        setButtons();
+
+
+        for (int i = 2; i <= 5; i++) {
+            Label counter = new Label("Empfangen: 0");
+            shipCounters[i] = counter;
+
+            HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
+            row.setAlignment(Pos.CENTER);
+            boxenV.getChildren().add(row);
+        }
     }
 }

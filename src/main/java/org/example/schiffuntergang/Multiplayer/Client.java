@@ -24,7 +24,7 @@ public class Client implements Network {
     }
 
     public void sendShips(int[] lengths) {
-        out.write("ships");
+        out.write("ships\n");
         out.flush();
 
         for (int l : lengths) {
@@ -36,43 +36,43 @@ public class Client implements Network {
     }
 
     public void sendShot(int row, int col) {
-        out.write("shot " + row + " " + col);
+        out.write("shot " + row + " " + col+"\n");
         out.flush();
 
     }
 
     public void sendAnswer(int result) {
-        out.write("answer " + result);
+        out.write("answer " + result+"\n");
         out.flush();
 
     }
 
     public void sendPass() {
-        out.write("pass");
+        out.write("pass\n");
         out.flush();
 
     }
 
     public void sendReady() {
-        out.write("ready");
+        out.write("ready\n");
         out.flush();
 
     }
 
     public void sendDone() {
-        out.write("done");
+        out.write("done\n");
         out.flush();
 
     }
 
     public void sendSave(long id) {
-        out.write("save " + id);
+        out.write("save " + id+"\n");
         out.flush();
 
     }
 
     public void sendLoad(long id) {
-        out.write("load " + id);
+        out.write("load " + id+"\n");
         out.flush();
 
     }

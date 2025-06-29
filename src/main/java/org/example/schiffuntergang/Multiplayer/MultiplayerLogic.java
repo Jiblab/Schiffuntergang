@@ -7,6 +7,7 @@ import org.example.schiffuntergang.components.Cell;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 
+import javax.imageio.IIOException;
 import java.io.IOException;
 
 public class MultiplayerLogic {
@@ -128,31 +129,32 @@ public class MultiplayerLogic {
 
             System.out.println("While schleife fürs warten verlassen");
 
-
-
-
-
         }
         else {// man ist client und joined
             cl.connect(contr.getIP(), contr.getPort());
             boolean temp = true;
-            String m1 = cl.receiveMessage();
-            String [] p1 = m1.split(" ");
+
+            System.out.println("nachricht wurde gesplitet");
             int rows = 0;
             int cols = 0;
-            while(temp){
-                switch (cl.receiveMessage()){
+            for (int i = 0; i <= 1; i++) {
+                String m1 = cl.receiveMessage();
+                System.out.println(m1);
+                String[] p1 = m1.split(" ");
+
+                switch (p1[0]) {
                     /*case "done":
                         cl.sendDone();
                         temp = false;
                         break;*/
                     case "size":
+                        System.out.println("bin in case size");
                         rows = Integer.parseInt(p1[1]);
                         cols = Integer.parseInt(p1[2]);
                         // Jetzt kannst du das Spielfeld erzeugen
                         player = new Gamefield(false, contr, rows, cols, this);  // z. B. true = eigenes Feld
                         enemy = new Gamefield(true, contr, rows, cols, this); // false = Gegnerfeld
-                        contr.setBoard(enemy, player);
+                        contr.setupGameMult(enemy, player);
                         cl.sendDone(); // Antwort an den Server
                         break;
                     case "load":
@@ -160,21 +162,24 @@ public class MultiplayerLogic {
                         break;
                     case "ships":
                         int[] lengths = new int[p1.length - 1];
-                        for (int i = 1; i < p1.length; i++) {
-                            int len = Integer.parseInt(p1[i]);
-                            lengths[i - 1] = len;
+                        for (int j = 1; j < p1.length; j++) {
+                            System.out.println(p1[j]);
+                            int len = Integer.parseInt(p1[j]);
+
+                            lengths[j - 1] = len;
                             player.addShip(new Ships(len, len));
                         }
                         player.getControl().setShipCountsFromNetwork(lengths);
-                        while(!contr.getReady()){
+                        //while (!contr.getReady()) {
 
-                        }
+                        //}
                         cl.sendDone();
                         break;
+
                 }
             }
-
-            if (cl.receiveMessage().equals("ready")) {
+            String f = cl.receiveMessage();
+            if (f.equals("ready")) {
                 cl.sendReady();
 
                 while (true) {

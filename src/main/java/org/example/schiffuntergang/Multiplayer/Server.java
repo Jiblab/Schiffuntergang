@@ -26,12 +26,12 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendSize(int rows, int cols) {
-        out.write("size " +rows+ " " +cols + "\n");
+        out.write("size " +rows+ " " +cols+" \n");
         out.flush();
     }
 
     public void sendShips(int[] lengths) {
-        out.write("ships");
+        out.write("ships\n");
         out.flush();
         for (int l : lengths) {
             out.write(" " + l);
@@ -41,7 +41,7 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendShot(int row, int col) {
-        out.write("shot " + row + " " + col);
+        out.write("shot " + row + " " + col+"\n");
         out.flush();
     }
 
@@ -51,18 +51,19 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendPass() {
-        out.write("pass");
+        out.write("pass\n");
         out.flush();
 
     }
 
     public void sendReady() {
-        out.write("ready" + "\n");
+        out.write("ready\n");
         out.flush();
+
     }
 
     public void sendDone() {
-        out.write("done" + "\n");
+        out.write("done\n");
         out.flush();
 
     }
@@ -74,7 +75,7 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
 
     public void sendLoad(long id) {
-        out.write("load " + id + "\n");
+        out.write("load " + id+"\n");
         out.flush();
 
     }
