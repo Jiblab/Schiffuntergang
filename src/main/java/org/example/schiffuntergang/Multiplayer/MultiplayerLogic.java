@@ -1,5 +1,6 @@
 package org.example.schiffuntergang.Multiplayer;
 
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.components.Cell;
@@ -43,9 +44,21 @@ public class MultiplayerLogic {
 
             }
             //hier sollen die platzierten schiffe dann rübergeschickt werden vielleicht am besten mit einem button oder so
-            while(!player.getControl().getReady()){
+            //das thread ding von chat mal übernommen und ausprobiert aber funktioniert auch d
+            new Thread(() -> {
+                while (!player.getControl().getReady()) {
+                    try {
+                        Thread.sleep(100); // damit CPU nicht voll ausgelastet wird
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-            }
+                Platform.runLater(() -> {
+                    System.out.println("Spieler ist bereit");
+                    // evtl. UI-Änderung hier
+                });
+            }).start();
             int[] shipLengths = player.getShipLengths();
             s.sendShips(shipLengths);
 
@@ -137,7 +150,6 @@ public class MultiplayerLogic {
                         player = new Gamefield(false, contr, rows, cols, this);  // z. B. true = eigenes Feld
                         enemy = new Gamefield(true, contr, rows, cols, this); // false = Gegnerfeld
                         contr.setBoard(enemy, player);
-                        contr.temp();
                         cl.sendDone(); // Antwort an den Server
                         break;
                     case "load":

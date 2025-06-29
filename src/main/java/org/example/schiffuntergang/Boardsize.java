@@ -7,12 +7,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.schiffuntergang.sounds.SoundEffect;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class Boardsize {
     private final Stage stage;
@@ -109,6 +112,19 @@ public class Boardsize {
     public void showMulti(){
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
 
+        String ipAddress = "Unbekannt";
+        try {
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            ipAddress = inetAddress.getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        TextField ipField = new TextField(ipAddress);
+        ipField.setEditable(false);
+        ipField.setFocusTraversable(false);
+        ipField.setStyle("-fx-opacity: 1.0;");
+
         Slider slider1 = new Slider(0, 30, 10);
         slider1.setShowTickLabels(true);
         slider1.setShowTickMarks(true);
@@ -160,7 +176,12 @@ public class Boardsize {
             gameScreen.show();
         });
 
-        VBox layout = new VBox(15, label1, slider1, label2, slider2, start, backtostart);
+        VBox layout = new VBox(15,
+                new Label("Deine IP-Adresse:"), ipField,
+                label1, slider1,
+                label2, slider2,
+                start, backtostart
+        );
         layout.setStyle("-fx-padding: 30px;");
         layout.setAlignment(Pos.CENTER);
 

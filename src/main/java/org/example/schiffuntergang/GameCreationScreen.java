@@ -179,6 +179,7 @@ public class GameCreationScreen {
 
     private void showMultiplayerWindowAndCloseCurrent() {
         // Neues Fenster (Stage) erstellen
+        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
         Stage multiplayerStage = new Stage();
         multiplayerStage.setTitle("Multiplayer");
         HelloController controller = new HelloController();
@@ -204,6 +205,7 @@ public class GameCreationScreen {
             Label statusLabel = new Label();
 
             connectButton.setOnAction(ev -> {
+                clickSound.play();
                 String ip = ipField.getText();
                 int port = 5000; // Passe ggf. den Port an
 
@@ -226,11 +228,18 @@ public class GameCreationScreen {
 
         createGame.setOnAction(e -> {
             //System.out.println("Spiel erstellen geklickt!");
+            clickSound.play();
             Boardsize boardsize = new Boardsize(stage, true);
             boardsize.showMulti();
+            multiplayerStage.close();
         });
 
-        close.setOnAction(e -> multiplayerStage.close());
+        close.setOnAction(e -> {
+            StartScreen startScreen = new StartScreen(stage);
+
+            clickSound.play();
+            startScreen.show();
+        });
 
         Scene scene = new Scene(vbox);
         multiplayerStage.setScene(scene);

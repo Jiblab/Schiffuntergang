@@ -25,39 +25,57 @@ public class Client implements Network{
     }
 
     public void sendShips(int[] lengths) {
-        out.print("ships");
+        out.write("ships");
+        out.flush();
+
         for (int l : lengths) {
-            out.print(" " + l);
+            out.write(" " + l);
+            out.flush();
+
         }
         out.println();
     }
 
     public void sendShot(int row, int col) {
-        out.println("shot " + row + " " + col);
+        out.write("shot " + row + " " + col);
+        out.flush();
+
     }
 
     public void sendAnswer(int result) {
-        out.println("answer " + result);
+        out.write("answer " + result);
+        out.flush();
+
     }
 
     public void sendPass() {
-        out.println("pass");
+        out.write("pass");
+        out.flush();
+
     }
 
     public void sendReady() {
-        out.println("ready");
+        out.write("ready");
+        out.flush();
+
     }
 
     public void sendDone() {
-        out.println("done");
+        out.write("done");
+        out.flush();
+
     }
 
     public void sendSave(long id) {
-        out.println("save " + id);
+        out.write("save " + id);
+        out.flush();
+
     }
 
     public void sendLoad(long id) {
-        out.println("load " + id);
+        out.write("load " + id);
+        out.flush();
+
     }
 
     public void close() {

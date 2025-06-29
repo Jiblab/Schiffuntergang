@@ -38,7 +38,7 @@ public class HelloController {
     private boolean readyToSendShips = false;
     private Gamefield enemy;
     private Gamefield player;
-    private boolean temp;
+    private boolean temp = true;
     private String ipa;
     private int porta;
 
@@ -133,11 +133,13 @@ public class HelloController {
             row.setAlignment(Pos.CENTER);
             boxenV.getChildren().add(row);
         }
-        try{
-            mlp.start();
-        } catch(IOException e){
-            System.out.println("IOException");
-        }
+        new Thread(() -> {
+            try {
+                mlp.start(); // alles Netzwerk-Zeug → eigener Thread
+            } catch(IOException e){
+                System.out.println("IOException");
+            }
+        }).start();
 
     }
 
@@ -176,6 +178,13 @@ public class HelloController {
             }
         }
 
+        new Thread(() -> {
+            try {
+                mlp.start(); // alles Netzwerk-Zeug → eigener Thread
+            } catch(IOException e){
+                System.out.println("IOException");
+            }
+        }).start();
 
 
 
@@ -273,6 +282,7 @@ public class HelloController {
     public void setBoard(Gamefield e, Gamefield p){
         player = p;
         enemy = e;
+        temp = false;
     }
 
     private void setButtons(){
