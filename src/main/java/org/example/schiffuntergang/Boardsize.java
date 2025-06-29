@@ -82,8 +82,11 @@ public class Boardsize {
         VBox layout = new VBox(15, label1, slider1, label2, slider2, start, backtostart);
         layout.setStyle("-fx-padding: 30px;");
         layout.setAlignment(Pos.CENTER);
-
+//background
+        layout.getStyleClass().add("background");
         Scene scene = new Scene(layout, 300, 250);
+        scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
+
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
@@ -163,8 +166,9 @@ public class Boardsize {
         VBox layout = new VBox(15, label1, slider1, label2, slider2, start, backtostart);
         layout.setStyle("-fx-padding: 30px;");
         layout.setAlignment(Pos.CENTER);
-
+        layout.getStyleClass().add("background");
         Scene scene = new Scene(layout, 300, 250);
+        scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
