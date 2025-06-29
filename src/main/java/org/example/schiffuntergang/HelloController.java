@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.schiffuntergang.Multiplayer.Client;
@@ -15,6 +17,7 @@ import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
 import org.example.schiffuntergang.sounds.SoundEffect;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Random;
 
@@ -53,11 +56,32 @@ public class HelloController {
 
     @FXML
     VBox boxenV;
-
+    @FXML
+    private ImageView backgroundImage;
     @FXML
     public void initialize() {
+        Image img = new Image(getClass().getResource("/images/gamebg.png").toExternalForm());
+        backgroundImage.setImage(img);
 
+        backgroundImage.setPreserveRatio(false);
+
+        backgroundImage.setFitWidth(anker.getPrefWidth());
+        backgroundImage.setFitHeight(anker.getPrefHeight());
+
+        anker.widthProperty().addListener((obs, oldVal, newVal) -> {
+            backgroundImage.setFitWidth(newVal.doubleValue());
+        });
+        anker.heightProperty().addListener((obs, oldVal, newVal) -> {
+            backgroundImage.setFitHeight(newVal.doubleValue());
+        });
+     /*   rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
+            }
+        });*/
     }
+
+
     public void setup(){
 
         player = new Gamefield(false, this, (int) x, (int) y);

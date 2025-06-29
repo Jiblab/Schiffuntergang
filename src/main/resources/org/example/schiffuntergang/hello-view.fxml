@@ -3,9 +3,17 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
 
-<AnchorPane fx:id="anker" prefHeight="632.0" prefWidth="829.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.schiffuntergang.HelloController">
-   <children>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="anker" prefHeight="632.0"
+            prefWidth="829.0"
+            styleClass="background"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="org.example.schiffuntergang.HelloController">
+
+    <children>
+        <ImageView fx:id="backgroundImage" fitWidth="829" fitHeight="632" preserveRatio="false" pickOnBounds="true"/>
        <BorderPane fx:id="rootPane" layoutX="14.0" layoutY="-1.0" prefHeight="632.0" prefWidth="402.0">
           <padding>
               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
