@@ -18,13 +18,13 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Gamefield extends GridPane {
-    private List<Ships> placedShip = new ArrayList<>();
-    private int lang;
-    private int breit;
-    private boolean enemy;
-    private Cell[][] cells;
+    private final List<Ships> placedShip = new ArrayList<>();
+    private final int lang;
+    private final int breit;
+    private final boolean enemy;
+    private final Cell[][] cells;
     private int usedCells = 0;
-    private HelloController control;
+    private final HelloController control;
     private EnemyPlayer en;
     private MultiplayerLogic lo;
 
@@ -53,7 +53,7 @@ public class Gamefield extends GridPane {
                 c.setOnMouseClicked(event -> {
                     if(event.getButton() == MouseButton.PRIMARY && !enemy){
 
-                        if (getUsedCells() <= maxShipsC()){
+                        if (getUsedCells() + control.getLength() <= maxShipsC()) { //+ control.getlength damit das auf auf neue schiffe prüft
                             Ships ship = new Ships(control.getLength(), control.getLength());
                             if (placeShip(ship, x, y, control.getDirection())){
                                 increaseCells(ship.getLength());
@@ -68,7 +68,8 @@ public class Gamefield extends GridPane {
 
 
                     }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
-                        shoot((int) c.getX(), (int) c.getY());
+                        // shoot((int) c.getX(), (int) c.getY());
+                        shoot(c.x, c.y);
                     }
                 });
 
@@ -297,8 +298,6 @@ public class Gamefield extends GridPane {
                 en.revenge();
 
             }
-
-
         }
         else {
             c.setFill(Color.BLACK);
@@ -308,6 +307,8 @@ public class Gamefield extends GridPane {
             }
 
         }
+        if (c.isShot()) return; //damit man nicht das geiche feld mehrmals anschießt
+        c.setShot(true);
 
     }
 

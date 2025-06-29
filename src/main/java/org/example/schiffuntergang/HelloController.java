@@ -4,10 +4,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.schiffuntergang.Multiplayer.Client;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
@@ -45,8 +42,11 @@ public class HelloController {
     @FXML
     private AnchorPane anker;
 
+    // @FXML
+    //  private VBox rootPane;
+
     @FXML
-    private VBox rootPane;
+    private BorderPane rootPane;
 
     @FXML
     private HBox boxen;
@@ -65,13 +65,30 @@ public class HelloController {
         enemy = new Gamefield(true, this, (int) x, (int) y, en);
 
 
+        HBox spielfelderBox = new HBox(20, enemy, player);
+        spielfelderBox.setAlignment(Pos.CENTER);
+
+        rootPane.setCenter(spielfelderBox);
+        rootPane.setRight(boxenV); // oder setBottom(boxenV);
+        BorderPane.setAlignment(boxenV, Pos.CENTER);
+
+        VBox enemyBox = new VBox(5);
+        enemyBox.setAlignment(Pos.CENTER);
+        Label enemyLabel = new Label("Enemy");
+        enemyBox.getChildren().addAll(enemy, enemyLabel);
+
+        VBox playerBox = new VBox(10);
+        playerBox.setAlignment(Pos.CENTER);
+        Label playerLabel = new Label("Player");
+        playerBox.getChildren().addAll(player, playerLabel);
+
+        HBox spielfeldBox = new HBox(20, enemyBox, playerBox);
+        spielfelderBox.setAlignment(Pos.CENTER);
+
+        rootPane.setCenter(spielfeldBox);
 
 
-
-        rootPane.getChildren().add(enemy);
-        rootPane.getChildren().add(player);
-        rootPane.setAlignment(Pos.CENTER);
-       //random platzieren der gegnerschiffe
+        //random platzieren der gegnerschiffe
         while(enemy.getUsedCells() <= enemy.maxShipsC()){
             int shipLength = 2 + rand.nextInt(4);
             boolean vertical = rand.nextBoolean();
@@ -114,7 +131,7 @@ public class HelloController {
 
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
-        rootPane.setAlignment(Pos.CENTER);
+
 
         VBox.setVgrow(enemy, Priority.ALWAYS);
         VBox.setVgrow(player, Priority.ALWAYS);
@@ -255,7 +272,7 @@ public class HelloController {
         // Boards zur Anzeige hinzufügen
         rootPane.getChildren().add(enemyBoard);
         rootPane.getChildren().add(playerBoard);
-        rootPane.setAlignment(Pos.CENTER);
+
 
         VBox.setVgrow(enemyBoard, Priority.ALWAYS);
         VBox.setVgrow(playerBoard, Priority.ALWAYS);
@@ -325,11 +342,7 @@ public class HelloController {
         }
 
         // Wenn wir hier sind, sind alle bei 0 → Nachricht senden
-        if (c != null) {
-            return true;
-
-        }
-        return false;
+        return c != null;
     }
 
     public String getIP(){
