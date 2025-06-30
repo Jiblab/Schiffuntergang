@@ -45,8 +45,11 @@ public class HelloController {
     @FXML
     private AnchorPane anker;
 
-    // @FXML
-    //  private VBox rootPane;
+    @FXML
+    private Button shootButton;
+
+    @FXML
+    private Label messageLabel;
 
     @FXML
     private BorderPane rootPane;
@@ -74,14 +77,32 @@ public class HelloController {
         anker.heightProperty().addListener((obs, oldVal, newVal) -> {
             backgroundImage.setFitHeight(newVal.doubleValue());
         });
-     /*   rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
-            }
-        });*/
     }
 
+    @FXML
+    private void onShootClicked() {
+        if (!playerturn) {
+            setMessage("Wait your turn!");
+            return;
+        }
+        int targetX = rand.nextInt((int) x);
+        int targetY = rand.nextInt((int) y);
 
+        boolean validShot = enemy.shoot(targetX, targetY);
+
+        if (validShot) {
+            setMessage("Shot fired at (" + targetX + ", " + targetY + ")");
+            setPlayerturn(); // Spielerwechsel
+        } else {
+            setMessage("Already shot at (" + targetX + ", " + targetY + ")");
+        }
+    }
+
+    public void setMessage(String msg) {
+        if (messageLabel != null) {
+            messageLabel.setText(msg);
+        }
+    }
     public void setup(){
 
         player = new Gamefield(false, this, (int) x, (int) y);
@@ -129,18 +150,12 @@ public class HelloController {
             if (enemy.placeShip(ship, x2, y2, vertical )){
                 enemy.increaseCells(shipLength);
             }
-
         }
-
-
         VBox.setVgrow(enemy, Priority.ALWAYS);
         VBox.setVgrow(player, Priority.ALWAYS);
         enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-
        setButtons();
-
     }
 
     public void setupMultiC(String ip, int port){
@@ -152,19 +167,15 @@ public class HelloController {
         while(temp){
 
         }
-
         rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
-
 
         VBox.setVgrow(enemy, Priority.ALWAYS);
         VBox.setVgrow(player, Priority.ALWAYS);
         enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-
         setButtons();
-
 
         for (int i = 2; i <= 5; i++) {
             Label counter = new Label("Empfangen: 0");
@@ -179,7 +190,6 @@ public class HelloController {
         } catch(IOException e){
             System.out.println("IOException");
         }
-
     }
 
     public void setupMultiS(){
@@ -191,7 +201,6 @@ public class HelloController {
         enemy = new Gamefield(true, this, (int) x, (int) y, mlp);
         mlp.setEn(enemy);
         mlp.setPl(player);
-
 
         setButtons();
 
@@ -216,10 +225,6 @@ public class HelloController {
                 System.out.println("IOException");
             }
         }
-
-
-
-
     }
 
     public int getLength(){
@@ -315,7 +320,6 @@ public class HelloController {
         player = p;
         enemy = e;
     }
-
     private void setButtons(){
         Button b2 = new Button("Länge 2");
         Button b3 = new Button("Länge 3");
@@ -368,7 +372,6 @@ public class HelloController {
         // Wenn wir hier sind, sind alle bei 0 → Nachricht senden
         return c != null;
     }
-
     public String getIP(){
         return ipa;
     }
