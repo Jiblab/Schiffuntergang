@@ -81,10 +81,10 @@ public class HelloController {
 
     @FXML
     private void onShootClicked() {
-        if (!playerturn) {
+       /* if (!playerturn) {
             setMessage("Wait your turn!");
             return;
-        }
+        }*/ //geht nicht ganz, wenn playerturn einmal ungleich ist bleibt es so
         int targetX = rand.nextInt((int) x);
         int targetY = rand.nextInt((int) y);
 
