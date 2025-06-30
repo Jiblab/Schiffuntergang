@@ -178,14 +178,17 @@ public class Gamefield extends GridPane {
 
 
                     }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
-                        lo.setX(x);
-                        lo.setY(y);
-                        System.out.println(x+ " "+y);
-                        try {
-                            lo.startShoot();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+                        if (lo.getTurn()){
+                            lo.setX(x);
+                            lo.setY(y);
+                            System.out.println(x+ " "+y);
+                            try {
+                                lo.startShoot();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
+
                     }
                 });
 
