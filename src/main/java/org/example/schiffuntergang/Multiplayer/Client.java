@@ -42,7 +42,7 @@ public class Client implements Network {
     }
 
     public void sendAnswer(int result) {
-        out.write("answer " + result+" \n");
+        out.write("answer " +result+"\n");
         out.flush();
 
     }

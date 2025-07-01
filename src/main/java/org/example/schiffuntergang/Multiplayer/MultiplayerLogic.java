@@ -99,16 +99,22 @@ public class MultiplayerLogic {
                             case "answer":
                                 Cell ce = enemy.getCell(x, y);
                                 if (p[1].equals("0")) {
+                                    System.out.println("habe 0 antwort");
+
                                     Platform.runLater(()->ce.setFill(Color.BLACK));
                                     myturn = false;
                                     System.out.println("habe pass gesendet server");
                                     s.sendPass();
                                 }
                                 if (p[1].equals("1")) {
+                                    System.out.println("habe 1 antwort");
+
                                     //ce.getShip().hit();
                                     Platform.runLater(()->ce.setFill(Color.RED));
                                 }
                                 if (p[1].equals("2")) {
+                                    System.out.println("habe 2 antwort");
+
                                     //ce.getShip().hit();
                                     //enemy.deleteShip();
                                     Platform.runLater(()->ce.setFill(Color.RED));
@@ -229,7 +235,6 @@ public class MultiplayerLogic {
                     switch (p[0]) {
                         case "shot": //TODO hier wird die answer nicht richtig geschickt oder im server nicht richtig enmpfangen
                             Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                            if (!c.isShot()) {
                                 merkx = Integer.parseInt(p[1]);
                                 merky = Integer.parseInt(p[2]);
                                 player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
@@ -241,14 +246,19 @@ public class MultiplayerLogic {
                                 } else {
                                     cl.sendAnswer(1);
                                 }
-                            } else {
-                                System.out.println("ist doch schon geschossen");
+                                if(!c.isShot()) {
+
+                                  cl.sendAnswer(0);
+                                //gehört zur ifabfrage
+                                //System.out.println("ist doch schon geschossen");
                             }
                             break;
 
                         case "answer":
                             Cell ce = enemy.getCell(x, y);
                             if (p[1].equals("0")) {
+                                System.out.println("habe 0 antwort");
+
                                 Platform.runLater(()->ce.setFill(Color.BLACK));
                                 myturn = false;
                                 System.out.println("sende pass");
@@ -256,11 +266,14 @@ public class MultiplayerLogic {
                             }
                             if (p[1].equals("1")) {
                                 //ce.getShip().hit();
+                                System.out.println("habe 1 antwort");
                                 Platform.runLater(()->ce.setFill(Color.RED));
                             }
                             if (p[1].equals("2")) {
                                 //ce.getShip().hit();
                                 //enemy.deleteShip();
+                                System.out.println("habe 2 antwort");
+
                                 Platform.runLater(()->ce.setFill(Color.RED));
                             }
                             break;
