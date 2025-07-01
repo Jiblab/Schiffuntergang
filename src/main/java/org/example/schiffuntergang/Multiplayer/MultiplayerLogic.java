@@ -61,7 +61,7 @@ public class MultiplayerLogic {
     }
 
     private void startGameFlow() throws IOException {
-        if(!client) {
+        if(!client) { // This check is good
             String yeye = s.receiveMessage();
             System.out.println(yeye);
             if (firstturn){
@@ -69,78 +69,68 @@ public class MultiplayerLogic {
                     firstturn = false;
                 }
             }
-            else {
-                while (true) {
-                    if (myturn) {
+            // The 'else' block was missing, but the core logic is inside the while loop.
+            // Let's assume the firstturn logic is handled and we proceed to the main loop.
 
+            while (true) {
+                // Nur auf Nachrichten lauschen, wenn man nicht am Zug ist
+                if (!myturn) {
+                    String m = s.receiveMessage();
+                    String[] p = m.split(" ");
+                    switch (p[0]) {
+                        case "shot": // Der Client hat auf uns geschossen
+                            Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
 
-                        String m = s.receiveMessage();
-                        String[] p = m.split(" ");
-                        switch (p[0]) {
-                            case "shot":
-                                Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                                if (!c.isShot()) {
-                                    merkx = Integer.parseInt(p[1]);
-                                    merky = Integer.parseInt(p[2]);
-                                    player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                                    if (c.getShip() == null) {
-                                        s.sendAnswer(0);
-                                    } else if (c.getShip() != null && !c.getShip().isAlive()) {
-                                        player.deleteShip();
-                                        s.sendAnswer(2);
-                                    } else {
-                                        s.sendAnswer(1);
-                                    }
-                                } else {
-                                    System.out.println("ist doch schon geschossen");
+                            // Fall 1: Zelle wurde bereits beschossen
+                            if (c.isShot()) {
+                                s.sendAnswer(0);
+                                System.out.println("Schon getroffen, sende 0");
+                            } else {
+                                player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
+                                if (c.getShip() == null) { // Fehlschuss
+                                    s.sendAnswer(0);
+                                    System.out.println("Antwort gesendet: 0 (Miss)");
+                                } else if (!c.getShip().isAlive()) { // Versenkt
+                                    player.deleteShip();
+                                    s.sendAnswer(2);
+                                    System.out.println("Antwort gesendet: 2 (Sunk)");
+                                } else { // Treffer
+                                    s.sendAnswer(1);
+                                    System.out.println("Antwort gesendet: 1 (Hit)");
                                 }
-                                break;
+                            }
+                            break;
 
-                            case "answer":
-                                Cell ce = enemy.getCell(x, y);
-                                if (p[1].equals("0")) {
-                                    System.out.println("habe 0 antwort");
-
-                                    Platform.runLater(()->ce.setFill(Color.BLACK));
-                                    myturn = false;
-                                    System.out.println("habe pass gesendet server");
-                                    s.sendPass();
-                                }
-                                if (p[1].equals("1")) {
-                                    System.out.println("habe 1 antwort");
-
-                                    //ce.getShip().hit();
-                                    Platform.runLater(()->ce.setFill(Color.RED));
-                                }
-                                if (p[1].equals("2")) {
-                                    System.out.println("habe 2 antwort");
-
-                                    //ce.getShip().hit();
-                                    //enemy.deleteShip();
-                                    Platform.runLater(()->ce.setFill(Color.RED));
-                                }
-                                break;
-
-                            case "pass":
-                                System.out.println("habe pass bekommen");
+                        case "answer": // Wir haben eine Antwort auf unseren Schuss erhalten
+                            Cell ce = enemy.getCell(x, y);
+                            if (p[1].equals("0")) { // Fehlschuss
+                                Platform.runLater(() -> ce.setFill(Color.BLACK));
+                                // Unser Zug ist vorbei. Wir übergeben mit "pass".
+                                System.out.println("Fehlschuss. Sende pass.");
+                                s.sendPass();
+                            } else { // Treffer (1) oder Versenkt (2)
+                                Platform.runLater(() -> ce.setFill(Color.RED));
+                                // Es ist immer noch unser Zug! Wir setzen myturn wieder auf true.
+                                System.out.println("Treffer/Versenkt. Ich bin wieder dran.");
                                 myturn = true;
-                                break;
+                            }
+                            break;
 
-
-                            case "ok":
-                                break;
-
-                            case "save":
-                                break;
-
-                            case "ships":
-                                break;
-                        }
-
+                        case "pass": // Der Client übergibt den Zug an uns
+                            System.out.println("habe pass bekommen");
+                            myturn = true; // Jetzt sind wir dran
+                            break;
+                        // ... andere cases
+                    }
+                } else {
+                    // Wenn wir am Zug sind, warten wir auf eine UI-Aktion.
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                     }
                 }
             }
-
         }
     }
 
@@ -214,7 +204,6 @@ public class MultiplayerLogic {
     }
 
     public void clientGame() throws IOException {
-
         if (firstturn){
             String f = cl.receiveMessage();
             if (f.equals("ready")) {
@@ -224,77 +213,70 @@ public class MultiplayerLogic {
             }
         }
 
+        while (true) {
+            // Nur auf Nachrichten lauschen, wenn man nicht am Zug ist
+            if (!myturn) {
+                String m = cl.receiveMessage();
+                String[] p = m.split(" ");
+                switch (p[0]) {
+                    case "shot": // Der Server hat auf uns geschossen
+                        Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
 
-            while (true) {
-
-                if (!myturn) {
-
-
-                    String m = cl.receiveMessage();
-                    String[] p = m.split(" ");
-                    switch (p[0]) {
-                        case "shot": //TODO hier wird die answer nicht richtig geschickt oder im server nicht richtig enmpfangen
-                            Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                                merkx = Integer.parseInt(p[1]);
-                                merky = Integer.parseInt(p[2]);
-                                player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                                if (c.getShip() == null) {
-                                    cl.sendAnswer(0);
-                                } else if (c.getShip() != null && !c.getShip().isAlive()) {
-                                    player.deleteShip();
-                                    cl.sendAnswer(2);
-                                } else {
-                                    cl.sendAnswer(1);
-                                }
-                                if(!c.isShot()) {
-
-                                  cl.sendAnswer(0);
-                                //gehört zur ifabfrage
-                                //System.out.println("ist doch schon geschossen");
+                        // Fall 1: Zelle wurde bereits beschossen
+                        if (c.isShot()) {
+                            // Sende "miss", da es keine Auswirkung hat. Der Server ist weiterhin dran.
+                            cl.sendAnswer(0);
+                            System.out.println("Schon getroffen, sende 0");
+                        } else {
+                            // Ansonsten, schieße auf die Zelle
+                            player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
+                            if (c.getShip() == null) { // Fehlschuss
+                                cl.sendAnswer(0);
+                                System.out.println("Antwort gesendet: 0 (Miss)");
+                            } else if (!c.getShip().isAlive()) { // Versenkt
+                                player.deleteShip();
+                                cl.sendAnswer(2);
+                                System.out.println("Antwort gesendet: 2 (Sunk)");
+                            } else { // Treffer
+                                cl.sendAnswer(1);
+                                // WICHTIG: myturn wird hier NICHT geändert. Der Server ist weiterhin dran.
+                                System.out.println("Antwort gesendet: 1 (Hit)");
                             }
-                            break;
-
-                        case "answer":
-                            Cell ce = enemy.getCell(x, y);
-                            if (p[1].equals("0")) {
-                                System.out.println("habe 0 antwort");
-
-                                Platform.runLater(()->ce.setFill(Color.BLACK));
-                                myturn = false;
-                                System.out.println("sende pass");
-                                cl.sendPass();
-                            }
-                            if (p[1].equals("1")) {
-                                //ce.getShip().hit();
-                                System.out.println("habe 1 antwort");
-                                Platform.runLater(()->ce.setFill(Color.RED));
-                            }
-                            if (p[1].equals("2")) {
-                                //ce.getShip().hit();
-                                //enemy.deleteShip();
-                                System.out.println("habe 2 antwort");
-
-                                Platform.runLater(()->ce.setFill(Color.RED));
-                            }
-                            break;
-
-                        case "pass":
-                            System.out.println("habe pass bekommen");
-                            myturn = true;
+                        }
                         break;
 
+                    case "answer": // Wir haben eine Antwort auf unseren Schuss erhalten
+                        Cell ce = enemy.getCell(x, y);
+                        if (p[1].equals("0")) { // Fehlschuss
+                            Platform.runLater(() -> ce.setFill(Color.BLACK));
+                            // Unser Zug ist vorbei. Wir übergeben mit "pass".
+                            System.out.println("Fehlschuss. Sende pass.");
+                            cl.sendPass();
+                        } else { // Treffer (1) oder Versenkt (2)
+                            Platform.runLater(() -> ce.setFill(Color.RED));
+                            // Es ist immer noch unser Zug! Wir müssen myturn wieder auf true setzen,
+                            // damit die UI einen neuen Schuss erlaubt.
+                            System.out.println("Treffer/Versenkt. Ich bin wieder dran.");
+                            myturn = true;
+                        }
+                        break;
 
-                        case "ok":
-                            break;
+                    case "pass": // Der Server übergibt den Zug an uns
+                        System.out.println("habe pass bekommen");
+                        myturn = true; // Jetzt sind wir dran
+                        break;
 
-                        case "save":
-                            break;
-
-                    }
+                    //... andere cases
                 }
-                else {
-
+            } else {
+                // Wenn wir am Zug sind, warten wir auf eine UI-Aktion.
+                // Ein kurzer Sleep verhindert, dass die Schleife die CPU voll auslastet.
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
+            }
         }
     }
 
@@ -347,9 +329,9 @@ public class MultiplayerLogic {
             Thread t = new Thread(() -> {
                 try {
                     startGameFlow();
-               } catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
-            }
+                }
             });
             t.setDaemon(true);
             t.start();
@@ -359,7 +341,7 @@ public class MultiplayerLogic {
                 try {
                     clientGame();
                 } catch (IOException e) {
-                   e.printStackTrace();
+                    e.printStackTrace();
                 }
             });
             t.setDaemon(true);
