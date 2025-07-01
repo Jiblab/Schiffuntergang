@@ -1,10 +1,8 @@
-//TODO: DESIGN STARTET JEDES MAL NEU SOBALD MAN AUF OPTIONS DRÜCKT // --> fym?
 package org.example.schiffuntergang;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.ToggleSwitch;
@@ -21,157 +20,149 @@ import org.example.schiffuntergang.sounds.BackgroundMusic;
 import org.example.schiffuntergang.sounds.SoundEffect;
 import org.example.schiffuntergang.ui.ParallaxLayer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Options {
     private final Stage stage;
     private static BackgroundMusic bgMusic;
     private double previousVolume;
+    static {
+        try {
+            Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
+        } catch (Exception e) {
+            System.err.println("Pixel-Schriftart konnte nicht geladen werden!");
+            e.printStackTrace();
+        }
+    }
+
+    private Timeline parallaxTimeline;
+
     public Options(Stage stage) {
         this.stage = stage;
         bgMusic = BackgroundMusic.getInstance();
-
     }
 
     public void show() {
-        //Buttons
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
-        //Save game
-        //Musik an aus
+
         ToggleSwitch musictoggle = new ToggleSwitch("MUTE MUSIC");
-        //Lautstärke
         double initialVolume = SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50;
         Slider volume = new Slider(0, 100, initialVolume);
-
-        volume.setBlockIncrement(1);
-        volume.setMaxWidth(200);
-        volume.setMajorTickUnit(100.0);
-        volume.setMinorTickCount(5);
-        volume.setSnapToTicks(true);
-        volume.setShowTickMarks(true);
-        volume.setShowTickLabels(true);
+        Button back = new Button("BACK TO START");
 
         SoundEffect.setVolume(volume.getValue());
         bgMusic.setVolume(volume.getValue() / 100.0);
-        //bgMusic.stop();
-        //bgMusic.play(volume.getValue() / 100.0);
 
-        //BacktoStart
-        Button back = new Button("BACK TO START");
         back.setOnAction(e -> {
-            StartScreen startScreen = new StartScreen(stage);
             clickSound.play();
+            if (parallaxTimeline != null) parallaxTimeline.stop();
+            StartScreen startScreen = new StartScreen(stage);
             startScreen.show();
         });
-        //exit brauchen wir hier doch nicht sorry
-
 
         volume.valueProperty().addListener((obs, oldVal, newVal) -> {
             double vol = newVal.doubleValue();
             SoundEffect.setVolume(vol);
             bgMusic.setVolume(vol / 100.0);
-
-            if (vol > 0) {
-                previousVolume = vol;
-                musictoggle.setSelected(false);
-            } else {
-                musictoggle.setSelected(true); // Stumm schalten
-            }
+            musictoggle.setSelected(vol == 0);
         });
-
-        //toggle
 
         musictoggle.selectedProperty().addListener((obs, before, after) -> {
             if (after) {
                 previousVolume = volume.getValue();
-                volume.setValue(0);
+                if (previousVolume > 0) {
+                    volume.setValue(0);
+                }
             } else {
-
-                volume.setValue(previousVolume);
+                if (volume.getValue() == 0) {
+                    volume.setValue(previousVolume > 0 ? previousVolume : 50);
+                }
             }
         });
-        stage.widthProperty().addListener((obs, oldVal, newVal) -> {
-            for (Button b: new Button[]{back}) {
-                adjustFontSize(b, 30);
-            }
-        });
-        VBox buttonBox = new VBox(15,volume,musictoggle,back);
-        buttonBox.setAlignment(Pos.CENTER);
-        StackPane.setAlignment(buttonBox, Pos.CENTER);
 
-        for (Button b : new Button[]{back}) {
-            b.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
-            b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
-        }
+        VBox controlsLayout = new VBox(25, musictoggle, volume, back);
+        controlsLayout.setAlignment(Pos.CENTER);
+        controlsLayout.maxWidthProperty().bind(stage.widthProperty().multiply(0.6));
+        controlsLayout.setPadding(new Insets(30));
 
-        volume.setMaxWidth(200);
-        musictoggle.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
-        //musictoggle.prefWidthProperty().bind(stage.widthProperty().multiply(0.1));
-        musictoggle.setStyle("-fx-font-size: 40px;");
+        adjustFontSize(back, 20);
+        back.prefWidthProperty().bind(stage.widthProperty().multiply(0.2));
+        back.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
+
         StackPane parallaxRoot = new StackPane();
-        parallaxRoot.setAlignment(Pos.CENTER);
+        List<ParallaxLayer> animatedLayers = new ArrayList<>();
 
-        //HINTERGRUND:
-        //Fest
-        ImageView background = createFullscreenImageView("/images/0.png");
-        ImageView ocean = createFullscreenImageView("/images/1.png");
-        ImageView beach = createFullscreenImageView("/images/4.png");
-        ImageView white = createFullscreenImageView("/images/5.png");
-        ImageView rocks = createFullscreenImageView("/images/7.png");
-        ImageView palm = createFullscreenImageView("/images/12.png");
+        addStaticBackground(parallaxRoot);
+        addAnimatedBackground(parallaxRoot, animatedLayers);
+        parallaxRoot.getChildren().add(controlsLayout);
 
-        //bewegend
+        Scene scene = new Scene(parallaxRoot, 400, 300);
+
+        scene.getStylesheets().add(getClass().getResource("/slider.css").toExternalForm());
+
+        scene.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                stage.setFullScreen(false);
+                stage.setResizable(true);
+                stage.setWidth(800);
+                stage.setHeight(600);
+            }
+        });
+
+        stage.setScene(scene);
+        stage.setTitle("Options");
+        stage.setFullScreen(true);
+        stage.show();
+
+        // 6. --- Animation starten ---
+        startParallaxAnimation(animatedLayers);
+    }
+
+    // --- HELFERMETHODEN FÜR SAUBEREN AUFBAU ---
+
+    private void addStaticBackground(StackPane root) {
+        root.getChildren().addAll(
+                createFullscreenImageView("/images/0.png"),
+                createFullscreenImageView("/images/1.png"),
+                createFullscreenImageView("/images/4.png"),
+                createFullscreenImageView("/images/5.png"),
+                createFullscreenImageView("/images/7.png"),
+                createFullscreenImageView("/images/12.png")
+        );
+    }
+
+    private void addAnimatedBackground(StackPane root, List<ParallaxLayer> layerList) {
         ParallaxLayer ocean1 = new ParallaxLayer("/images/2.png", 0.3, stage);
         ParallaxLayer ocean2 = new ParallaxLayer("/images/3.png", 0.4, stage);
         ParallaxLayer cloud1 = new ParallaxLayer("/images/9.png", 0.6, stage);
         ParallaxLayer cloud2 = new ParallaxLayer("/images/10.png", 0.8, stage);
         ParallaxLayer cloud3 = new ParallaxLayer("/images/11.png", 1.2, stage);
 
-        for (ImageView x : new ImageView[]{background, beach, ocean, white, rocks, palm}) {
-            x.fitWidthProperty().bind(stage.widthProperty());
-            x.setPreserveRatio(false);
-        }
+        layerList.addAll(List.of(ocean1, ocean2, cloud1, cloud2, cloud3));
 
-        parallaxRoot.getChildren().addAll(
-                background,
-                ocean,
+        root.getChildren().addAll(
                 ocean1.getNode(),
                 ocean2.getNode(),
-                beach,
-                white,
                 cloud1.getNode(),
                 cloud2.getNode(),
-                cloud3.getNode(),
-                palm,
-                rocks,
-                buttonBox
+                cloud3.getNode()
         );
-
-        Scene scene = new Scene(parallaxRoot, 400, 300);
-        scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ESCAPE) {
-                stage.setFullScreen(false);
-                stage.setResizable(true);
-                stage.setWidth(400);
-                stage.setHeight(300);
-            }
-        });
-        stage.setScene(scene);
-        stage.setTitle("GameScreen");
-        stage.setFullScreen(true);
-        stage.show();
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
-            ocean1.update();
-            ocean2.update();
-            cloud1.update();
-            cloud2.update();
-            cloud3.update();
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
     }
+
+    private void startParallaxAnimation(List<ParallaxLayer> layers) {
+        this.parallaxTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
+            for (ParallaxLayer layer : layers) {
+                layer.update();
+            }
+        }));
+        this.parallaxTimeline.setCycleCount(Timeline.INDEFINITE);
+        this.parallaxTimeline.play();
+    }
+
     void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
-        button.setStyle("-fx-font-size:" + size + "px");
+        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';");
     }
 
     private ImageView createFullscreenImageView(String path) {

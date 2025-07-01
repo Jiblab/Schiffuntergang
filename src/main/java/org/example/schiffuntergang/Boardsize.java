@@ -1,6 +1,7 @@
 package org.example.schiffuntergang;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -8,8 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.StackPane; // NEU: Import für StackPane
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.example.schiffuntergang.sounds.SoundEffect;
 
@@ -26,7 +28,15 @@ public class Boardsize {
         this.stage = stage;
     }
 
-    // Die öffentlichen Methoden rufen jetzt nur noch die private Helfermethode auf.
+    static {
+        try {
+            Font.loadFont(Boardsize.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
+        } catch (Exception e) {
+            System.err.println("Pixel-Schriftart konnte nicht geladen werden");
+            e.printStackTrace();
+        }
+    }
+
     public void show() {
         createAndShowScene(false);
     }
@@ -35,22 +45,17 @@ public class Boardsize {
         createAndShowScene(true);
     }
 
-    /**
-     * Private Helfermethode, um Codeduplizierung zwischen Single- und Multiplayer-Ansicht zu vermeiden.
-     *
-     * @param isMultiplayerSetup Legt fest, ob setup() oder setupMultiS() aufgerufen wird.
-     */
     private void createAndShowScene(boolean isMultiplayerSetup) {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
 
-        // --- Steuerelemente erstellen (unverändert) ---
+        //slider
         Slider slider1 = new Slider(0, 30, 10);
-        slider1.setShowTickLabels(true);
-        slider1.setShowTickMarks(true);
+        // slider1.setShowTickLabels(true);
+        //slider1.setShowTickMarks(true);
 
         Slider slider2 = new Slider(0, 30, 10);
-        slider2.setShowTickLabels(true);
-        slider2.setShowTickMarks(true);
+        // slider2.setShowTickLabels(true);
+        //  slider2.setShowTickMarks(true);
 
         Label label1 = new Label("Boardbreite: 10");
         Label label2 = new Label("Boardhöhe: 10"); // "Boardsize" war doppelt, ich habe es in "Boardhöhe" geändert für Klarheit
@@ -75,7 +80,6 @@ public class Boardsize {
                 controller.setStage(stage);
                 controller.setSize(x, y);
 
-                // Hier wird basierend auf dem Parameter die richtige Setup-Methode aufgerufen
                 if (isMultiplayerSetup) {
                     controller.setupMultiS();
                 } else {
@@ -99,35 +103,31 @@ public class Boardsize {
             gameScreen.show();
         });
 
-        // --- Layout-Struktur (GEÄNDERT) ---
+//Layout
 
-        // 1. VBox für die Steuerelemente erstellen (wie zuvor, aber ohne Hintergrund)
         VBox controlsLayout = new VBox(15, label1, slider1, label2, slider2, start, backtostart);
-        controlsLayout.setStyle("-fx-padding: 30px;");
+        controlsLayout.setPadding(new Insets(50));
         controlsLayout.setAlignment(Pos.CENTER);
-        // WICHTIG: Die VBox sollte selbst keinen undurchsichtigen Hintergrund haben.
-        // Meist ist das Standard, aber falls nicht, füge dies hinzu:
-        controlsLayout.setStyle("-fx-background-color: transparent;");
+        controlsLayout.maxWidthProperty().bind(stage.widthProperty().multiply(0.5));
 
-
-        // 2. StackPane als neuer Hauptcontainer erstellen
         StackPane rootPane = new StackPane();
-        rootPane.getStyleClass().add("background"); // Hintergrund auf das StackPane anwenden
-        rootPane.getChildren().add(controlsLayout); // Die VBox mit den Controls in das StackPane legen
+        rootPane.getStyleClass().add("background");
+        rootPane.getChildren().add(controlsLayout);
 
-        // 3. Szene mit dem StackPane als Wurzel erstellen
-        Scene scene = new Scene(rootPane); // Die Größe wird durch den Vollbildmodus automatisch angepasst
+        Scene scene = new Scene(rootPane);
         scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/slider.css").toExternalForm());
+
 
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
                 stage.setResizable(true);
-                // Du kannst hier optional eine feste Größe für den Fenstermodus setzen
                 stage.setWidth(800);
                 stage.setHeight(600);
             }
         });
+
 
         stage.setScene(scene);
         stage.setTitle("Boardsize");

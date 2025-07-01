@@ -1,0 +1,73 @@
+/*
+ * 8-Bit / Retro Game Style für JavaFX
+ */
+
+/* -- SLIDER -- */
+
+/* Die blockige Schiene (track) */
+.slider .track {
+    -fx-background-color: #333333; /* Dunkelgrauer Hintergrund */
+    -fx-background-radius: 0;      /* Keine abgerundeten Ecken! */
+    -fx-pref-height: 15px;          /* Schöne, blockige Dicke */
+    -fx-border-color: #111111;     /* Fast schwarzer Rand für Tiefe */
+    -fx-border-width: 2px;
+}
+
+/* Der quadratische Regler (thumb) */
+.slider .thumb {
+    -fx-background-color: #7b68ee; /* Ein klassisches Retro-Rot */
+    -fx-background-radius: 0;      /* Perfektes Quadrat */
+    -fx-pref-width: 24px;
+    -fx-pref-height: 24px;
+    -fx-border-color: black;       /* Harter schwarzer Rand */
+    -fx-border-width: 2px;
+    -fx-effect: null;              /* Keinen Schatten oder andere Effekte */
+}
+
+/* Hover-Effekt: Keine Animation, nur eine Farbänderung */
+.slider:hover .thumb {
+    -fx-background-color: #b0e0e6; /* Retro-Orange bei Hover */
+}
+
+/* Gedrückt-Effekt */
+.slider .thumb:pressed {
+    -fx-background-color: #ffffff; /* Weiß, wenn gedrückt, für klares Feedback */
+}
+
+/* -- LABELS (Texte) -- */
+
+/* Stil für alle Labels in der Szene */
+.label {
+    -fx-font-family: "Press Start 2P"; /* HIER WIRD DIE PIXEL-SCHRIFTART VERWENDET */
+    -fx-font-size: 16px;
+    -fx-text-fill: white;              /* Weiße Schrift */
+    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 1, 1); /* Harter Schlagschatten für Lesbarkeit */
+    -fx-font-smoothing-type: gray;     /* Verhindert unscharfe Kanten der Schrift */
+}
+.toggle-switch {
+    -fx-padding: 5px;
+}
+
+/*Toogle switch*/
+/* Die "Schiene" des Schalters */
+.toggle-switch .switch {
+    -fx-background-color: #333333; /* Dunkelgrau wie beim Slider */
+    -fx-background-radius: 0;      /* Keine Rundungen */
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+
+/* Der "Daumen" bzw. der bewegliche Teil des Schalters */
+.toggle-switch .thumb {
+    -fx-background-color: #ff4136; /* Retro-Rot, wenn AUS */
+    -fx-background-radius: 0;      /* Perfektes Quadrat */
+}
+
+/* Stil, wenn der Schalter AN ist (selected) */
+.toggle-switch:selected .thumb {
+    -fx-background-color: #2ecc40; /* Ein schönes Retro-Grün für AN */
+}
+
+.toggle-switch:selected .switch {
+    -fx-background-color: #555555; /* Etwas hellerer Hintergrund, wenn AN */
+}
