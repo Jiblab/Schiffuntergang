@@ -16,6 +16,7 @@ import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
 import org.example.schiffuntergang.sounds.SoundEffect;
+import javafx.geometry.Insets;
 
 import java.awt.*;
 import java.io.IOException;
@@ -72,7 +73,9 @@ public class HelloController {
         anker.heightProperty().addListener((obs, oldVal, newVal) -> {
             backgroundImage.setFitHeight(newVal.doubleValue());
         });
+        anker.getStylesheets().add(getClass().getResource("/button.css").toExternalForm());
     }
+
 
     public void setMessage(String msg) {
         if (messageLabel != null) {
@@ -86,15 +89,20 @@ public class HelloController {
         enemy = new Gamefield(true, this, (int) x, (int) y, en);
 
         // VBox für die Spielfelder mit label
-        VBox enemyBox = new VBox(10, enemy, new Label("Enemy"));
+        Label enemyLabel = new Label("Enemy");
+        enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox enemyBox = new VBox(10, enemyLabel, enemy);
         enemyBox.setAlignment(Pos.CENTER);
 
-        VBox playerBox = new VBox(10, player, new Label("Player"));
+        Label playerLabel = new Label("You");
+        playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox playerBox = new VBox(10, playerLabel, player);
         playerBox.setAlignment(Pos.CENTER);
 
         // main HBox für VBoxes
         HBox spielfeldBox = new HBox(20, enemyBox, playerBox);
         spielfeldBox.setAlignment(Pos.CENTER);
+        spielfeldBox.setPadding(new Insets(20));
 
         rootPane.setCenter(spielfeldBox);
 
@@ -302,6 +310,15 @@ public class HelloController {
         Button d2 = new Button("Vertikal");
         Button back = new Button("Back to Start");
 
+        b2.getStyleClass().add("option-button");
+        b3.getStyleClass().add("option-button");
+        b4.getStyleClass().add("option-button");
+        b5.getStyleClass().add("option-button");
+        d.getStyleClass().add("option-button");
+        d2.getStyleClass().add("option-button");
+
+        back.getStyleClass().add("control-button");
+
         b2.setOnAction(e -> length = 2);
         b3.setOnAction(e -> length = 3);
         b4.setOnAction(e -> length = 4);
@@ -314,6 +331,7 @@ public class HelloController {
                 }
         );
         shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back);
+        shipControlBox.setSpacing(10);
     }
 
     public void temp(){

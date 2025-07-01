@@ -68,6 +68,7 @@ public class Boardsize {
         );
 
         Button start = new Button("Start Game");
+        start.getStyleClass().add("control-button");
         start.setOnAction(e -> {
             clickSound.play();
             x = slider1.getValue();
@@ -96,8 +97,9 @@ public class Boardsize {
         });
 
         Button backtostart = new Button("Back to Menu");
+        backtostart.getStyleClass().add("control-button");
         backtostart.setOnAction(e -> {
-            // isSinglePlayer wird aus der Klasseninstanz wiederverwendet
+
             GameCreationScreen gameScreen = new GameCreationScreen(stage);
             clickSound.play();
             gameScreen.show();
@@ -115,9 +117,13 @@ public class Boardsize {
         rootPane.getChildren().add(controlsLayout);
 
         Scene scene = new Scene(rootPane);
+
+        VBox.setMargin(start, new Insets(60, 0, 0, 0));
+
+        //css
         scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
         scene.getStylesheets().add(getClass().getResource("/slider.css").toExternalForm());
-
+        scene.getStylesheets().add(getClass().getResource("/button.css").toExternalForm());
 
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {

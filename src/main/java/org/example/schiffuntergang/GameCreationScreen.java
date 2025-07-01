@@ -225,7 +225,13 @@ public class GameCreationScreen {
 
     private void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
-        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';");
+        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';" +
+                "-fx-background-color: #8b6248; " +
+                "-fx-text-fill: white; " +
+                "-fx-border-color: #402d21; " +
+                "-fx-border-width: 3px; " +
+                "-fx-background-radius: 5; " +
+                "-fx-border-radius: 5;");
     }
 
     private ImageView createFullscreenImageView(String path) {
