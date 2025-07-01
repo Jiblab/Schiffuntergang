@@ -8,6 +8,8 @@ import org.example.schiffuntergang.sounds.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import javax.swing.plaf.synth.SynthDesktopIconUI;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,8 +19,10 @@ import java.util.List;
 
 public class StorageManager {
 
-    private static final String basePath = "data";
+    private static final String basePath = "./data";
 
+    //TODO: im Prinzip kein schlechter Ansatz, aber man kann nicht einfach GameFields zum speichern übergeben, ihr müsstet wenn dann die einzelnen Attribute/Variablen der GameFields abgeben. Schaut euch auch den Aufbau einer JSON an
+    //
     public static void saveFullGame(Gamefield playerBoard, Gamefield aiBoard,
                                     double musicVolume, boolean musicEnabled,
                                     boolean soundEnabled, String filename)
@@ -28,15 +32,30 @@ public class StorageManager {
 
         FullGameState fullState = new FullGameState(playerState, aiState);
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String fullPath = Paths.get(basePath, filename + ".json").toString();
+        //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        //String fullPath = Paths.get(basePath, filename + ".json").toString();
 
+        File file = new File(filename+".json");
+        try{
+            file.createNewFile();
+            FileWriter writer = new FileWriter(file);
+            writer.write(new Gson().toJson(fullState));
+            //gson.toJson(fullState, writer);
+            System.out.println("Game successfully saved to: " + file.getAbsolutePath());
+
+        }catch (IOException e){
+            System.err.println("Error while saving game: " + e.getMessage());
+
+        }
+        /*
         try (FileWriter writer = new FileWriter(fullPath)) {
             gson.toJson(fullState, writer);
             System.out.println("Game successfully saved to: " + fullPath);
         } catch (IOException e) {
             System.err.println("Error while saving game: " + e.getMessage());
         }
+
+         */
     }
 
     public static Pair<Gamefield, Gamefield> loadFullGame(String filename,
@@ -44,7 +63,7 @@ public class StorageManager {
                                                           EnemyPlayer enemyPlayer)
     {
         Gson gson = new Gson();
-        String fullPath = Paths.get(basePath, filename + ".json").toString();
+        String fullPath = Paths.get("", filename + ".json").toString();
 
         try (FileReader reader = new FileReader(fullPath)) {
             FullGameState fullState = gson.fromJson(reader, FullGameState.class);
@@ -64,8 +83,8 @@ public class StorageManager {
         }
     }
     private static GameState toGameState(Gamefield board, double volume, boolean music, boolean sound) {
-        int width = (int)board.getWidth();
-        int height = (int)board.getHeight();
+        int width = board.getBreit();
+        int height = board.getLang();
 
         List<SerializableShip> shipList = new ArrayList<>();
         for (Ships ship : board.getShips()) {

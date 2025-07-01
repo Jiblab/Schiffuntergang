@@ -13,7 +13,8 @@ module org.example.schiffuntergang {
     requires java.desktop;
     requires com.google.gson;
 
-    opens org.example.schiffuntergang to javafx.fxml;
+    opens org.example.schiffuntergang to javafx.fxml,com.google.gson;
+    opens org.example.schiffuntergang.components to com.google.gson;
     exports org.example.schiffuntergang to javafx.graphics;
 }
 

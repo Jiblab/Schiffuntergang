@@ -103,12 +103,12 @@ public class HelloController {
         VBox playerBox = new VBox(10, playerLabel, player);
         playerBox.setAlignment(Pos.CENTER);
 
-        // main HBox für VBoxes
-        HBox spielfeldBox = new HBox(20, enemyBox, playerBox);
-        spielfeldBox.setAlignment(Pos.CENTER);
-        spielfeldBox.setPadding(new Insets(20));
+        Button saveBtn = new Button("Spiel speichern");
+        saveBtn.setOnAction(e -> {
+            StorageManager.saveFullGame(player, enemy, 0.8, true, true, "spielstand1");
+        });
+        boxenV.getChildren().add(saveBtn);
 
-        rootPane.setCenter(spielfeldBox);
 
         // enemy ships random setzen
         while (enemy.getUsedCells() <= enemy.maxShipsC()) {
