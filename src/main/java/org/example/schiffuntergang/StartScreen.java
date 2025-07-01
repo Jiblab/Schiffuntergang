@@ -52,7 +52,7 @@ public class StartScreen {
 
         // Button-Verhalten
         start.setOnAction(e -> {
-            GameCreationScreen gameScreen = new GameCreationScreen(stage, isSinglePlayer);
+            GameCreationScreen gameScreen = new GameCreationScreen(stage);
             clickSound.play();
             gameScreen.show();
         });
