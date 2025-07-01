@@ -19,13 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Gamefield extends GridPane {
-    private List<Ships> placedShip = new ArrayList<>();
-    private int lang;
-    private int breit;
-    private boolean enemy;
-    private Cell[][] cells;
+    private final List<Ships> placedShip = new ArrayList<>();
+    private final int lang;
+    private final int breit;
+    private final boolean enemy;
+    private final Cell[][] cells;
     private int usedCells = 0;
-    private HelloController control;
+    private final HelloController control;
     private EnemyPlayer en;
     private MultiplayerLogic lo;
 
@@ -33,18 +33,16 @@ public class Gamefield extends GridPane {
 
 
 
-
-
-    public Gamefield(boolean enemy, HelloController controler, int h, int b){
+    public Gamefield(boolean enemy, HelloController controler, int h, int b) {
         lang = h;
         breit = b;
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
 
-        for (int i = 0; i < h; i++){
+        for (int i = 0; i < h; i++) {
 
-            for(int j = 0; j < b; j++){
+            for (int j = 0; j < b; j++) {
                 Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
 
@@ -55,24 +53,23 @@ public class Gamefield extends GridPane {
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
                 // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
                 c.setOnMouseClicked(event -> {
-                    if(event.getButton() == MouseButton.PRIMARY && !enemy){
+                    if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
-                        if (getUsedCells() <= maxShipsC()){
+                        if (getUsedCells() + control.getLength() <= maxShipsC()) { //+ control.getlength damit das auf auf neue schiffe prüft
                             Ships ship = new Ships(control.getLength(), control.getLength());
-                            if (placeShip(ship, x, y, control.getDirection())){
+                            if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
                                 addShip(ship);
                             }
-                        }
-                        else {
+                        } else {
                             System.out.println(maxShipsC());
                             System.out.println("Maximale Anzahl an schiffen erreicht");
                         }
 
 
-
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
-                        shoot((int) c.getX(), (int) c.getY());
+                    } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
+                        // shoot((int) c.getX(), (int) c.getY());
+                        shoot(c.x, c.y);
                     }
                 });
 
@@ -81,7 +78,7 @@ public class Gamefield extends GridPane {
         }
     }
 
-    public Gamefield(boolean enemy, HelloController controler, int h, int b, EnemyPlayer e){
+    public Gamefield(boolean enemy, HelloController controler, int h, int b, EnemyPlayer e) {
         en = e;
         lang = h;
         breit = b;
@@ -89,9 +86,9 @@ public class Gamefield extends GridPane {
         this.enemy = enemy;
         this.control = controler;
 
-        for (int i = 0; i < h; i++){
+        for (int i = 0; i < h; i++) {
 
-            for(int j = 0; j < b; j++){
+            for (int j = 0; j < b; j++) {
                 Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
 
@@ -102,23 +99,21 @@ public class Gamefield extends GridPane {
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
                 // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
                 c.setOnMouseClicked(event -> {
-                    if(event.getButton() == MouseButton.PRIMARY && !enemy){
+                    if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
-                        if (getUsedCells() <= maxShipsC()){
+                        if (getUsedCells() <= maxShipsC()) {
                             Ships ship = new Ships(control.getLength(), control.getLength());
-                            if (placeShip(ship, x, y, control.getDirection())){
+                            if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
                                 addShip(ship);
                             }
-                        }
-                        else {
+                        } else {
                             System.out.println(maxShipsC());
                             System.out.println("Maximale Anzahl an schiffen erreicht");
                         }
 
 
-
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
+                    } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
                         shoot(x, y);
                     }
                 });
@@ -128,7 +123,7 @@ public class Gamefield extends GridPane {
         }
     }
 
-    public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l){
+    public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l) {
         lang = h;
         breit = b;
         multiplayer = true;
@@ -137,9 +132,9 @@ public class Gamefield extends GridPane {
         this.control = controler;
         this.lo = l;
 
-        for (int i = 0; i < h; i++){
+        for (int i = 0; i < h; i++) {
 
-            for(int j = 0; j < b; j++){
+            for (int j = 0; j < b; j++) {
                 Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
 
@@ -150,7 +145,7 @@ public class Gamefield extends GridPane {
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
                 // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
                 c.setOnMouseClicked(event -> {
-                    if(event.getButton() == MouseButton.PRIMARY && !enemy){
+                    if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
                         int len = control.getLength();
                         if (getUsedCells() <= maxShipsC() && len > 0 ) {
@@ -161,8 +156,7 @@ public class Gamefield extends GridPane {
                                     control.shipPlaced(len);
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             System.out.println(maxShipsC());
                             System.out.println("Maximale Anzahl an schiffen erreicht");
                             /*Platform.runLater(() -> {
@@ -188,22 +182,18 @@ public class Gamefield extends GridPane {
                                 throw new RuntimeException(e);
                             }
                         }
-
-                    }
-                });
-
+                  
                 add(c, i, j);
             }
         }
     }
 
 
-
-    public Cell getCell(int x, int y){
+    public Cell getCell(int x, int y) {
         return cells[x][y];
     }
 
-    public boolean getStatus(){
+    public boolean getStatus() {
         return enemy;
     }
 
@@ -265,8 +255,7 @@ public class Gamefield extends GridPane {
             if (!enemy) {
                 c.setFill(Color.WHITE);
                 c.setStroke(Color.GREEN);
-            }
-            else{
+            } else {
                 c.setFill(Color.GRAY);
             }
         }
@@ -280,54 +269,52 @@ public class Gamefield extends GridPane {
         return enemy;
     }
 
-    public double maxShipsC(){
+    public double maxShipsC() {
         return (double) lang * (double) breit * 0.3;
     }
 
-    public void addShip(Ships ship){
+    public void addShip(Ships ship) {
         placedShip.add(ship);
     }
 
-    public int getUsedCells(){
+    public int getUsedCells() {
         return usedCells;
     }
-    public void increaseCells(int laenge){
+
+    public void increaseCells(int laenge) {
         usedCells += laenge;
     }
-
 
     public void shoot(int x, int y){
         Cell c = getCell(x, y);
         Ships s = c.getShip();
+        if (c.isShot()) {
+            return false;
+        }
+        c.setShot(true);
 
-        if (s != null){
+        if (s != null) {
             s.hit();
             c.setFill(Color.RED);
-            if (s.getHealth() == 0){
+            if (s.getHealth() == 0) {
                 deleteShip();
             }
             System.out.println(control.getPlayerturn());
             if (this.enemy && !multiplayer){
+
                 System.out.println("nix hier in der if abfrage");
                 en.revenge();
-
             }
-
-
-        }
-        else {
+        } else {
             c.setFill(Color.BLACK);
             System.out.println("Koordinaten x, dann y: "+x+" "+y);
             if (this.enemy && !multiplayer){
+
                 en.revenge();
             }
-
         }
-
+        return true;
     }
-
-
-
     public boolean inBounds(int x, int y){
         return x >= 0 && y >= 0 && x < getWidth() && y < getHeight();
     }

@@ -1,0 +1,50 @@
+/* src/main/resources/button.css */
+
+.control-button {
+    -fx-font-family: 'Press Start 2P';
+    -fx-font-size: 14px;
+
+    -fx-background-color: #0084b3; /* Blauer Hintergrund */
+    -fx-text-fill: white;          /* Weiße Schrift */
+
+    -fx-border-color: #03396C;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+
+    -fx-padding: 20px 20px; /* Innenabstand (oben/unten und links/rechts) */
+    -fx-pref-width: 280px;  /* Feste Breite für die Buttons */
+    -fx-cursor: hand;       /* Zeigt eine Hand als Cursor */
+}
+
+.option-button {
+    -fx-font-family: 'Press Start 2P';
+    -fx-font-size: 12px; /* Etwas kleinere Schrift */
+    -fx-background-color: #8b6248;
+    -fx-text-fill: white;
+    -fx-border-color: #402d21;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8px 16px
+    -fx-cursor: hand;
+     -fx-min-width: 150px;
+      -fx-min-height: 80px;
+}
+
+/* Stil, wenn die Maus über dem Button ist */
+.control-button:hover {
+    -fx-background-color: #357ABD; /* Dunkleres Blau */
+}
+.option-button:hover {
+    -fx-background-color: #251a13; /* Dunkleres Braun */
+}
+/* Stil, wenn der Button geklickt wird */
+.control-button:pressed {
+    -fx-background-color: #2A5A8C; /* Noch dunkleres Blau */
+    -fx-padding: 13px 20px 11px 20px; /* Simuliert das "Hineindrücken" des Buttons */
+}
+.option-button:pressed {
+    -fx-background-color: #251a13;
+    -fx-padding: 13px 20px 11px 20px; /* Simuliert das "Hineindrücken" des Buttons */
+}

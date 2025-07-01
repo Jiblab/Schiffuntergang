@@ -1,173 +1,241 @@
-
 package org.example.schiffuntergang;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.example.schiffuntergang.components.Gamefield;
-import org.example.schiffuntergang.sounds.SoundEffect;
 import org.example.schiffuntergang.ui.ParallaxLayer;
+import org.example.schiffuntergang.sounds.SoundEffect;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameCreationScreen {
     private final Stage stage;
-    private final boolean isSinglePlayer;
-    private double x;
-    private double y;
 
-
-    public GameCreationScreen(Stage stage, boolean isSinglePlayer) {
-        this.stage = stage;
-        this.isSinglePlayer = isSinglePlayer;
-
+    private final SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
+    static {
+        try {
+            Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
+        } catch (Exception e) {
+            System.err.println("Pixel-Schriftart konnte nicht geladen werden!");
+            e.printStackTrace();
+        }
     }
 
+    public GameCreationScreen(Stage stage) {
+        this.stage = stage;
+    }
+
+    private Timeline parallaxTimeline;
+
     public void show() {
-        Button back = new Button("BACK TO START");
+        // Aufteilung in Helfermethoden für bessere Lesbarkeit
+        List<ParallaxLayer> parallaxLayers = new ArrayList<>();
+        StackPane parallaxRoot = createParallaxBackground(parallaxLayers);
+
+        VBox buttonBox = createMenuButtons();
+        parallaxRoot.getChildren().add(buttonBox);
+
+        Scene scene = new Scene(parallaxRoot);
+        setupEscapeKey(scene);
+
+        stage.setScene(scene);
+        stage.setTitle("Game Mode Selection");
+        stage.setFullScreen(true);
+        stage.show();
+
+        startParallaxAnimation(parallaxLayers);
+    }
+
+    private VBox createMenuButtons() {
         Button singleP = new Button("SINGLE PLAYER");
         Button multiP = new Button("MULTIPLAYER");
-
-        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
-        //Sound Effect by <a href="https://pixabay.com/users/driken5482-45721595/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=236677">Driken Stan</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=236677">Pixabay</a>
-
-        stage.widthProperty().addListener((obs, oldVal, newVal) -> {
-            for (Button b: new Button[]{singleP,multiP,back}) {
-                adjustFontSize(b, 30);
-            }
-        });
-
-        VBox buttonBox = new VBox(15,singleP,multiP,back);
-        buttonBox.setAlignment(Pos.CENTER);
-        StackPane.setAlignment(buttonBox, Pos.CENTER);
-
-        back.setOnAction(e ->{
-            StartScreen startScreen = new StartScreen(stage);
-            clickSound.play();
-            startScreen.show();
-        });
+        Button back = new Button("BACK TO START");
 
         singleP.setOnAction(e -> {
             clickSound.play();
+            if (parallaxTimeline != null) parallaxTimeline.stop();
             Boardsize boardsize = new Boardsize(stage, true);
             boardsize.show();
         });
 
         multiP.setOnAction(e -> {
             clickSound.play();
-            showMultiplayerWindowAndCloseCurrent();
-            /*HelloController controller = new HelloController();
-            Gamefield playerfield = new Gamefield(false, controller, (int) x, (int) y);
-            Gamefield enemyfield = new Gamefield(true, controller, (int) x, (int) y);
-
-            HBox gamefieldbox = new HBox(50, playerfield, enemyfield);
-            gamefieldbox.setAlignment(Pos.CENTER);
-
-            Button backtogamescreen = new Button("Back to Menu");
-            backtogamescreen.setOnAction(ev -> {
-                GameCreationScreen gameScreen = new GameCreationScreen(stage, true);
-                clickSound.play();
-                gameScreen.show();
-            });
-            Button searchgame = new Button("Search Game");
-            Button hostgame = new Button("Host Game");
-
-            VBox gamebox = new VBox(15, gamefieldbox, backtogamescreen, searchgame, hostgame);
-            gamebox.setAlignment(Pos.CENTER);
-
-            Scene gamescene = new Scene(gamebox);
-            stage.setScene(gamescene);
-            stage.setFullScreen(true);*/
-
+            if (parallaxTimeline != null) parallaxTimeline.stop();
+            showMultiplayerMenuScene();
         });
 
-        for (Button b : new Button[]{singleP,multiP,back}) {
-            b.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
+        back.setOnAction(e -> {
+            clickSound.play();
+            if (parallaxTimeline != null) parallaxTimeline.stop();
+            StartScreen startScreen = new StartScreen(stage);
+            startScreen.show();
+        });
+
+        for (Button b : new Button[]{singleP, multiP, back}) {
+            b.prefWidthProperty().bind(stage.widthProperty().multiply(0.4));
             b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
+            stage.widthProperty().addListener((obs, oldVal, newVal) -> adjustFontSize(b, 40));
         }
 
-        StackPane parallaxRoot = new StackPane();
-        parallaxRoot.setAlignment(Pos.CENTER);
-        //HINTERGRUND:
-        //Fest
-        ImageView background = createFullscreenImageView("/images/0.png");
-        ImageView ocean = createFullscreenImageView("/images/1.png");
-        ImageView beach = createFullscreenImageView("/images/4.png");
-        ImageView white = createFullscreenImageView("/images/5.png");
-        ImageView rocks = createFullscreenImageView("/images/7.png");
-        ImageView palm = createFullscreenImageView("/images/12.png");
+        VBox buttonBox = new VBox(15, singleP, multiP, back);
+        buttonBox.setAlignment(Pos.CENTER);
+        return buttonBox;
+    }
 
-        //bewegend
-        ParallaxLayer ocean1 = new ParallaxLayer("/images/2.png",0.3, stage);
-        ParallaxLayer ocean2 = new ParallaxLayer("/images/3.png", 0.4, stage);
-        ParallaxLayer cloud1 = new ParallaxLayer("/images/9.png", 0.6, stage);
-        ParallaxLayer cloud2 = new ParallaxLayer("/images/10.png",0.8, stage);
-        ParallaxLayer cloud3 = new ParallaxLayer("/images/11.png", 1.2, stage);
+    // --- NEUE METHODEN FÜR MULTIPLAYER-NAVIGATION ---
 
-        for (ImageView x : new ImageView[]{background, beach, ocean, white,rocks,palm}){
-            x.fitWidthProperty().bind(stage.widthProperty());
-            x.setPreserveRatio(false);
-        }
+    private void showMultiplayerMenuScene() {
+        Button createGame = new Button("Host Game");
+        Button findGame = new Button("Join Game");
+        Button backButton = new Button("Back");
 
-        parallaxRoot.getChildren().addAll(
-                background,
-                ocean,
-                ocean1.getNode(),
-                ocean2.getNode(),
-                beach,
-                white,
-                cloud1.getNode(),
-                cloud2.getNode(),
-                cloud3.getNode(),
-                palm,
-                rocks,
-                buttonBox
-                //label
+        createGame.setOnAction(e -> {
+            clickSound.play();
+            // Leitet direkt zum Boardsize-Screen im Multiplayer-Modus
+            Boardsize boardsize = new Boardsize(stage, false);
+            boardsize.showMulti();
+        });
+
+        findGame.setOnAction(e -> {
+            clickSound.play();
+            showJoinGameScene(); // Wechselt zur nächsten Szene
+        });
+
+        backButton.setOnAction(e -> {
+            clickSound.play();
+            this.show(); // Kehrt zum vorherigen Bildschirm zurück (GameCreationScreen)
+        });
+
+        VBox layout = new VBox(20, createGame, findGame, backButton);
+        layout.setAlignment(Pos.CENTER);
+        // Hintergrundklasse für einheitliches Aussehen hinzufügen
+        layout.getStyleClass().add("background");
+
+        Scene scene = new Scene(layout);
+        // Stylesheet für den Hintergrund laden
+        scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
+        setupEscapeKey(scene);
+
+        stage.setScene(scene);
+        stage.setTitle("Multiplayer");
+        stage.setFullScreen(true);
+    }
+
+    private void showJoinGameScene() {
+        Label ipLabel = new Label("Server-IP:");
+        TextField ipField = new TextField();
+        ipField.setPromptText("e.g., 192.168.0.10");
+        ipField.setMaxWidth(200);
+
+        Button connectButton = new Button("Connect");
+        Button backButton = new Button("Back");
+        Label statusLabel = new Label();
+
+        connectButton.setOnAction(e -> {
+            clickSound.play();
+            String ip = ipField.getText();
+            int port = 5000;
+
+            statusLabel.setText("Connecting to " + ip + "...");
+
+            // HIER würde die Logik zum Laden der FXML und des Controllers hinkommen.
+            // Der `HelloController` würde erst HIER, nach dem Klick, durch den FXMLLoader erstellt werden.
+            // z.B. fxmlLoader.load() -> controller = fxmlLoader.getController() -> controller.setupMultiC(ip, port);
+            System.out.println("Hier würde die Verbindung zum Server aufgebaut und zur Spielansicht gewechselt.");
+        });
+
+        backButton.setOnAction(e -> {
+            clickSound.play();
+            showMultiplayerMenuScene(); // Zurück zum Multiplayer-Menü
+        });
+
+        VBox layout = new VBox(15, ipLabel, ipField, connectButton, backButton, statusLabel);
+        layout.setAlignment(Pos.CENTER);
+        layout.getStyleClass().add("background");
+
+        Scene scene = new Scene(layout);
+        scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
+        setupEscapeKey(scene);
+
+        stage.setScene(scene);
+        stage.setTitle("Join Game");
+        stage.setFullScreen(true);
+    }
+
+    // --- Helfermethoden (unverändert, aber jetzt besser strukturiert) ---
+
+    private void startParallaxAnimation(List<ParallaxLayer> layers) {
+        this.parallaxTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
+            for (ParallaxLayer layer : layers) {
+                layer.update();
+            }
+        }));
+        this.parallaxTimeline.setCycleCount(Timeline.INDEFINITE);
+        this.parallaxTimeline.play();
+    }
+
+    private StackPane createParallaxBackground(List<ParallaxLayer> parallaxLayers) {
+        StackPane parallaxRoot = new StackPane(
+                createFullscreenImageView("/images/0.png"),
+                createFullscreenImageView("/images/1.png")
         );
 
-        Scene scene = new Scene(parallaxRoot);
+        ParallaxLayer ocean1 = new ParallaxLayer("/images/2.png", 0.3, stage);
+        ParallaxLayer ocean2 = new ParallaxLayer("/images/3.png", 0.4, stage);
+        ParallaxLayer cloud1 = new ParallaxLayer("/images/9.png", 0.6, stage);
+        ParallaxLayer cloud2 = new ParallaxLayer("/images/10.png", 0.8, stage);
+        ParallaxLayer cloud3 = new ParallaxLayer("/images/11.png", 1.2, stage);
+        parallaxLayers.addAll(List.of(ocean1, ocean2, cloud1, cloud2, cloud3));
+
+        parallaxRoot.getChildren().addAll(
+                ocean1.getNode(), ocean2.getNode(),
+                createFullscreenImageView("/images/4.png"),
+                createFullscreenImageView("/images/5.png"),
+                cloud1.getNode(), cloud2.getNode(), cloud3.getNode(),
+                createFullscreenImageView("/images/12.png"),
+                createFullscreenImageView("/images/7.png")
+        );
+        parallaxRoot.setAlignment(Pos.CENTER);
+        return parallaxRoot;
+    }
+
+    private void setupEscapeKey(Scene scene) {
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
                 stage.setResizable(true);
-                stage.setWidth(400);
-                stage.setHeight(300);
+                stage.setWidth(800);
+                stage.setHeight(600);
             }
         });
-        stage.setScene(scene);
-        stage.setTitle("GameScreen");
-        stage.setFullScreen(true);
-        stage.show();
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), e ->{
-            ocean1.update();
-            ocean2.update();
-            cloud1.update();
-            cloud2.update();
-            cloud3.update();
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
     }
 
-    void adjustFontSize(Button button, double baseWidth) {
+    private void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
-        button.setStyle("-fx-font-size:" + size + "px");
+        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';" +
+                "-fx-background-color: #8b6248; " +
+                "-fx-text-fill: white; " +
+                "-fx-border-color: #402d21; " +
+                "-fx-border-width: 3px; " +
+                "-fx-background-radius: 5; " +
+                "-fx-border-radius: 5;");
     }
+
     private ImageView createFullscreenImageView(String path) {
+        // Hinweis: Es ist besser, hier eine Fehlerbehandlung einzubauen, falls das Bild nicht gefunden wird.
         Image image = new Image(getClass().getResourceAsStream(path));
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(false);
@@ -269,5 +337,6 @@ public class GameCreationScreen {
 
         // Altes Fenster schließen
         stage.close();
+
     }
 }

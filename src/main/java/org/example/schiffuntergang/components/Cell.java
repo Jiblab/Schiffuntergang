@@ -10,8 +10,8 @@ public class Cell extends Rectangle {
     private Ships ship = null;
     public int x;
     public int y;
-    private Gamefield board;
-    private HelloController control;
+    private final Gamefield board;
+    private final HelloController control;
 
     public Cell(int x, int y, Gamefield board, int h, int w, HelloController controler){
 
@@ -38,7 +38,10 @@ public class Cell extends Rectangle {
     }
 
     public void setShot(boolean s){
-        shot = s;
+        this.shot = s;
+        if (s) {
+            setFill(ship != null ? Color.RED : Color.LIGHTGREEN);
+        }
 
     }
     public boolean isShot(){

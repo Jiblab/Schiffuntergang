@@ -5,10 +5,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.schiffuntergang.Multiplayer.Client;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
@@ -18,7 +17,9 @@ import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
 import org.example.schiffuntergang.sounds.SoundEffect;
+import javafx.geometry.Insets;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Random;
 
@@ -50,59 +51,91 @@ public class HelloController {
     private AnchorPane anker;
 
     @FXML
-    private VBox rootPane;
+    private Label messageLabel;
 
     @FXML
-    private HBox boxen;
+    private BorderPane rootPane;
 
     @FXML
-    VBox boxenV;
+    private HBox shipControlBox;
 
+    @FXML
+    private ImageView backgroundImage;
     @FXML
     public void initialize() {
+        Image img = new Image(getClass().getResource("/images/gamebg.png").toExternalForm());
+        backgroundImage.setImage(img);
 
+        backgroundImage.setPreserveRatio(false);
+
+        backgroundImage.setFitWidth(anker.getPrefWidth());
+        backgroundImage.setFitHeight(anker.getPrefHeight());
+
+        anker.widthProperty().addListener((obs, oldVal, newVal) -> {
+            backgroundImage.setFitWidth(newVal.doubleValue());
+        });
+        anker.heightProperty().addListener((obs, oldVal, newVal) -> {
+            backgroundImage.setFitHeight(newVal.doubleValue());
+        });
+        anker.getStylesheets().add(getClass().getResource("/button.css").toExternalForm());
+    }
+
+
+    public void setMessage(String msg) {
+        if (messageLabel != null) {
+            messageLabel.setText(msg);
+        }
     }
     public void setup(){
-
+        // Create the game fields
         player = new Gamefield(false, this, (int) x, (int) y);
         EnemyPlayer en = new EnemyPlayer(player);
         enemy = new Gamefield(true, this, (int) x, (int) y, en);
 
+        // VBox für die Spielfelder mit label
+        Label enemyLabel = new Label("Enemy");
+        enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox enemyBox = new VBox(10, enemyLabel, enemy);
+        enemyBox.setAlignment(Pos.CENTER);
 
+        Label playerLabel = new Label("You");
+        playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox playerBox = new VBox(10, playerLabel, player);
+        playerBox.setAlignment(Pos.CENTER);
 
+        // main HBox für VBoxes
+        HBox spielfeldBox = new HBox(20, enemyBox, playerBox);
+        spielfeldBox.setAlignment(Pos.CENTER);
+        spielfeldBox.setPadding(new Insets(20));
 
+        rootPane.setCenter(spielfeldBox);
 
-        rootPane.getChildren().add(enemy);
-        rootPane.getChildren().add(player);
-        rootPane.setAlignment(Pos.CENTER);
-       //random platzieren der gegnerschiffe
-        while(enemy.getUsedCells() <= enemy.maxShipsC()){
-            int shipLength = 2 + rand.nextInt(4);
+        // enemy ships random setzen
+        while (enemy.getUsedCells() <= enemy.maxShipsC()) {
+            int shipLength = 2 + rand.nextInt(4); // Creates ships of length 2, 3, 4, or 5
             boolean vertical = rand.nextBoolean();
 
-            // ACHTUNG: Breite = x, Höhe = y
+            // Correctly calculate max coordinates to prevent ships from going out of bounds
             int xMax = (int) x - (vertical ? 1 : shipLength);
             int yMax = (int) y - (vertical ? shipLength : 1);
+
+            if (xMax < 0 || yMax < 0) continue; // Skip if a ship can't fit at all
 
             int x2 = rand.nextInt(xMax + 1);
             int y2 = rand.nextInt(yMax + 1);
 
             Ships ship = new Ships(shipLength, shipLength);
-
-            if (enemy.placeShip(ship, x2, y2, vertical )){
+            if (enemy.placeShip(ship, x2, y2, vertical)) {
                 enemy.increaseCells(shipLength);
             }
-
         }
-
-
-        VBox.setVgrow(enemy, Priority.ALWAYS);
-        VBox.setVgrow(player, Priority.ALWAYS);
-        enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-
-       setButtons();
+        setButtons();
+            /*// Ensure game fields resize properly
+            VBox.setVgrow(enemy, Priority.ALWAYS);
+            VBox.setVgrow(player, Priority.ALWAYS);
+            enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+*/
 
     }
 
@@ -121,6 +154,34 @@ public class HelloController {
         }).start();
 
 
+        while(temp){
+
+        }
+
+        rootPane.getChildren().add(enemy);
+        rootPane.getChildren().add(player);
+
+
+        VBox.setVgrow(enemy, Priority.ALWAYS);
+        VBox.setVgrow(player, Priority.ALWAYS);
+        enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+
+        setButtons();
+
+        for (int i = 2; i <= 5; i++) {
+            Label counter = new Label("Empfangen: 0");
+            shipCounters[i] = counter;
+
+            HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
+            row.setAlignment(Pos.CENTER);
+        }
+        try{
+            mlp.start();
+        } catch(IOException e){
+            System.out.println("IOException");
+        }
 
     }
 
@@ -161,6 +222,12 @@ public class HelloController {
                 System.out.println("IOException");
             }
         }).start();
+            try{
+                mlp.start();
+            } catch(IOException e){
+                System.out.println("IOException");
+            }
+        }
     }
 
     public int getLength(){
@@ -239,7 +306,7 @@ public class HelloController {
         // Boards zur Anzeige hinzufügen
         rootPane.getChildren().add(enemyBoard);
         rootPane.getChildren().add(playerBoard);
-        rootPane.setAlignment(Pos.CENTER);
+
 
         VBox.setVgrow(enemyBoard, Priority.ALWAYS);
         VBox.setVgrow(playerBoard, Priority.ALWAYS);
@@ -265,9 +332,18 @@ public class HelloController {
         Button b3 = new Button("Länge 3");
         Button b4 = new Button("Länge 4");
         Button b5 = new Button("Länge 5");
-        Button d = new Button("Vertikal");
-        Button d2 = new Button("Horizental");
+        Button d = new Button("Horizontal");
+        Button d2 = new Button("Vertikal");
         Button back = new Button("Back to Start");
+
+        b2.getStyleClass().add("option-button");
+        b3.getStyleClass().add("option-button");
+        b4.getStyleClass().add("option-button");
+        b5.getStyleClass().add("option-button");
+        d.getStyleClass().add("option-button");
+        d2.getStyleClass().add("option-button");
+
+        back.getStyleClass().add("control-button");
 
         b2.setOnAction(e -> length = 2);
         b3.setOnAction(e -> length = 3);
@@ -280,15 +356,8 @@ public class HelloController {
                     startScreen.show();
                 }
         );
-
-        boxenV.getChildren().add(b2);
-        boxenV.getChildren().add(b3);
-        boxenV.getChildren().add(b4);
-        boxenV.getChildren().add(b5);
-        boxenV.getChildren().add(d);
-        boxenV.getChildren().add(d2);
-        boxenV.getChildren().add(back);
-        boxenV.setAlignment(Pos.CENTER);
+        shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back);
+        shipControlBox.setSpacing(10);
     }
 
     public void temp(){
@@ -310,11 +379,7 @@ public class HelloController {
         }
 
         // Wenn wir hier sind, sind alle bei 0 → Nachricht senden
-        if (c != null) {
-            return true;
-
-        }
-        return false;
+        return c != null;
     }
 
     public String getIP(){
