@@ -242,5 +242,101 @@ public class GameCreationScreen {
         imageView.fitWidthProperty().bind(stage.widthProperty());
         imageView.fitHeightProperty().bind(stage.heightProperty());
         return imageView;
+
+    }
+
+    private void showMultiplayerWindowAndCloseCurrent() {
+        // Neues Fenster (Stage) erstellen
+        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
+        Stage multiplayerStage = new Stage();
+        multiplayerStage.setTitle("Multiplayer");
+        HelloController controller = new HelloController();
+        Button findGame = new Button("Game finden");
+        Button createGame = new Button("Spiel erstellen");
+        Button close = new Button("Schließen");
+
+        VBox vbox = new VBox(20, findGame, createGame, close);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPrefWidth(300);
+        vbox.setPrefHeight(200);
+
+        // Button-Logik
+        findGame.setOnAction(e -> {
+            //System.out.println("Game finden geklickt!");
+            Stage connectStage = new Stage();
+            connectStage.setTitle("Mit Server verbinden");
+
+            Label ipLabel = new Label("Server-IP:");
+            TextField ipField = new TextField();
+            ipField.setPromptText("z.B. 192.168.0.10");
+            Button connectButton = new Button("Verbinden");
+            Label statusLabel = new Label();
+
+            connectButton.setOnAction(ev -> {
+                clickSound.play();
+                String ip = ipField.getText();
+                int port = 5000; // Passe ggf. den Port an
+
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
+                    Parent root = loader.load();
+                    HelloController controller1 = loader.getController();
+                    controller1.setStage(connectStage);
+
+                    // Optional: controller.buildGamefield(); falls Gamefield erst hier erzeugt wird
+                    controller1.setSize(x, y);
+                    controller1.setupMultiC(ip, port);
+
+                    Scene scene = new Scene(root);
+                    connectStage.setScene(scene);
+                    connectStage.setFullScreen(true);
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+                    //connectStage.close();
+
+            });
+
+            VBox vbox2 = new VBox(15, ipLabel, ipField, connectButton, statusLabel);
+            vbox2.setAlignment(Pos.CENTER);
+            vbox2.setPrefWidth(350);
+            vbox2.setPrefHeight(200);
+
+            Scene scene = new Scene(vbox2);
+            connectStage.setScene(scene);
+            connectStage.setFullScreen(true); // Optional: im Vollbild öffnen
+            connectStage.show();
+
+        });
+
+        createGame.setOnAction(e -> {
+            //System.out.println("Spiel erstellen geklickt!");
+            clickSound.play();
+            Boardsize boardsize = new Boardsize(stage, true);
+            boardsize.showMulti();
+            multiplayerStage.close();
+        });
+
+        close.setOnAction(e -> {
+            StartScreen startScreen = new StartScreen(stage);
+
+            clickSound.play();
+            startScreen.show();
+        });
+
+        Scene scene = new Scene(vbox);
+        multiplayerStage.setScene(scene);
+
+        // Direkt im Vollbild öffnen
+        multiplayerStage.setFullScreen(true);
+
+        // Multiplayer-Fenster öffnen
+        multiplayerStage.show();
+
+        // Altes Fenster schließen
+        stage.close();
+
     }
 }

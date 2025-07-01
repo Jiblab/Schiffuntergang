@@ -1,5 +1,6 @@
 package org.example.schiffuntergang.Multiplayer;
 
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.components.Cell;
@@ -20,12 +21,15 @@ public class MultiplayerLogic {
     private int x;
     private int y;
     private HelloController contr;
+    private boolean myturn;
+    private boolean firstturn = true;
 
     public MultiplayerLogic(Client c, boolean client1, Gamefield en, Gamefield pl){
         cl = c;
         player = pl;
         enemy = en;
         client = client1;
+        myturn = false;
     }
 
     public MultiplayerLogic(Server se, boolean client1, Gamefield en, Gamefield pl){
@@ -33,187 +37,244 @@ public class MultiplayerLogic {
         player = pl;
         enemy = en;
         client = client1;
+        myturn = true;
+    }
+
+    public void sendShips() throws IOException {
+        if (client){
+            startMultiplayerloop();
+        }
+        else {
+            int[] shipLengths = player.getShipLengths();
+            //int[] shipLengths = {5,4,3};
+            s.sendShips(shipLengths);
+            System.out.println("Schiffe gesendet");
+            String messagedone = s.receiveMessage();
+            System.out.println(messagedone);
+            if (messagedone.contains("done")){
+                s.sendReady();
+                System.out.println("Ready sent!");
+                startMultiplayerloop();
+            }
+        }
+
+    }
+
+    private void startGameFlow() throws IOException {
+        if(!client) { // This check is good
+            String yeye = s.receiveMessage();
+            System.out.println(yeye);
+            if (firstturn){
+                if (yeye.equals("ready")) {
+                    firstturn = false;
+                }
+            }
+            // The 'else' block was missing, but the core logic is inside the while loop.
+            // Let's assume the firstturn logic is handled and we proceed to the main loop.
+
+            while (true) {
+                // Nur auf Nachrichten lauschen, wenn man nicht am Zug ist
+                if (!myturn) {
+                    String m = s.receiveMessage();
+                    String[] p = m.split(" ");
+                    switch (p[0]) {
+                        case "shot": // Der Client hat auf uns geschossen
+                            Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
+
+                            // Fall 1: Zelle wurde bereits beschossen
+                            if (c.isShot()) {
+                                s.sendAnswer(0);
+                                System.out.println("Schon getroffen, sende 0");
+                            } else {
+                                player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
+                                if (c.getShip() == null) { // Fehlschuss
+                                    s.sendAnswer(0);
+                                    System.out.println("Antwort gesendet: 0 (Miss)");
+                                } else if (!c.getShip().isAlive()) { // Versenkt
+                                    player.deleteShip();
+                                    s.sendAnswer(2);
+                                    System.out.println("Antwort gesendet: 2 (Sunk)");
+                                } else { // Treffer
+                                    s.sendAnswer(1);
+                                    System.out.println("Antwort gesendet: 1 (Hit)");
+                                }
+                            }
+                            break;
+
+                        case "answer": // Wir haben eine Antwort auf unseren Schuss erhalten
+                            Cell ce = enemy.getCell(x, y);
+                            if (p[1].equals("0")) { // Fehlschuss
+                                Platform.runLater(() -> ce.setFill(Color.BLACK));
+                                // Unser Zug ist vorbei. Wir übergeben mit "pass".
+                                System.out.println("Fehlschuss. Sende pass.");
+                                s.sendPass();
+                            } else { // Treffer (1) oder Versenkt (2)
+                                Platform.runLater(() -> ce.setFill(Color.RED));
+                                // Es ist immer noch unser Zug! Wir setzen myturn wieder auf true.
+                                System.out.println("Treffer/Versenkt. Ich bin wieder dran.");
+                                myturn = true;
+                            }
+                            break;
+
+                        case "pass": // Der Client übergibt den Zug an uns
+                            System.out.println("habe pass bekommen");
+                            myturn = true; // Jetzt sind wir dran
+                            break;
+                        // ... andere cases
+                    }
+                } else {
+                    // Wenn wir am Zug sind, warten wir auf eine UI-Aktion.
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
     }
 
     public void start() throws IOException {
         if (!client){ //man selber ist host
             s.start(5000);
+            System.out.println("Multiplayer connected!");
             s.sendSize(player.getBreit(), player.getLang());
-            while(!s.receiveMessage().equals("done")){
-
-            }
+            System.out.println("Server: Größen geschickt mit Werten von: "+player.getBreit()+" "+player.getLang());
+            String message = s.receiveMessage();
+            System.out.println(message);
             //hier sollen die platzierten schiffe dann rübergeschickt werden vielleicht am besten mit einem button oder so
-            while(!player.getControl().getReady()){
+            //das thread ding von chat mal übernommen und ausprobiert aber funktioniert auch d
 
-            }
-            int[] shipLengths = player.getShipLengths();
-            s.sendShips(shipLengths);
-
-            while(true){
-                if (s.receiveMessage().equals("done")){
-                    s.sendReady();
-                    break;
-                }
-            }
-
-
-            if (s.receiveMessage().equals("ready")){
-                while(true){
-                    String m = s.receiveMessage();
-                    String [] p = m.split(" ");
-                    switch(s.receiveMessage()){
-                        case "shot":
-                            Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                            if (!c.isShot()){
-                                merkx = Integer.parseInt(p[1]);
-                                merky = Integer.parseInt(p[2]);
-                                player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                                if (c.getShip() == null){
-                                    s.sendAnswer(0);
-                                } else if (c.getShip() != null && !c.getShip().isAlive()) {
-                                    s.sendAnswer(2);
-                                }
-                                else {
-                                    s.sendAnswer(1);
-                                }
-                            }
-                            else{
-                                System.out.println("ist doch schon geschossen");
-                            }
-                            break;
-
-                        case "answer":
-                            Cell ce = enemy.getCell(merkx, merky);
-                            if (p[1].equals("0")){
-                                ce.setFill(Color.BLACK);
-                                s.sendPass();
-                            }
-                            if (p[1].equals("1")){
-                                ce.getShip().hit();
-                                ce.setFill(Color.RED);
-                            }
-                            if (p[1].equals("2")){
-                                ce.getShip().hit();
-                                enemy.deleteShip();
-                                ce.setFill(Color.RED);
-                            }
-                            break;
-
-                        case "pass":
-                            s.sendShot(x, y);
-                            break;
-
-
-                        case "ok":
-                            break;
-
-                        case "save":
-                            break;
-
-                        case "ships":
-                            break;
-                    }
-                }
-            }
+            System.out.println("While schleife fürs warten verlassen");
 
         }
         else {// man ist client und joined
             cl.connect(contr.getIP(), contr.getPort());
             boolean temp = true;
-            String m1 = cl.receiveMessage();
-            String [] p1 = m1.split(" ");
+
+            System.out.println("nachricht wurde gesplitet");
             int rows = 0;
             int cols = 0;
-            while(temp){
-                switch (cl.receiveMessage()){
+            for (int i = 0; i <= 1; i++) {
+                String m1 = cl.receiveMessage();
+                System.out.println(m1);
+                String[] p1 = m1.split(" ");
+
+                switch (p1[0]) {
                     /*case "done":
                         cl.sendDone();
                         temp = false;
                         break;*/
                     case "size":
+                        System.out.println("bin in case size");
                         rows = Integer.parseInt(p1[1]);
                         cols = Integer.parseInt(p1[2]);
                         // Jetzt kannst du das Spielfeld erzeugen
                         player = new Gamefield(false, contr, rows, cols, this);  // z. B. true = eigenes Feld
                         enemy = new Gamefield(true, contr, rows, cols, this); // false = Gegnerfeld
-                        contr.setBoard(enemy, player);
-                        contr.temp();
+                        Platform.runLater(() -> {
+                            contr.setupGameMult(enemy, player);
+                        });
                         cl.sendDone(); // Antwort an den Server
                         break;
                     case "load":
                         //lade ID
                         break;
                     case "ships":
+                        player.clearShips();
                         int[] lengths = new int[p1.length - 1];
-                        for (int i = 1; i < p1.length; i++) {
-                            int len = Integer.parseInt(p1[i]);
-                            lengths[i - 1] = len;
+                        for (int j = 1; j < p1.length; j++) {
+                            System.out.println(p1[j]);
+                            int len = Integer.parseInt(p1[j]);
+
+                            lengths[j - 1] = len;
                             player.addShip(new Ships(len, len));
                         }
                         player.getControl().setShipCountsFromNetwork(lengths);
-                        while(!contr.getReady()){
+                        //while (!contr.getReady()) {
 
-                        }
+                        //}
                         cl.sendDone();
                         break;
+
                 }
             }
 
-            if (cl.receiveMessage().equals("ready")) {
+        }
+    }
+
+    public void clientGame() throws IOException {
+        if (firstturn){
+            String f = cl.receiveMessage();
+            if (f.equals("ready")) {
+                System.out.println("hab ready bekommen");
                 cl.sendReady();
+                firstturn = false;
+            }
+        }
 
-                while (true) {
-                    String m = cl.receiveMessage();
-                    String[] p = m.split(" ");
-                    switch (cl.receiveMessage()) {
-                        case "shot":
-                            Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                            if (!c.isShot()) {
-                                merkx = Integer.parseInt(p[1]);
-                                merky = Integer.parseInt(p[2]);
-                                player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
-                                if (c.getShip() == null){
-                                    cl.sendAnswer(0);
-                                } else if (c.getShip() != null && !c.getShip().isAlive()) {
-                                    cl.sendAnswer(2);
-                                }
-                                else {
-                                    cl.sendAnswer(1);
-                                }
-                            } else {
-                                System.out.println("ist doch schon geschossen");
+        while (true) {
+            // Nur auf Nachrichten lauschen, wenn man nicht am Zug ist
+            if (!myturn) {
+                String m = cl.receiveMessage();
+                String[] p = m.split(" ");
+                switch (p[0]) {
+                    case "shot": // Der Server hat auf uns geschossen
+                        Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
+
+                        // Fall 1: Zelle wurde bereits beschossen
+                        if (c.isShot()) {
+                            // Sende "miss", da es keine Auswirkung hat. Der Server ist weiterhin dran.
+                            cl.sendAnswer(0);
+                            System.out.println("Schon getroffen, sende 0");
+                        } else {
+                            // Ansonsten, schieße auf die Zelle
+                            player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
+                            if (c.getShip() == null) { // Fehlschuss
+                                cl.sendAnswer(0);
+                                System.out.println("Antwort gesendet: 0 (Miss)");
+                            } else if (!c.getShip().isAlive()) { // Versenkt
+                                player.deleteShip();
+                                cl.sendAnswer(2);
+                                System.out.println("Antwort gesendet: 2 (Sunk)");
+                            } else { // Treffer
+                                cl.sendAnswer(1);
+                                // WICHTIG: myturn wird hier NICHT geändert. Der Server ist weiterhin dran.
+                                System.out.println("Antwort gesendet: 1 (Hit)");
                             }
-                            break;
+                        }
+                        break;
 
-                        case "answer":
-                            Cell ce = enemy.getCell(merkx, merky);
-                            if (p[1].equals("0")) {
-                                ce.setFill(Color.BLACK);
-                                cl.sendPass();
-                            }
-                            if (p[1].equals("1")) {
-                                ce.getShip().hit();
-                                ce.setFill(Color.RED);
-                            }
-                            if (p[1].equals("2")) {
-                                ce.getShip().hit();
-                                enemy.deleteShip();
-                                ce.setFill(Color.RED);
-                            }
-                            break;
+                    case "answer": // Wir haben eine Antwort auf unseren Schuss erhalten
+                        Cell ce = enemy.getCell(x, y);
+                        if (p[1].equals("0")) { // Fehlschuss
+                            Platform.runLater(() -> ce.setFill(Color.BLACK));
+                            // Unser Zug ist vorbei. Wir übergeben mit "pass".
+                            System.out.println("Fehlschuss. Sende pass.");
+                            cl.sendPass();
+                        } else { // Treffer (1) oder Versenkt (2)
+                            Platform.runLater(() -> ce.setFill(Color.RED));
+                            // Es ist immer noch unser Zug! Wir müssen myturn wieder auf true setzen,
+                            // damit die UI einen neuen Schuss erlaubt.
+                            System.out.println("Treffer/Versenkt. Ich bin wieder dran.");
+                            myturn = true;
+                        }
+                        break;
 
-                        case "pass":
-                            cl.sendShot(x, y);
-                            break;
+                    case "pass": // Der Server übergibt den Zug an uns
+                        System.out.println("habe pass bekommen");
+                        myturn = true; // Jetzt sind wir dran
+                        break;
 
-
-                        case "ok":
-                            break;
-
-                        case "save":
-                            break;
-
-                    }
+                    //... andere cases
+                }
+            } else {
+                // Wenn wir am Zug sind, warten wir auf eine UI-Aktion.
+                // Ein kurzer Sleep verhindert, dass die Schleife die CPU voll auslastet.
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -235,5 +296,56 @@ public class MultiplayerLogic {
 
     public void setController(HelloController c ){
         contr = c;
+    }
+
+    public boolean getClient(){
+        return client;
+    }
+
+    public void startShoot() throws IOException {
+        if (!client){
+            s.sendShot(x, y);
+            myturn = false;
+            System.out.println(x+" "+y);
+        }
+        else {
+            cl.sendShot(x, y);
+            myturn = false;
+        }
+
+    }
+
+
+    /*public void setmyturn(boolean turn) {
+        myturn = !turn;
+    }*/
+
+    public boolean getTurn(){
+        return myturn;
+    }
+
+    public void startMultiplayerloop() throws IOException {
+        if (!client){
+            Thread t = new Thread(() -> {
+                try {
+                    startGameFlow();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            t.setDaemon(true);
+            t.start();
+        }
+        else {
+            Thread t = new Thread(() -> {
+                try {
+                    clientGame();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            t.setDaemon(true);
+            t.start();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package org.example.schiffuntergang;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -39,9 +40,12 @@ public class HelloController {
     private boolean readyToSendShips = false;
     private Gamefield enemy;
     private Gamefield player;
-    private boolean temp;
+    private boolean temp = true;
     private String ipa;
     private int porta;
+    private int[] shipsAllowed = new int[6];
+
+    MultiplayerLogic mlp;
 
     @FXML
     private AnchorPane anker;
@@ -139,8 +143,17 @@ public class HelloController {
         ipa = ip;
         porta = port;
         Client ce = new Client();
-        MultiplayerLogic mlp = new MultiplayerLogic(ce, true, null, null);
+        mlp = new MultiplayerLogic(ce, true, null, null);
         mlp.setController(this);
+        new Thread(() -> {
+            try {
+                mlp.start(); // alles Netzwerk-Zeug → eigener Thread
+            } catch(IOException e){
+                System.out.println("IOException");
+            }
+        }).start();
+
+
         while(temp){
 
         }
@@ -176,12 +189,11 @@ public class HelloController {
         isClientMode = true;
 
         Server se = new Server();
-        MultiplayerLogic mlp = new MultiplayerLogic(se, false, null, null);
+        mlp = new MultiplayerLogic(se, false, null, null);
         player = new Gamefield(false, this, (int) x, (int) y, mlp);
         enemy = new Gamefield(true, this, (int) x, (int) y, mlp);
         mlp.setEn(enemy);
         mlp.setPl(player);
-
 
         setButtons();
 
@@ -189,9 +201,9 @@ public class HelloController {
             int len = i;
             Button b = new Button("Länge " + len);
             b.setOnAction(e -> {
-                if (canPlaceShipOfLength(len)) {
+                //if (canPlaceShipOfLength(len)) {
                     length = len;
-                }
+                //}
             });
 
             Label counter = new Label("Verbleibend: " + maxPerShipLength);
@@ -199,6 +211,17 @@ public class HelloController {
 
             HBox row = new HBox(10, b, counter);
             row.setAlignment(Pos.CENTER);
+            boxenV.getChildren().add(row);
+        }
+        rootPane.getChildren().add(player);
+        rootPane.getChildren().add(enemy);
+        new Thread(() ->{
+            try {
+                mlp.start(); // alles Netzwerk-Zeug → eigener Thread
+            } catch(IOException e){
+                System.out.println("IOException");
+            }
+        }).start();
             try{
                 mlp.start();
             } catch(IOException e){
@@ -237,9 +260,9 @@ public class HelloController {
         playerturn = !playerturn;
     }
 
-    public boolean canPlaceShipOfLength(int len) {
+    /*public boolean canPlaceShipOfLength(int len) {
         return shipsPlaced[len] < maxPerShipLength;
-    }
+    }*/
 
     public void shipPlaced(int len) {
         shipsPlaced[len]++;
@@ -258,21 +281,23 @@ public class HelloController {
     }
 
     public void setShipCountsFromNetwork(int[] lengths) {
-        for (int len : lengths) {
-            if (len >= 1 && len < shipsPlaced.length) {
-                shipsPlaced[len]++;
-                updateCounter(len);
-            }
+        for (int len = 1; len < lengths.length ; len++) {
+            shipsAllowed[len] = lengths[len];
+            final int lengleng = len;
+            Platform.runLater(() -> updateAllowedCounter(lengleng));
         }
     }
-
+    private void updateAllowedCounter(int len) {
+        //shipCounters[len].setText(shipsPlaced[len] + " / " + shipsAllowed[len]);
+    }
     public boolean getReady(){
         return readyToSendShips;
     }
 
     @FXML
-    private void onReadyClicked() {
+    private void onReadyClicked() throws IOException {
         readyToSendShips = true;
+        mlp.sendShips();
         System.out.println("Fertig gedrückt – bereit zum Senden der Schiffe");
     }
     public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
@@ -299,6 +324,7 @@ public class HelloController {
     public void setBoard(Gamefield e, Gamefield p){
         player = p;
         enemy = e;
+        temp = false;
     }
 
     private void setButtons(){
@@ -361,5 +387,29 @@ public class HelloController {
     }
     public int getPort(){
         return porta;
+    }
+
+    public void setupGameMult(Gamefield pl, Gamefield en){
+
+        rootPane.getChildren().add(en);
+        rootPane.getChildren().add(pl);
+        rootPane.setAlignment(Pos.CENTER);
+
+        VBox.setVgrow(en, Priority.ALWAYS);
+        VBox.setVgrow(pl, Priority.ALWAYS);
+        en.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        pl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        setButtons();
+
+
+        for (int i = 2; i <= 5; i++) {
+            Label counter = new Label("Empfangen: 0");
+            shipCounters[i] = counter;
+
+            HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
+            row.setAlignment(Pos.CENTER);
+            boxenV.getChildren().add(row);
+        }
     }
 }

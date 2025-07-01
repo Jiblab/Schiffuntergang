@@ -13,6 +13,7 @@ import org.example.schiffuntergang.sounds.*;
 import org.example.schiffuntergang.GameState;
 import org.example.schiffuntergang.SerializableShip;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,9 @@ public class Gamefield extends GridPane {
     private final HelloController control;
     private EnemyPlayer en;
     private MultiplayerLogic lo;
+
+    private boolean multiplayer = false;
+
 
 
     public Gamefield(boolean enemy, HelloController controler, int h, int b) {
@@ -122,6 +126,7 @@ public class Gamefield extends GridPane {
     public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l) {
         lang = h;
         breit = b;
+        multiplayer = true;
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
@@ -143,11 +148,10 @@ public class Gamefield extends GridPane {
                     if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
                         int len = control.getLength();
-                        if (getUsedCells() <= maxShipsC() && len > 0 && control.canPlaceShipOfLength(len)) {
+                        if (getUsedCells() <= maxShipsC() && len > 0 ) {
                             Ships ship = new Ships(len, len);
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(len);
-                                addShip(ship);
                                 if (control.isClientMode()) {
                                     control.shipPlaced(len);
                                 }
@@ -166,13 +170,19 @@ public class Gamefield extends GridPane {
                         }
 
 
-                    } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
-                        lo.setX(c.x); // c.getX());
-                        lo.setY(c.y); // c.getY());
-                        shoot(c.x, c.y);//((int) c.getX(), (int) c.getY());
-                    }
-                });
 
+                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
+                        if (lo.getTurn()){
+                            lo.setX(x);
+                            lo.setY(y);
+                            System.out.println(x+ " "+y);
+                            try {
+                                lo.startShoot();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                  
                 add(c, i, j);
             }
         }
@@ -237,7 +247,9 @@ public class Gamefield extends GridPane {
 
             Cell c = getCell(xi, yi);
             c.setShip(ship);
-            placedShip.add(ship);
+
+
+
 
 
             if (!enemy) {
@@ -247,7 +259,7 @@ public class Gamefield extends GridPane {
                 c.setFill(Color.GRAY);
             }
         }
-
+        placedShip.add(ship);
         System.out.println("Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
@@ -273,35 +285,7 @@ public class Gamefield extends GridPane {
         usedCells += laenge;
     }
 
-    /* public void shoot(int x, int y){
-         Cell c = getCell(x, y);
-         Ships s = c.getShip();
-
-         if (s != null){
-             s.hit();
-             c.setFill(Color.RED);
-             if (s.getHealth() == 0){
-                 deleteShip();
-             }
-             System.out.println(control.getPlayerturn());
-             if (this.enemy){
-                 System.out.println("nix hier in der if abfrage");
-                 en.revenge();
-             }
-         }
-         else {
-             c.setFill(Color.BLACK);
-             System.out.println("Koordinaten x, dann y: "+x+" "+y);
-             if (this.enemy){
-                 en.revenge();
-             }
-
-         }
-         if (c.isShot()) return; //damit man nicht das geiche feld mehrmals anschießt
-         c.setShot(true);
-     }
- */
-    public boolean shoot(int x, int y) {
+    public void shoot(int x, int y){
         Cell c = getCell(x, y);
         Ships s = c.getShip();
         if (c.isShot()) {
@@ -316,14 +300,16 @@ public class Gamefield extends GridPane {
                 deleteShip();
             }
             System.out.println(control.getPlayerturn());
-            if (this.enemy) {
+            if (this.enemy && !multiplayer){
+
                 System.out.println("nix hier in der if abfrage");
                 en.revenge();
             }
         } else {
             c.setFill(Color.BLACK);
-            System.out.println("Koordinaten x, dann y: " + x + " " + y);
-            if (this.enemy) {
+            System.out.println("Koordinaten x, dann y: "+x+" "+y);
+            if (this.enemy && !multiplayer){
+
                 en.revenge();
             }
         }
@@ -423,6 +409,11 @@ public class Gamefield extends GridPane {
         }
 
         return board;
+    }
+
+    public void clearShips() {
+        placedShip.clear();
+        // ggf. auch das Spielfeld zurücksetzen, falls nötig
     }
 
 }
