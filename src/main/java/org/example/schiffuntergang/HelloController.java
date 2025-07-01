@@ -46,19 +46,14 @@ public class HelloController {
     private AnchorPane anker;
 
     @FXML
-    private Button shootButton;
-
-    @FXML
     private Label messageLabel;
 
     @FXML
     private BorderPane rootPane;
 
     @FXML
-    private HBox boxen;
+    private HBox shipControlBox;
 
-    @FXML
-    VBox boxenV;
     @FXML
     private ImageView backgroundImage;
     @FXML
@@ -78,24 +73,6 @@ public class HelloController {
             backgroundImage.setFitHeight(newVal.doubleValue());
         });
     }
-    @FXML
-    private void onShootClicked() {
-        if (!playerturn) {
-            setMessage("Wait your turn");
-            return;
-        }
-        setPlayerturn();
-        int targetX = rand.nextInt((int) x);
-        int targetY = rand.nextInt((int) y);
-
-        boolean validShot = enemy.shoot(targetX, targetY);
-        if (validShot) {
-            setMessage("Treffer auf (" + targetX + ", " + targetY + ")");
-            setPlayerturn(); // Spielerwechsel
-        } else {
-            setMessage("Schon getroffen auf (" + targetX + ", " + targetY + ")");
-        }
-    }
 
     public void setMessage(String msg) {
         if (messageLabel != null) {
@@ -103,58 +80,51 @@ public class HelloController {
         }
     }
     public void setup(){
-
+        // Create the game fields
         player = new Gamefield(false, this, (int) x, (int) y);
         EnemyPlayer en = new EnemyPlayer(player);
         enemy = new Gamefield(true, this, (int) x, (int) y, en);
 
-
-        HBox spielfelderBox = new HBox(20, enemy, player);
-        spielfelderBox.setAlignment(Pos.CENTER);
-
-        rootPane.setCenter(spielfelderBox);
-        rootPane.setRight(boxenV); // oder setBottom(boxenV);
-        BorderPane.setAlignment(boxenV, Pos.CENTER);
-
-        VBox enemyBox = new VBox(5);
+        // VBox für die Spielfelder mit label
+        VBox enemyBox = new VBox(10, enemy, new Label("Enemy"));
         enemyBox.setAlignment(Pos.CENTER);
-        Label enemyLabel = new Label("Enemy");
-        enemyBox.getChildren().addAll(enemy, enemyLabel);
 
-        VBox playerBox = new VBox(10);
+        VBox playerBox = new VBox(10, player, new Label("Player"));
         playerBox.setAlignment(Pos.CENTER);
-        Label playerLabel = new Label("Player");
-        playerBox.getChildren().addAll(player, playerLabel);
 
+        // main HBox für VBoxes
         HBox spielfeldBox = new HBox(20, enemyBox, playerBox);
-        spielfelderBox.setAlignment(Pos.CENTER);
+        spielfeldBox.setAlignment(Pos.CENTER);
 
         rootPane.setCenter(spielfeldBox);
 
-
-        //random platzieren der gegnerschiffe
-        while(enemy.getUsedCells() <= enemy.maxShipsC()){
-            int shipLength = 2 + rand.nextInt(4);
+        // enemy ships random setzen
+        while (enemy.getUsedCells() <= enemy.maxShipsC()) {
+            int shipLength = 2 + rand.nextInt(4); // Creates ships of length 2, 3, 4, or 5
             boolean vertical = rand.nextBoolean();
 
-            // ACHTUNG: Breite = x, Höhe = y
+            // Correctly calculate max coordinates to prevent ships from going out of bounds
             int xMax = (int) x - (vertical ? 1 : shipLength);
             int yMax = (int) y - (vertical ? shipLength : 1);
+
+            if (xMax < 0 || yMax < 0) continue; // Skip if a ship can't fit at all
 
             int x2 = rand.nextInt(xMax + 1);
             int y2 = rand.nextInt(yMax + 1);
 
             Ships ship = new Ships(shipLength, shipLength);
-
-            if (enemy.placeShip(ship, x2, y2, vertical )){
+            if (enemy.placeShip(ship, x2, y2, vertical)) {
                 enemy.increaseCells(shipLength);
             }
         }
-        VBox.setVgrow(enemy, Priority.ALWAYS);
-        VBox.setVgrow(player, Priority.ALWAYS);
-        enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-       setButtons();
+        setButtons();
+            /*// Ensure game fields resize properly
+            VBox.setVgrow(enemy, Priority.ALWAYS);
+            VBox.setVgrow(player, Priority.ALWAYS);
+            enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+*/
+
     }
 
     public void setupMultiC(String ip, int port){
@@ -179,14 +149,12 @@ public class HelloController {
 
         setButtons();
 
-
         for (int i = 2; i <= 5; i++) {
             Label counter = new Label("Empfangen: 0");
             shipCounters[i] = counter;
 
             HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
             row.setAlignment(Pos.CENTER);
-            boxenV.getChildren().add(row);
         }
         try{
             mlp.start();
@@ -223,7 +191,6 @@ public class HelloController {
 
             HBox row = new HBox(10, b, counter);
             row.setAlignment(Pos.CENTER);
-            boxenV.getChildren().add(row);
             try{
                 mlp.start();
             } catch(IOException e){
@@ -331,8 +298,8 @@ public class HelloController {
         Button b3 = new Button("Länge 3");
         Button b4 = new Button("Länge 4");
         Button b5 = new Button("Länge 5");
-        Button d = new Button("Vertikal");
-        Button d2 = new Button("Horizental");
+        Button d = new Button("Horizontal");
+        Button d2 = new Button("Vertikal");
         Button back = new Button("Back to Start");
 
         b2.setOnAction(e -> length = 2);
@@ -346,15 +313,7 @@ public class HelloController {
                     startScreen.show();
                 }
         );
-
-        boxenV.getChildren().add(b2);
-        boxenV.getChildren().add(b3);
-        boxenV.getChildren().add(b4);
-        boxenV.getChildren().add(b5);
-        boxenV.getChildren().add(d);
-        boxenV.getChildren().add(d2);
-        boxenV.getChildren().add(back);
-        boxenV.setAlignment(Pos.CENTER);
+        shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back);
     }
 
     public void temp(){

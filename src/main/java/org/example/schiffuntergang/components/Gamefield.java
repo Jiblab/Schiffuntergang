@@ -167,9 +167,9 @@ public class Gamefield extends GridPane {
 
 
                     } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
-                        lo.setX((int) c.getX());
-                        lo.setY((int) c.getY());
-                        shoot((int) c.getX(), (int) c.getY());
+                        lo.setX(c.x); // c.getX());
+                        lo.setY(c.y); // c.getY());
+                        shoot(c.x, c.y);//((int) c.getX(), (int) c.getY());
                     }
                 });
 
