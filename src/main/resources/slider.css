@@ -1,0 +1,69 @@
+
+/*SLIDER*/
+
+/* track */
+.slider .track {
+    -fx-background-color: #333333; /* dunkelgrau */
+    -fx-background-radius: 0;
+    -fx-pref-height: 15px;          /* dicke */
+    -fx-border-color: #111111;     /* fast schwarz */
+    -fx-border-width: 2px;
+}
+
+/* Der quadratische Regler*/
+.slider .thumb {
+    -fx-background-color: #7b68ee; /* Rot */
+    -fx-background-radius: 0;
+    -fx-pref-width: 24px;
+    -fx-pref-height: 24px;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-effect: null;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #b0e0e6; /* orange Hover */
+}
+
+/* Gedrückt-Effekt */
+.slider .thumb:pressed {
+    -fx-background-color: #ffffff; /* Weiß, wenn gedrückt*/
+}
+
+/*LABELS */
+
+/* Stil für alle Labels in der Szene */
+.label {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 1, 1); /* schatten für lesbarkeit */
+    -fx-font-smoothing-type: gray;
+}
+/* Toggle */
+.toggle-switch {
+    -fx-padding: 5px;
+}
+
+/* Die Schiene des Schalters */
+.toggle-switch .switch {
+    -fx-background-color: #333333; /* dunkelgrauer Slider */
+    -fx-background-radius: 0;      /* Keine Rundungen */
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+}
+
+/*der bewegliche Teil des Schalters */
+.toggle-switch .thumb {
+    -fx-background-color: #ff4136; /* rot wenn aus */
+    -fx-background-radius: 0;
+}
+
+/* Schalter an */
+.toggle-switch:selected .thumb {
+    -fx-background-color: #2ecc40; /*Grün für an */
+}
+
+.toggle-switch:selected .switch {
+    -fx-background-color: #555555; /*heller Hintergrund, wenn an */
+}

@@ -1,23 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="anker" prefHeight="632.0" prefWidth="829.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.schiffuntergang.HelloController">
-   <children>
-      <VBox fx:id="rootPane" alignment="CENTER" layoutX="14.0" layoutY="-1.0" prefHeight="632.0" prefWidth="402.0" spacing="20.0">
-      
-          <padding>
-              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-          </padding>
-      
-          <Label fx:id="welcomeText" />
-      
-          <HBox fx:id="boxen" alignment="TOP_RIGHT" spacing="50" />
-          <Button fx:id="readyButton" text="Fertig" onAction="#onReadyClicked" />
-      
-      </VBox>
-      <VBox fx:id="boxenV" layoutX="701.0" layoutY="216.0" prefHeight="200.0" prefWidth="100.0" />
-   </children>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="anker" prefHeight="632.0" prefWidth="829.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="org.example.schiffuntergang.HelloController">
+
+    <children>
+        <!-- Hintergrundbild, das den gesamten Bereich füllt -->
+        <ImageView fx:id="backgroundImage" fitHeight="632.0" fitWidth="829.0" pickOnBounds="true"
+                   preserveRatio="false"/>
+
+        <!-- Diese BorderPane ist der Haupt-Layout-Container und füllt den gesamten Anker -->
+        <BorderPane fx:id="rootPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+            <!-- Der Center-Bereich wird durch Ihren Java-Code mit den Spielfeldern befüllt -->
+            <center>
+                <!-- absichtlich leer -->
+            </center>
+
+
+            <!-- Der Bottom-Bereich enthält ALLE Steuerelemente -->
+            <bottom>
+                <VBox alignment="CENTER" spacing="15.0">
+                    <padding>
+                        <Insets bottom="20.0" top="10.0"/>
+                    </padding>
+                    <children>
+                        <!-- Nachrichts-Label -->
+                        <Label fx:id="messageLabel" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+
+                        <!-- Dieser HBox ist der neue Container für Ihre Buttons -->
+                        <HBox fx:id="shipControlBox" alignment="CENTER" spacing="10.0"/>
+
+                        <!-- Fertig-Button -->
+                        <Button fx:id="readyButton" onAction="#onReadyClicked" text="Fertig"/>
+                    </children>
+                </VBox>
+            </bottom>
+
+        </BorderPane>
+    </children>
 </AnchorPane>
