@@ -27,6 +27,8 @@ public class Options {
     private final Stage stage;
     private static BackgroundMusic bgMusic;
     private double previousVolume;
+    private Timeline parallaxTimeline;
+
     static {
         try {
             Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
@@ -36,69 +38,22 @@ public class Options {
         }
     }
 
-    private Timeline parallaxTimeline;
-
     public Options(Stage stage) {
         this.stage = stage;
         bgMusic = BackgroundMusic.getInstance();
     }
 
     public void show() {
-        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
-
-        ToggleSwitch musictoggle = new ToggleSwitch("MUTE MUSIC");
-        double initialVolume = SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50;
-        Slider volume = new Slider(0, 100, initialVolume);
-        Button back = new Button("BACK TO START");
-
-        SoundEffect.setVolume(volume.getValue());
-        bgMusic.setVolume(volume.getValue() / 100.0);
-
-        back.setOnAction(e -> {
-            clickSound.play();
-            if (parallaxTimeline != null) parallaxTimeline.stop();
-            StartScreen startScreen = new StartScreen(stage);
-            startScreen.show();
-        });
-
-        volume.valueProperty().addListener((obs, oldVal, newVal) -> {
-            double vol = newVal.doubleValue();
-            SoundEffect.setVolume(vol);
-            bgMusic.setVolume(vol / 100.0);
-            musictoggle.setSelected(vol == 0);
-        });
-
-        musictoggle.selectedProperty().addListener((obs, before, after) -> {
-            if (after) {
-                previousVolume = volume.getValue();
-                if (previousVolume > 0) {
-                    volume.setValue(0);
-                }
-            } else {
-                if (volume.getValue() == 0) {
-                    volume.setValue(previousVolume > 0 ? previousVolume : 50);
-                }
-            }
-        });
-
-        VBox controlsLayout = new VBox(25, musictoggle, volume, back);
-        controlsLayout.setAlignment(Pos.CENTER);
-        controlsLayout.maxWidthProperty().bind(stage.widthProperty().multiply(0.6));
-        controlsLayout.setPadding(new Insets(30));
-
-        adjustFontSize(back, 20);
-        back.prefWidthProperty().bind(stage.widthProperty().multiply(0.2));
-        back.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
+        VBox controlsLayout = createControls();
 
         StackPane parallaxRoot = new StackPane();
-        List<ParallaxLayer> animatedLayers = new ArrayList<>();
-
-        addStaticBackground(parallaxRoot);
-        addAnimatedBackground(parallaxRoot, animatedLayers);
+        parallaxRoot.setAlignment(Pos.CENTER);
+        List<ParallaxLayer> animatedLayers = createAndAddBackgroundLayers(parallaxRoot);
         parallaxRoot.getChildren().add(controlsLayout);
 
         Scene scene = new Scene(parallaxRoot, 400, 300);
 
+        //CSS
         scene.getStylesheets().add(getClass().getResource("/slider.css").toExternalForm());
 
         scene.setOnKeyPressed(e -> {
@@ -114,40 +69,85 @@ public class Options {
         stage.setTitle("Options");
         stage.setFullScreen(true);
         stage.show();
-
-        // 6. --- Animation starten ---
         startParallaxAnimation(animatedLayers);
     }
 
-    // --- HELFERMETHODEN FÜR SAUBEREN AUFBAU ---
+    private VBox createControls() {
+        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
+        ToggleSwitch musictoggle = new ToggleSwitch("MUTE MUSIC");
+        double initialVolume = SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50;
+        Slider volume = new Slider(0, 100, initialVolume);
+        Button back = new Button("BACK TO START");
 
-    private void addStaticBackground(StackPane root) {
-        root.getChildren().addAll(
-                createFullscreenImageView("/images/0.png"),
-                createFullscreenImageView("/images/1.png"),
-                createFullscreenImageView("/images/4.png"),
-                createFullscreenImageView("/images/5.png"),
-                createFullscreenImageView("/images/7.png"),
-                createFullscreenImageView("/images/12.png")
-        );
+        SoundEffect.setVolume(volume.getValue());
+        bgMusic.setVolume(volume.getValue() / 100.0);
+        back.setOnAction(e -> {
+            clickSound.play();
+            if (parallaxTimeline != null) parallaxTimeline.stop();
+            StartScreen startScreen = new StartScreen(stage);
+            startScreen.show();
+        });
+        volume.valueProperty().addListener((obs, oldVal, newVal) -> {
+            double vol = newVal.doubleValue();
+            SoundEffect.setVolume(vol);
+            bgMusic.setVolume(vol / 100.0);
+            musictoggle.setSelected(vol == 0);
+        });
+        musictoggle.selectedProperty().addListener((obs, before, after) -> {
+            if (after) {
+                previousVolume = volume.getValue();
+                if (previousVolume > 0) volume.setValue(0);
+            } else {
+                if (volume.getValue() == 0) volume.setValue(previousVolume > 0 ? previousVolume : 50);
+            }
+        });
+
+        VBox layout = new VBox(25, musictoggle, volume, back);
+        layout.setAlignment(Pos.CENTER);
+        layout.maxWidthProperty().bind(stage.widthProperty().multiply(0.6));
+        layout.setPadding(new Insets(30));
+
+        adjustFontSize(back, 40);
+        back.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
+        back.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
+
+        return layout;
     }
 
-    private void addAnimatedBackground(StackPane root, List<ParallaxLayer> layerList) {
+    private List<ParallaxLayer> createAndAddBackgroundLayers(StackPane root) {
+        // --- Alle Ebenen instanziieren ---
+        ImageView background = createFullscreenImageView("/images/0.png");
+        ImageView ocean = createFullscreenImageView("/images/1.png");
+        ImageView beach = createFullscreenImageView("/images/4.png");
+        ImageView white = createFullscreenImageView("/images/5.png");
+        ImageView rocks = createFullscreenImageView("/images/7.png");
+        ImageView palm = createFullscreenImageView("/images/12.png");
+
         ParallaxLayer ocean1 = new ParallaxLayer("/images/2.png", 0.3, stage);
         ParallaxLayer ocean2 = new ParallaxLayer("/images/3.png", 0.4, stage);
         ParallaxLayer cloud1 = new ParallaxLayer("/images/9.png", 0.6, stage);
         ParallaxLayer cloud2 = new ParallaxLayer("/images/10.png", 0.8, stage);
         ParallaxLayer cloud3 = new ParallaxLayer("/images/11.png", 1.2, stage);
 
-        layerList.addAll(List.of(ocean1, ocean2, cloud1, cloud2, cloud3));
+        // --- Die Liste der animierten Ebenen für die Timeline vorbereiten ---
+        List<ParallaxLayer> animatedLayers = List.of(ocean1, ocean2, cloud1, cloud2, cloud3);
 
+        // --- Alle Ebenen in der EXAKT KORREKTEN Reihenfolge zum StackPane hinzufügen ---
         root.getChildren().addAll(
+                background,
+                ocean,
                 ocean1.getNode(),
                 ocean2.getNode(),
+                beach,
+                white,
                 cloud1.getNode(),
                 cloud2.getNode(),
-                cloud3.getNode()
+                cloud3.getNode(),
+                palm,
+                rocks
         );
+
+        return new ArrayList<>(animatedLayers);
     }
 
     private void startParallaxAnimation(List<ParallaxLayer> layers) {

@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.example.schiffuntergang.sounds.SoundEffect;
@@ -29,9 +30,19 @@ public class StartScreen {
     private final Label modeLabel;
     private final boolean isSinglePlayer = true;
 
+    static {
+        try {
+            Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
+        } catch (Exception e) {
+            System.err.println("Pixel-Schriftart konnte nicht geladen werden!");
+            e.printStackTrace();
+        }
+    }
+
     public StartScreen(Stage stage) {
         this.stage = stage;
         this.modeLabel = new Label();
+
     }
 
     public void show() {
@@ -46,7 +57,7 @@ public class StartScreen {
 
         stage.widthProperty().addListener((obs, oldVal, newVal) -> {
             for (Button b : new Button[]{start, load, options, exit}) {
-                adjustFontSize(b, 30);
+                adjustFontSize(b, 40);
             }
         });
 
@@ -96,18 +107,16 @@ public class StartScreen {
             System.exit(0);
         });
 
-        // Layout für Buttons
+
         VBox buttonBox = new VBox(15, modeLabel, start, load, options, exit);
         buttonBox.setAlignment(Pos.CENTER);
         StackPane.setAlignment(buttonBox, Pos.CENTER);
 
-        // Dynamische Buttongröße
         for (Button b : new Button[]{start, load, options, exit}) {
             b.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
             b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
         }
 
-        // Hintergrund + Parallax-Ebenen
         StackPane parallaxRoot = new StackPane();
         ImageView background = createFullscreenImageView("/images/0.png");
         ImageView ocean = createFullscreenImageView("/images/1.png");
@@ -174,7 +183,7 @@ public class StartScreen {
 
     void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
-        button.setStyle("-fx-font-size:" + size + "px");
+        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';");
         // BackgroundImage image = new BackgroundImage(new Image(getClass().getResourceAsStream("/images/button_texture.png")),BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,new BackgroundSize(button.getWidth(), button.getHeight(), false, false, false, true));
         //button.setBackground(new Background(image));
     }

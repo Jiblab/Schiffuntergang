@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.example.schiffuntergang.ui.ParallaxLayer;
@@ -22,14 +23,22 @@ import java.util.List;
 
 public class GameCreationScreen {
     private final Stage stage;
-    // ungenutzte Variablen x, y und isSinglePlayer entfernt
 
     private final SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
-    private Timeline parallaxTimeline; // WICHTIG: Um die Animation zu stoppen
+    static {
+        try {
+            Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
+        } catch (Exception e) {
+            System.err.println("Pixel-Schriftart konnte nicht geladen werden!");
+            e.printStackTrace();
+        }
+    }
 
     public GameCreationScreen(Stage stage) {
         this.stage = stage;
     }
+
+    private Timeline parallaxTimeline;
 
     public void show() {
         // Aufteilung in Helfermethoden für bessere Lesbarkeit
@@ -57,29 +66,28 @@ public class GameCreationScreen {
 
         singleP.setOnAction(e -> {
             clickSound.play();
-            if (parallaxTimeline != null) parallaxTimeline.stop(); // Animation stoppen
+            if (parallaxTimeline != null) parallaxTimeline.stop();
             Boardsize boardsize = new Boardsize(stage, true);
             boardsize.show();
         });
 
         multiP.setOnAction(e -> {
             clickSound.play();
-            if (parallaxTimeline != null) parallaxTimeline.stop(); // Animation stoppen
-            showMultiplayerMenuScene(); // NEUE, SAUBERE METHODE
+            if (parallaxTimeline != null) parallaxTimeline.stop();
+            showMultiplayerMenuScene();
         });
 
         back.setOnAction(e -> {
             clickSound.play();
-            if (parallaxTimeline != null) parallaxTimeline.stop(); // Animation stoppen
+            if (parallaxTimeline != null) parallaxTimeline.stop();
             StartScreen startScreen = new StartScreen(stage);
             startScreen.show();
         });
 
-        // Styling in einer Schleife
         for (Button b : new Button[]{singleP, multiP, back}) {
-            b.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
+            b.prefWidthProperty().bind(stage.widthProperty().multiply(0.4));
             b.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
-            stage.widthProperty().addListener((obs, oldVal, newVal) -> adjustFontSize(b, 30));
+            stage.widthProperty().addListener((obs, oldVal, newVal) -> adjustFontSize(b, 40));
         }
 
         VBox buttonBox = new VBox(15, singleP, multiP, back);
@@ -217,7 +225,7 @@ public class GameCreationScreen {
 
     private void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
-        button.setStyle("-fx-font-size:" + size + "px;");
+        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';");
     }
 
     private ImageView createFullscreenImageView(String path) {

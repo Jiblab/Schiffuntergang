@@ -48,7 +48,15 @@
     -fx-padding: 5px;
 }
 
-/*Toogle switch*/
+/* Der Text neben dem Schalter ("MUTE MUSIC") */
+/* Dieser wird automatisch durch unsere .label Regel von oben gestylt! */
+/* .toggle-switch .label {
+    -fx-font-family: "Press Start 2P";
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+} */
+
+
 /* Die "Schiene" des Schalters */
 .toggle-switch .switch {
     -fx-background-color: #333333; /* Dunkelgrau wie beim Slider */
