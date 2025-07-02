@@ -3,6 +3,7 @@ package org.example.schiffuntergang;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -318,9 +319,31 @@ public boolean getReady(){
 
 @FXML
 private void onReadyClicked() throws IOException {
-    readyToSendShips = true;
-    mlp.sendShips();
-    System.out.println("Fertig gedrückt – bereit zum Senden der Schiffe");
+
+    if (player != null && player.hasShip()) {
+        // Nur wenn mindestens ein Schiff platziert wurde:
+        this.readyToSendShips = true;
+
+        if (mlp != null) {
+            mlp.sendShips();
+            System.out.println("Fertig! Schiffe werden gesendet.");
+        }
+
+        // Optional: Nachricht für den Spieler ändern
+        if (messageLabel != null) {
+            messageLabel.setText("Warte auf Gegner...");
+        }
+
+    } else {
+        // Wenn keine Schiffe platziert wurden:
+        System.out.println("Fehler: Bitte platziere zuerst mindestens ein Schiff!");
+
+        // Visuelles Feedback für den Spieler geben
+        if (messageLabel != null) {
+            messageLabel.setText("Platziere zuerst ein Schiff!");
+        }
+
+    }
 }
 public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
     this.rootPane.getChildren().clear();
@@ -343,11 +366,7 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         BackgroundMusic.getInstance().stop();
 }
 
-public void setBoard(Gamefield e, Gamefield p){
-    player = p;
-    enemy = e;
-    temp = false;
-}
+
 
 private void setButtons(){
     Button b2 = new Button("Länge 2");

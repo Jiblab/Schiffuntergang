@@ -148,25 +148,27 @@ public class Gamefield extends GridPane {
                             if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
                                 int len = control.getLength();
-                                if (getUsedCells() <= maxShipsC() && len > 0) {
+                                if (getUsedCells() + len <= maxShipsC()) {
                                     Ships ship = new Ships(len, len);
                                     if (placeShip(ship, x, y, control.getDirection())) {
-                                        increaseCells(len);
+                                        // Nur wenn das Platzieren erfolgreich war:
+                                        increaseCells(len); // Zähler für belegte Zellen erhöhen
+                                        addShip(ship);      // Schiff zur Liste der platzierten Schiffe hinzufügen
+
                                         if (control.isClientMode()) {
                                             control.shipPlaced(len);
                                         }
                                     }
                                 } else {
-                                    System.out.println(maxShipsC());
-                                    System.out.println("Maximale Anzahl an schiffen erreicht");
-                            /*Platform.runLater(() -> {
-                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                alert.setTitle("Maximum erreicht");
-                                alert.setHeaderText(null);
-                                alert.setContentText("Maximale Anzahl an schiffen erreicht");
-                                alert.showAndWait();
-                            });*/
-
+                                    System.out.println("Limit erreicht! (" + getUsedCells() + "/" + (int)maxShipsC() + ")");
+                                    // Optional: Visuelles Feedback für den Spieler
+                                    Platform.runLater(() -> {
+                                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                                        alert.setTitle("Limit erreicht");
+                                        alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
+                                        alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
+                                        alert.showAndWait();
+                                    });
                                 }
 
 
@@ -198,69 +200,59 @@ public class Gamefield extends GridPane {
     }
 
 
-    public boolean placeShip(Ships ship, int x, int y, boolean vertical) {
+    public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
         int length = ship.getLength();
 
-        // 1. Randüberprüfung
+        // 1. Randüberprüfung (ist jetzt logisch korrekt)
         if (vertical) {
-            if (y + length > lang) {
+            if (startY + length > lang) { // lang ist die Höhe (Anzahl Reihen)
                 System.out.println("Schiff geht vertikal über den Rand.");
                 return false;
             }
         } else {
-            if (x + length > breit) {
+            if (startX + length > breit) { // breit ist die Breite (Anzahl Spalten)
                 System.out.println("Schiff geht horizontal über den Rand.");
                 return false;
             }
         }
 
-        // 2. Überprüfung auf Kollisionen
+        // 2. Überprüfung auf Kollisionen auf ALLEN Zellen des Schiffes
         for (int i = 0; i < length; i++) {
-            int xi;
-            int yi;
+            int currentX = vertical ? startX : startX + i;
+            int currentY = vertical ? startY + i : startY;
 
-            if (vertical) {
-                xi = x;
-                yi = y + i;
-            } else {
-                xi = x + i;
-                yi = y;
-            }
-
-            Cell c = getCell(xi, yi);
-            if (c.getShip() != null) {
-                System.out.println("Zelle (" + xi + ", " + yi + ") ist bereits belegt.");
+            // Durch die Korrektur in getCell() funktioniert dieser Aufruf jetzt wie erwartet!
+            Cell cellToCheck = getCell(currentX, currentY);
+            if (cellToCheck.getShip() != null) {
+                System.out.println("Kollision bei (" + currentX + ", " + currentY + ").");
                 return false;
             }
         }
+
+        // 3. Wenn alle Prüfungen bestanden wurden, platziere das Schiff
         for (int i = 0; i < length; i++) {
-            int xi;
-            int yi;
+            int currentX = vertical ? startX : startX + i;
+            int currentY = vertical ? startY + i : startY;
 
-            if (vertical) {
-                xi = x;
-                yi = y + i;
-            } else {
-                xi = x + i;
-                yi = y;
-            }
-
-            Cell c = getCell(xi, yi);
-            c.setShip(ship);
-
-
-
-
+            Cell cellToPlaceOn = getCell(currentX, currentY);
+            cellToPlaceOn.setShip(ship);
 
             if (!enemy) {
-                c.setFill(Color.WHITE);
-                c.setStroke(Color.GREEN);
+                cellToPlaceOn.setFill(Color.WHITE);
+                cellToPlaceOn.setStroke(Color.GREEN);
             } else {
-                c.setFill(Color.GRAY);
+                // Für das unsichtbare Gegnerfeld. Grau ist vielleicht nicht ideal,
+                // da es suggeriert, dass dort etwas ist. Blau wäre konsistenter.
+                // Aber das ist eine Design-Entscheidung.
+                cellToPlaceOn.setFill(Color.GRAY);
             }
         }
+
+        // Dieser Aufruf gehört logisch eigentlich in die Methode, die placeShip aufruft,
+        // aber hier funktioniert er auch.
         placedShip.add(ship);
-        System.out.println("Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
+
+        System.out.println("Schiff platziert: Start(" + startX + ", " + startY + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
 
@@ -414,6 +406,10 @@ public class Gamefield extends GridPane {
     public void clearShips() {
         placedShip.clear();
         // ggf. auch das Spielfeld zurücksetzen, falls nötig
+    }
+
+    public boolean hasShip(){
+        return !placedShip.isEmpty();
     }
 
 }
