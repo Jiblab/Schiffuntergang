@@ -170,10 +170,10 @@ public class MultiplayerLogic {
                         rows = Integer.parseInt(p1[1]);
                         cols = Integer.parseInt(p1[2]);
                         // Jetzt kannst du das Spielfeld erzeugen
-                        player = new Gamefield(false, contr, rows, cols, this);  // z. B. true = eigenes Feld
-                        enemy = new Gamefield(true, contr, rows, cols, this); // false = Gegnerfeld
+                        player = new Gamefield(false, contr, cols, rows, this);  // z. B. true = eigenes Feld
+                        enemy = new Gamefield(true, contr, cols, rows, this); // false = Gegnerfeld
                         Platform.runLater(() -> {
-                            contr.setupGameMult(enemy, player);
+                            contr.setupGameMult(player, enemy);
                         });
                         cl.sendDone(); // Antwort an den Server
                         break;
@@ -181,19 +181,21 @@ public class MultiplayerLogic {
                         //lade ID
                         break;
                     case "ships":
-                        player.clearShips();
-                        int[] lengths = new int[p1.length - 1];
+                        int[] receivedShipCounts = new int[6]; // Index = Länge, Wert = Anzahl
                         for (int j = 1; j < p1.length; j++) {
-                            System.out.println(p1[j]);
                             int len = Integer.parseInt(p1[j]);
-
-                            lengths[j - 1] = len;
-                            player.addShip(new Ships(len, len));
+                            if (len < receivedShipCounts.length) {
+                                receivedShipCounts[len]++;
+                            }
                         }
-                        player.getControl().setShipCountsFromNetwork(lengths);
-                        //while (!contr.getReady()) {
 
-                        //}
+                        // Übergib dieses Zähler-Array an den Controller
+                        final int[] finalCounts = receivedShipCounts; // Finale Kopie für Lambda
+                        Platform.runLater(() -> {
+                            contr.setShipRules(finalCounts); // Eine neue Methode im Controller
+                            contr.setupClientPlacementUI(finalCounts); // Baut die UI auf
+                        });
+
                         cl.sendDone();
                         break;
 
