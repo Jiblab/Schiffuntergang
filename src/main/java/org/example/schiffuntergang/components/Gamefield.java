@@ -436,8 +436,8 @@ public class Gamefield extends GridPane {
             Cell cell = board.getCell(p.getX(), p.getY());
             cell.setShot(true);
             cell.setFill(cell.getShip() != null
-                    ? javafx.scene.paint.Color.RED
-                    : javafx.scene.paint.Color.BLACK);
+                    ? Color.RED
+                    : Color.BLACK);
         }
 
         return board;
@@ -471,15 +471,23 @@ public class Gamefield extends GridPane {
         List<SerializableShip> shipDataList = new ArrayList<>();
         Set<Ships> processedShips = new HashSet<>(); // To avoid adding a ship multiple times
 
-        for (int y = 0; y < lang; y++) {
-            for (int x = 0; x < breit; x++) {
+        for (int y = 0; y < breit; y++) {
+            for (int x = 0; x < lang; x++) {
+
                 Cell cell = getCell(x, y);
                 Ships ship = cell.getShip();
 
                 if (ship != null && !processedShips.contains(ship)) {
                     processedShips.add(ship); // Mark as processed
+                    boolean isVertical = false;
+                    // = (y + 1 < lang && getCell(x, y + 1).getShip() == ship) || y+1 >= breit || x+1 >= lang
+                    if(y+1 >= breit){
+                        if(getCell(x,y+1).getShip() == ship){
+                            isVertical = true;
+                        }
+                    }
 
-                    boolean isVertical = (y + 1 < lang && getCell(x, y + 1).getShip() == ship);
+
 
                     SerializableShip serializableShip = new SerializableShip();
                     serializableShip.setLength(ship.getLength());
@@ -496,8 +504,8 @@ public class Gamefield extends GridPane {
 
         // --- Populate Shot Positions ---
         List<Position> shotPositions = new ArrayList<>();
-        for (int y = 0; y < lang; y++) {
-            for (int x = 0; x < breit; x++) {
+        for (int y = 0; y < breit; y++) {
+            for (int x = 0; x < lang; x++) {
                 if (getCell(x, y).isShot()) {
                     shotPositions.add(new Position(x, y));
                 }
@@ -515,6 +523,7 @@ public class Gamefield extends GridPane {
             board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth(), logic);
         } else {
             // Adjust this if you have a separate constructor for single-player AI
+            System.out.println("height: "+data.getHeight()+" width: "+data.getWidth());
             board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth());
         }
 
