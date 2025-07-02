@@ -7,10 +7,7 @@ import org.example.schiffuntergang.components.Gamefield;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -27,10 +24,6 @@ public class FileManager {
     public FileManager(boolean newFile){
         newSave = newFile;
 
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setDialogTitle("Spielstand laden/speichern");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Save-Dateien", "save"));
-
     }
 
     /** Hier werden die Aktionen des Spielers und des Gegners temporär gespeichert
@@ -42,8 +35,26 @@ public class FileManager {
     }
 
 
-    public void sampleDataAndSave(Gamefield spieler, Gamefield gegner){
-        saveData = new SaveDataClass();
+    public void save(SaveDataClass saveData){
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle("Spielstand laden/speichern");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Save-Dateien", "save"));
+
+        int returnValue = fileChooser.showSaveDialog(null);
+        if(returnValue == JFileChooser.APPROVE_OPTION){
+            File file = fileChooser.getSelectedFile();
+            String filepath = file.getAbsolutePath();
+            if(!filepath.endsWith(".save")){
+                file = new File(filepath + ".save");
+            }
+            try{
+                FileWriter writer = new FileWriter(file.getAbsoluteFile());
+                writer.write(saveData.getDatenzumspeichern());
+                writer.close();
+            }catch(IOException e){
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 

@@ -14,11 +14,14 @@ import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
+import org.example.schiffuntergang.filemanagement.FileManager;
+import org.example.schiffuntergang.filemanagement.SaveDataClass;
 import org.example.schiffuntergang.filemanagement.StorageManager;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
 import org.example.schiffuntergang.sounds.SoundEffect;
 import javafx.geometry.Insets;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
@@ -60,6 +63,8 @@ public class HelloController {
 
     //@FXML
     //VBox boxenV;
+
+    private SaveDataClass savedata;
 
     @FXML
     private ImageView backgroundImage;
@@ -374,6 +379,7 @@ private void setButtons(){
     Button d = new Button("Horizontal");
     Button d2 = new Button("Vertikal");
     Button back = new Button("Back to Start");
+    Button speichern = new Button("Speichern");
 
     b2.getStyleClass().add("option-button");
     b3.getStyleClass().add("option-button");
@@ -381,6 +387,7 @@ private void setButtons(){
     b5.getStyleClass().add("option-button");
     d.getStyleClass().add("option-button");
     d2.getStyleClass().add("option-button");
+    speichern.getStyleClass().add("control-button");
 
     back.getStyleClass().add("control-button");
 
@@ -395,7 +402,13 @@ private void setButtons(){
                 startScreen.show();
             }
     );
-    shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back);
+    speichern.setOnAction(e ->{
+        savedata = new SaveDataClass(player, enemy);
+        savedata.prepareData();
+        FileManager fileManager = new FileManager(true);
+        fileManager.save(savedata);
+    });
+    shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back, speichern);
     shipControlBox.setSpacing(10);
 }
 

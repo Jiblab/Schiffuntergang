@@ -1,64 +1,75 @@
 package org.example.schiffuntergang.filemanagement;
 
-import org.example.schiffuntergang.components.Position;
-
-import java.util.List;
-
 public class GameState {
-    private int boardWidth;
-    private int boardHeight;
+
+    private GamefieldData playerBoardData;
+    private GamefieldData enemyBoardData;
 
     private double musikVolume;
     private boolean musikAktiv;
     private boolean soundEffekteAktiv;
+    private boolean isPlayerTurn; // It's important to save whose turn it is!
 
-    private List<SerializableShip> schiffe;
-    private List<Position> bereitsGeschossen;
 
-    public GameState(int boardWidth, int boardHeight, double musikVolume,
-                     boolean musikAktiv, boolean soundEffekteAktiv,
-                     List<SerializableShip> schiffe, List<Position> bereitsGeschossen) {
-        this.boardWidth = boardWidth;
-        this.boardHeight = boardHeight;
+
+    public GameState() {
+    }
+
+    public GameState(GamefieldData playerBoardData, GamefieldData enemyBoardData, double musikVolume, boolean musikAktiv, boolean soundEffekteAktiv, boolean isPlayerTurn) {
+        this.playerBoardData = playerBoardData;
+        this.enemyBoardData = enemyBoardData;
         this.musikVolume = musikVolume;
         this.musikAktiv = musikAktiv;
         this.soundEffekteAktiv = soundEffekteAktiv;
-        this.schiffe = schiffe;
-        this.bereitsGeschossen = bereitsGeschossen;
+        this.isPlayerTurn = isPlayerTurn;
     }
 
-    // Getters
-    public int getBoardWidth() {
-        return boardWidth;
+
+    public GamefieldData getPlayerBoardData() {
+        return playerBoardData;
     }
-    public int getBoardHeight() {
-        return boardHeight;
+
+    public void setPlayerBoardData(GamefieldData playerBoardData) {
+        this.playerBoardData = playerBoardData;
     }
-    public double getMusicVolume() {
+
+    public GamefieldData getEnemyBoardData() {
+        return enemyBoardData;
+    }
+
+    public void setEnemyBoardData(GamefieldData enemyBoardData) {
+        this.enemyBoardData = enemyBoardData;
+    }
+
+    public double getMusikVolume() {
         return musikVolume;
     }
-    public List<SerializableShip> getShips(){
-        return schiffe;
-    }
-    public List<Position> getShotCells() {
-        return bereitsGeschossen;
+
+    public void setMusikVolume(double musikVolume) {
+        this.musikVolume = musikVolume;
     }
 
-    // Setters
-    public void setBoardWidth(int boardWidth) {
-        this.boardWidth = boardWidth;
+    public boolean isMusikAktiv() {
+        return musikAktiv;
     }
 
-    public void setBoardHeight(int boardHeight) {
-        this.boardHeight = boardHeight;
+    public void setMusikAktiv(boolean musikAktiv) {
+        this.musikAktiv = musikAktiv;
     }
 
-    public void setMusicVolume(double musicVolume){
-        this.musikVolume = musicVolume;
+    public boolean isSoundEffekteAktiv() {
+        return soundEffekteAktiv;
     }
 
-    public Position[] getHitPositions() {
-        return new Position[1]; //unfertig
+    public void setSoundEffekteAktiv(boolean soundEffekteAktiv) {
+        this.soundEffekteAktiv = soundEffekteAktiv;
+    }
+
+    public boolean isPlayerTurn() {
+        return isPlayerTurn;
+    }
+
+    public void setPlayerTurn(boolean playerTurn) {
+        isPlayerTurn = playerTurn;
     }
 }
-

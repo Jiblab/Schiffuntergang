@@ -8,14 +8,13 @@ import javafx.scene.paint.Color;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
+import org.example.schiffuntergang.filemanagement.GamefieldData;
 import org.example.schiffuntergang.sounds.*;
 import org.example.schiffuntergang.filemanagement.GameState;
 import org.example.schiffuntergang.filemanagement.SerializableShip;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Gamefield extends GridPane {
     private final List<Ships> placedShip = new ArrayList<>();
@@ -199,6 +198,7 @@ public class Gamefield extends GridPane {
     }
 
 
+
     public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
         int length = ship.getLength();
 
@@ -379,10 +379,10 @@ public class Gamefield extends GridPane {
 
         // Gamefield erzeugen (ohne AI, da Player)
         Gamefield board = new Gamefield(isEnemy, dummyController,
-                state.getBoardHeight(), state.getBoardWidth());
+                state.getPlayerBoardData().getHeight(), state.getPlayerBoardData().getWidth());
 
         // Schiffe rekonstruieren
-        for (SerializableShip s : state.getShips()) {
+        for (SerializableShip s : state.getPlayerBoardData().getShips()) {
             Ships ship = new Ships(s.getLength(), s.getHealth());
             if (board.placeShip(ship, s.getStartX(), s.getStartY(), s.isVertical())) {
                 board.addShip(ship);
@@ -391,7 +391,7 @@ public class Gamefield extends GridPane {
         }
 
         // Getroffene Zellen wiederherstellen
-        for (Position p : state.getHitPositions()) {
+        for (Position p : state.getPlayerBoardData().getShotPositions()) {
             Cell cell = board.getCell(p.getX(), p.getY());
             cell.setShot(true);
             cell.setFill(cell.getShip() != null
@@ -411,4 +411,83 @@ public class Gamefield extends GridPane {
         return !placedShip.isEmpty();
     }
 
+
+    public GamefieldData toData() {
+        GamefieldData data = new GamefieldData();
+        data.setWidth(this.breit);
+        data.setHeight(this.lang);
+        data.setEnemy(this.enemy);
+
+
+        List<SerializableShip> shipDataList = new ArrayList<>();
+        Set<Ships> processedShips = new HashSet<>(); // To avoid adding a ship multiple times
+
+        for (int y = 0; y < lang; y++) {
+            for (int x = 0; x < breit; x++) {
+                Cell cell = getCell(x, y);
+                Ships ship = cell.getShip();
+
+                if (ship != null && !processedShips.contains(ship)) {
+                    processedShips.add(ship); // Mark as processed
+
+                    boolean isVertical = (y + 1 < lang && getCell(x, y + 1).getShip() == ship);
+
+                    SerializableShip serializableShip = new SerializableShip();
+                    serializableShip.setLength(ship.getLength());
+                    serializableShip.setHealth(ship.getHealth());
+                    serializableShip.setStartX(x);
+                    serializableShip.setStartY(y);
+                    serializableShip.setVertical(isVertical);
+                    shipDataList.add(serializableShip);
+                }
+            }
+        }
+        data.setShips(shipDataList);
+
+
+        // --- Populate Shot Positions ---
+        List<Position> shotPositions = new ArrayList<>();
+        for (int y = 0; y < lang; y++) {
+            for (int x = 0; x < breit; x++) {
+                if (getCell(x, y).isShot()) {
+                    shotPositions.add(new Position(x, y));
+                }
+            }
+        }
+        data.setShotPositions(shotPositions);
+
+        return data;
+    }
+
+
+    public static Gamefield fromData(GamefieldData data, HelloController controller, MultiplayerLogic logic) {
+        Gamefield board;
+        if (logic != null) {
+            board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth(), logic);
+        } else {
+            // Adjust this if you have a separate constructor for single-player AI
+            board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth());
+        }
+
+        for (SerializableShip shipData : data.getShips()) {
+            Ships ship = new Ships(shipData.getLength(), shipData.getHealth());
+            board.placeShip(ship, shipData.getStartX(), shipData.getStartY(), shipData.isVertical());
+            board.increaseCells(ship.getLength()); // Ensure usedCells count is correct
+        }
+
+        // Re-apply all the shots
+        for (Position pos : data.getShotPositions()) {
+            Cell cell = board.getCell(pos.getX(), pos.getY());
+            if (cell != null) {
+                cell.setShot(true);
+                if (cell.getShip() != null) {
+                    cell.setFill(Color.RED);
+                } else {
+                    cell.setFill(Color.BLACK);
+                }
+            }
+        }
+
+        return board;
+    }
 }
