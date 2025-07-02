@@ -35,6 +35,26 @@ public class FileManager {
 
     }
 
+    public GameState loadFromURI(String filepath) throws IOException {
+
+            File file = new File(filepath);
+            if(!file.exists()){
+                return null;
+            }
+            FileReader fileReader = new FileReader(file.getAbsolutePath());
+
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            String jsonString = stringBuilder.toString();
+            SaveDataClass save = new SaveDataClass();
+            GameState gameState = save.loadData(jsonString);
+            return gameState;
+
+    }
 
 
     public GameState load() throws IOException {

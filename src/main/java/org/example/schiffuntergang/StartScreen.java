@@ -15,6 +15,8 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.example.schiffuntergang.filemanagement.FileManager;
+import org.example.schiffuntergang.filemanagement.GameState;
 import org.example.schiffuntergang.sounds.SoundEffect;
 import org.example.schiffuntergang.ui.ParallaxLayer;
 
@@ -71,11 +73,12 @@ public class StartScreen {
 
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Load Game");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Speicherdaten", "*.save"));
 
             java.io.File selectedFile = fileChooser.showOpenDialog(stage);
             if (selectedFile != null) {
                 try {
+                    /*
                     Pair<Gamefield, Gamefield> boards = StorageManager.loadFullGame(selectedFile.getAbsolutePath());
                     Gamefield playerBoard = boards.getKey();
                     Gamefield aiBoard = boards.getValue();
@@ -90,6 +93,23 @@ public class StartScreen {
                     stage.setScene(scene);
                     stage.setFullScreen(true);
                     stage.show();
+
+                     */
+                    FileManager fileManager = new FileManager(true);
+                    GameState loadedState = fileManager.loadFromURI(selectedFile.getAbsolutePath());
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("hello-view.fxml")); // Pfad ggf. anpassen
+                    Parent root = loader.load();
+                    HelloController controller = loader.getController();
+                    Gamefield player = Gamefield.fromData( loadedState.getPlayerBoardData(), controller, null);
+                    Gamefield enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), controller, null);
+
+                    controller.setup(player, enemy);  // eigene Methode
+
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.setFullScreen(true);
+                    stage.show();
+
 
                 } catch (Exception ex) {
                     ex.printStackTrace();

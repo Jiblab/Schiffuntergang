@@ -15,13 +15,12 @@ import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.filemanagement.FileManager;
+import org.example.schiffuntergang.filemanagement.GameState;
 import org.example.schiffuntergang.filemanagement.SaveDataClass;
-import org.example.schiffuntergang.filemanagement.StorageManager;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
 import org.example.schiffuntergang.sounds.SoundEffect;
 import javafx.geometry.Insets;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
@@ -136,11 +135,6 @@ public class HelloController {
         VBox playerBox = new VBox(10, playerLabel, player);
         playerBox.setAlignment(Pos.CENTER);
 
-        Button saveBtn = new Button("Spiel speichern");
-        saveBtn.setOnAction(e -> {
-            StorageManager.saveFullGame(player, enemy, 0.8, true, true, "spielstand1");
-        });
-        shipControlBox.getChildren().add(saveBtn);
 
         HBox spielefeldbox = new HBox(20, enemyBox, playerBox);
         spielefeldbox.setAlignment(Pos.CENTER);
@@ -166,6 +160,52 @@ public class HelloController {
                 enemy.increaseCells(shipLength);
             }
         }
+        setButtons();
+            /*// Ensure game fields resize properly
+            VBox.setVgrow(enemy, Priority.ALWAYS);
+            VBox.setVgrow(player, Priority.ALWAYS);
+            enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+*/
+
+    }
+
+    public void setup(Gamefield loadedplayer, Gamefield loadedenemy){
+        // Create the game fields
+        remainingCell = new Label();
+        remainingCell.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: #0013b3;");
+
+        player = loadedplayer;
+        EnemyPlayer en = new EnemyPlayer(player);
+        enemy = loadedenemy;
+
+
+
+        updateRemainingCellsDisplay();
+
+
+        if (shipControlBox != null) {
+            shipControlBox.getChildren().add(0, remainingCell);
+        }
+
+        // VBox für die Spielfelder mit label
+        Label enemyLabel = new Label("Enemy");
+        enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox enemyBox = new VBox(10, enemyLabel, enemy);
+        enemyBox.setAlignment(Pos.CENTER);
+
+        Label playerLabel = new Label("You");
+        playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox playerBox = new VBox(10, playerLabel, player);
+        playerBox.setAlignment(Pos.CENTER);
+
+
+        HBox spielefeldbox = new HBox(20, enemyBox, playerBox);
+        spielefeldbox.setAlignment(Pos.CENTER);
+        spielefeldbox.setPadding(new Insets(20));
+        rootPane.setCenter(spielefeldbox);
+
+
         setButtons();
             /*// Ensure game fields resize properly
             VBox.setVgrow(enemy, Priority.ALWAYS);
@@ -273,7 +313,9 @@ public class HelloController {
 
         Button saveBtn = new Button("Spiel speichern");
         saveBtn.setOnAction(e -> {
-            StorageManager.saveFullGame(player, enemy, 0.8, true, true, "spielstand1");
+            //StorageManager.saveFullGame(player, enemy, 0.8, true, true, "spielstand1");
+            FileManager file = new FileManager(true);
+
         });
         shipControlBox.getChildren().add(saveBtn);
 
@@ -389,6 +431,14 @@ public class HelloController {
         readyToSendShips = true;
         mlp.sendShips();
     }
+
+    public void loadGameFromSave(GameState loadedstate){
+        player = Gamefield.fromData(loadedstate.getPlayerBoardData(), this, this.mlp);
+        enemy = Gamefield.fromData(loadedstate.getEnemyBoardData(), this, this.mlp);
+        loadGame(player, enemy);
+        setup();
+    }
+
     public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         this.rootPane.getChildren().clear();
 
@@ -410,8 +460,6 @@ public class HelloController {
             BackgroundMusic.getInstance().stop();
     }
 
-
-
     private void setButtons(){
         Button b2 = new Button("Länge 2");
         Button b3 = new Button("Länge 3");
@@ -421,6 +469,7 @@ public class HelloController {
         Button d2 = new Button("Vertikal");
         Button back = new Button("Back to Start");
         Button speichern = new Button("Speichern");
+        Button laden = new Button("Laden");
 
         b2.getStyleClass().add("option-button");
         b3.getStyleClass().add("option-button");
@@ -429,6 +478,8 @@ public class HelloController {
         d.getStyleClass().add("option-button");
         d2.getStyleClass().add("option-button");
         speichern.getStyleClass().add("control-button");
+        laden.getStyleClass().add("control-button");
+
 
         back.getStyleClass().add("control-button");
 
@@ -449,7 +500,17 @@ public class HelloController {
             FileManager fileManager = new FileManager(true);
             fileManager.save(savedata);
         });
-        shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back, speichern);
+        laden.setOnAction(e->{
+            FileManager fileManager = new FileManager(true);
+            try {
+                GameState loadedstate = fileManager.load();
+                loadGameFromSave(loadedstate);
+
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back, speichern, laden);
         shipControlBox.setSpacing(10);
     }
 
@@ -494,11 +555,7 @@ public class HelloController {
         VBox playerBox = new VBox(10, playerLabel, pl);
         playerBox.setAlignment(Pos.CENTER);
 
-        Button saveBtn = new Button("Spiel speichern");
-        saveBtn.setOnAction(e -> {
-            StorageManager.saveFullGame(pl, en, 0.8, true, true, "spielstand1");
-        });
-        shipControlBox.getChildren().add(saveBtn);
+
 
         HBox spielefeldbox = new HBox(20, enemyBox, playerBox);
         spielefeldbox.setAlignment(Pos.CENTER);
