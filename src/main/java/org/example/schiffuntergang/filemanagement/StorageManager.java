@@ -1,6 +1,7 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.filemanagement;
 
 import javafx.util.Pair;
+import org.example.schiffuntergang.*;
 import org.example.schiffuntergang.components.*;
 import org.example.schiffuntergang.sounds.*;
 
@@ -8,7 +9,8 @@ import org.example.schiffuntergang.sounds.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import javax.swing.plaf.synth.SynthDesktopIconUI;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -58,6 +60,18 @@ public class StorageManager {
          */
     }
 
+    /**
+     * Hier wird der Nutzer
+     * @param saveData Save-Daten des Spiels
+     */
+    public void saveGame(SaveDataClass saveData){
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setDialogTitle("Spielstand speichern");
+        chooser.setFileFilter(new FileNameExtensionFilter("Speicherstand", "save"));
+
+    }
+
     public static Pair<Gamefield, Gamefield> loadFullGame(String filename,
                                                           HelloController controller,
                                                           EnemyPlayer enemyPlayer)
@@ -72,8 +86,8 @@ public class StorageManager {
             Gamefield aiBoard = fromGameState(fullState.getEnemyPlayer(), controller, true, enemyPlayer);
 
             //Restore audio settings
-            SoundEffect.setVolume(fullState.getPlayer().getMusicVolume());
-            BackgroundMusic.getInstance().setVolume(fullState.getPlayer().getMusicVolume());
+            SoundEffect.setVolume(fullState.getPlayer().getMusikVolume());
+            BackgroundMusic.getInstance().setVolume(fullState.getPlayer().getMusikVolume());
 
             return new Pair<>(playerBoard, aiBoard);
 
@@ -106,7 +120,7 @@ public class StorageManager {
                 if (board.getCell(row, col).isShot())
                     hits.add(new Position(row, col));
 
-        return new GameState(width, height, volume, music, sound, shipList, hits);
+        return new GameState( );
     }
     private static Gamefield fromGameState(GameState state,
                                            HelloController controller,
@@ -114,10 +128,10 @@ public class StorageManager {
                                            EnemyPlayer aiLogic)
     {
         Gamefield board = isEnemy
-                ? new Gamefield(true, controller, state.getBoardHeight(), state.getBoardWidth(), aiLogic)
-                : new Gamefield(false, controller, state.getBoardHeight(), state.getBoardWidth());
+                ? new Gamefield(true, controller, state.getEnemyBoardData().getHeight(), state.getEnemyBoardData().getWidth(), aiLogic)
+                : new Gamefield(false, controller, state.getPlayerBoardData().getHeight(), state.getPlayerBoardData().getWidth(), aiLogic);
 
-        for (SerializableShip s : state.getShips()) {
+        for (SerializableShip s : state.getPlayerBoardData().getShips()) {
             Ships ship = new Ships(s.getLength(), s.getHealth());
             if (board.placeShip(ship, s.getStartX(), s.getStartY(), s.isVertical())) {
                 board.addShip(ship);
@@ -125,7 +139,7 @@ public class StorageManager {
             }
         }
 
-        for (Position p : state.getHitPositions()) {
+        for (Position p : state.getPlayerBoardData().getShotPositions()) {
             Cell cell = board.getCell(p.getX(), p.getY());
             cell.setShot(true);
             cell.setFill(cell.getShip() != null ? javafx.scene.paint.Color.RED : javafx.scene.paint.Color.BLACK);

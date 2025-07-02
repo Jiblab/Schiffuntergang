@@ -15,6 +15,9 @@ module org.example.schiffuntergang {
 
     opens org.example.schiffuntergang to javafx.fxml,com.google.gson;
     opens org.example.schiffuntergang.components to com.google.gson;
+
     exports org.example.schiffuntergang to javafx.graphics;
+    exports org.example.schiffuntergang.filemanagement to javafx.graphics;
+    opens org.example.schiffuntergang.filemanagement to com.google.gson, javafx.fxml;
 }
 

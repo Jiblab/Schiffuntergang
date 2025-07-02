@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.filemanagement;
 
 public class FullGameState {
 

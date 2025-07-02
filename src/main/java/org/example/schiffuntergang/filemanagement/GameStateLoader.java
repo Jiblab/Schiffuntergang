@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.filemanagement;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
