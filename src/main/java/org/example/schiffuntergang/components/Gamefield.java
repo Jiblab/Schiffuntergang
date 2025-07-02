@@ -315,34 +315,50 @@ public class Gamefield extends GridPane {
         usedCells += laenge;
     }
 
-    public void shoot(int x, int y){
+    public void shoot(int x, int y) {
+
         Cell c = getCell(x, y);
-        Ships s = c.getShip();
+        if (c == null) return; // Sicherheitsprüfung
+
+        // Fall 1: Feld wurde bereits beschossen
         if (c.isShot()) {
             System.out.println("Bereits beschossen");
+            // Nur eine Nachricht anzeigen, wenn der Spieler selbst auf ein bereits beschossenes Feld klickt
+            if (this.enemy && control != null) {
+                control.showNotification("Dieses Feld wurde bereits beschossen!", "info");
+            }
             return;
         }
-        c.setShot(true);
 
+        c.setShot(true);
+        Ships s = c.getShip();
+
+        // Fall 2: Ein Schiff wurde getroffen (s ist nicht null)
         if (s != null) {
             s.hit();
             c.setFill(Color.RED);
+            // SoundEffect.play("hit.wav");
+
             if (s.getHealth() == 0) {
+                // Fall 2a: Schiff ist versenkt
+                if (control != null) control.showNotification("Schiff versenkt!", "sunk");
                 deleteShip();
+            } else {
+                // Fall 2b: Normaler Treffer
+                if (control != null) control.showNotification("Treffer!", "hit");
             }
-            System.out.println(control.getPlayerturn());
-            if (this.enemy && !multiplayer){
-
-                System.out.println("nix hier in der if abfrage");
-                en.revenge();
-            }
-        } else {
+        }
+        // Fall 3: Fehlschuss (s ist null)
+        else {
             c.setFill(Color.BLACK);
-            System.out.println("Koordinaten x, dann y: "+x+" "+y);
-            if (this.enemy && !multiplayer){
+            // SoundEffect.play("miss.wav");
+            if (control != null) control.showNotification("Verfehlt!", "miss");
+        }
 
-                en.revenge();
-            }
+        // Fall 4: Gegner ist im Einzelspielermodus am Zug (nach Treffer ODER Fehlschuss)
+        if (this.enemy && !multiplayer) {
+            System.out.println("Einzelspieler: Gegner ist am Zug.");
+            en.revenge();
         }
     }
     public boolean inBounds(int x, int y){

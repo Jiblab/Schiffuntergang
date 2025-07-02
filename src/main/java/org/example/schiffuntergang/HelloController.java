@@ -1,5 +1,6 @@
 package org.example.schiffuntergang;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -11,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.example.schiffuntergang.Multiplayer.Client;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.Multiplayer.Server;
@@ -49,6 +51,8 @@ public class HelloController {
     private int[] shipsAllowed = new int[6];
     private Label remainingCell;
 
+    private Label notificationLabel;
+    private PauseTransition notificationTimer;
     MultiplayerLogic mlp;
     private final Label[] availableShipCounters = new Label[6];
     private final Button[] shipLengthButtons = new Button[6];
@@ -125,6 +129,47 @@ public class HelloController {
 
         // 3. Steuerleiste (links)
         rootPane.setLeft(controlNode);
+
+        //Messages für treffer, verfehlt, etc
+        notificationLabel = new Label(); // Label initialisieren
+        notificationLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 18px; -fx-padding: 10px;");
+
+        HBox notificationBox = new HBox(notificationLabel);
+        notificationBox.setAlignment(Pos.CENTER);
+        notificationBox.setMinHeight(50); // Gibt der Leiste eine feste Höhe
+
+        rootPane.setBottom(notificationBox);
+    }
+
+    public void showNotification(String message, String type) {
+        Platform.runLater(() -> {
+            // Stoppt einen laufenden Timer, falls eine neue Nachricht schnell hinterherkommt
+            if (notificationTimer != null) {
+                notificationTimer.stop();
+            }
+
+            // Setzt Text und Farbe basierend auf dem Typ
+            notificationLabel.setText(message);
+            switch (type.toLowerCase()) {
+                case "hit":
+                    notificationLabel.setStyle("-fx-text-fill: #ffbf00; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px;"); // Gelb/Orange für Treffer
+                    break;
+                case "sunk":
+                    notificationLabel.setStyle("-fx-text-fill: #ff4d4d; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px; -fx-font-weight: bold;"); // Rot für Versenkt
+                    break;
+                case "miss":
+                    notificationLabel.setStyle("-fx-text-fill: #b3b3b3; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px;"); // Grau für Fehlschuss
+                    break;
+                default: // "info" oder unbekannt
+                    notificationLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px;"); // Weiß für allgemeine Infos
+                    break;
+            }
+
+            // Timer starten, um die Nachricht auszublenden
+            notificationTimer = new PauseTransition(Duration.seconds(3));
+            notificationTimer.setOnFinished(event -> notificationLabel.setText(""));
+            notificationTimer.play();
+        });
     }
 
     /**
