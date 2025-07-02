@@ -14,9 +14,15 @@ public class SaveDataClass {
 
     private Map<String, Object> datenzumspeichern = new HashMap<String, Object>();
 
+    //Fürs Speichern
     public SaveDataClass(Gamefield spielergamefield, Gamefield gegnergamefield) {
         spieler = spielergamefield;
         gegner = gegnergamefield;
+    }
+
+    //Fürs Laden
+    public SaveDataClass(){
+
     }
 
     public void prepareData() {
@@ -27,8 +33,13 @@ public class SaveDataClass {
 
     }
 
-    public void setData(){
+    public GameState loadData(String json){
+        GameState completeGameState;
 
+        Gson gson = new Gson();
+        completeGameState = gson.fromJson(json, GameState.class);
+
+        return completeGameState;
     }
 
     public String getDatenzumspeichern() {
@@ -47,5 +58,7 @@ public class SaveDataClass {
         String json = gson.toJson(completeGameState);
         return json;
     }
+
+
 
 }

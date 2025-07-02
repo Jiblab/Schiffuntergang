@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.example.schiffuntergang.components.Gamefield;
+import org.example.schiffuntergang.sounds.BackgroundMusic;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -35,10 +36,35 @@ public class FileManager {
     }
 
 
+
+    public GameState load() throws IOException {
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle("Spielstand laden");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Spielstand", "save"));
+        int returnvalue = fileChooser.showOpenDialog(null);
+        if (returnvalue == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            FileReader fileReader = new FileReader(file.getAbsolutePath());
+
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            String jsonString = stringBuilder.toString();
+            SaveDataClass save = new SaveDataClass();
+            GameState gameState = save.loadData(jsonString);
+            return gameState;
+        }
+        return null;
+    }
+
+
     public void save(SaveDataClass saveData){
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Spielstand laden/speichern");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Save-Dateien", "save"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Spielstand", "save"));
 
         int returnValue = fileChooser.showSaveDialog(null);
         if(returnValue == JFileChooser.APPROVE_OPTION){
@@ -65,25 +91,4 @@ public class FileManager {
     public void saveFromRemote(String id){
 
     }
-
-    /**
-     * Das normale Speichern mit Chooser etc
-     */
-    private void save(){
-        int returnValue = fileChooser.showOpenDialog(null);
-        if(returnValue == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            String filePath = file.getAbsolutePath();
-            Gson gson = new GsonBuilder().create();
-            try{
-                FileReader fileReader = new FileReader(filePath);
-                BufferedReader bufferedReader = new BufferedReader(fileReader);
-                StringBuilder stringBuilder = new StringBuilder();
-
-            }catch(IOException e){
-                e.printStackTrace();
-            }
-        }
-    }
-
 }
