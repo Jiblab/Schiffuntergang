@@ -21,7 +21,6 @@ import org.example.schiffuntergang.sounds.SoundEffect;
 import org.example.schiffuntergang.ui.ParallaxLayer;
 
 import javafx.stage.FileChooser;
-import org.example.schiffuntergang.filemanagement.StorageManager;
 import org.example.schiffuntergang.components.Gamefield;
 import javafx.util.Pair;
 

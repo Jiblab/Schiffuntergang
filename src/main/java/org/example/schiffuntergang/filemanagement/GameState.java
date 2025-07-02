@@ -8,7 +8,7 @@ public class GameState {
     private double musikVolume;
     private boolean musikAktiv;
     private boolean soundEffekteAktiv;
-    private boolean isPlayerTurn; // It's important to save whose turn it is!
+    private boolean isPlayerTurn;
 
 
 
