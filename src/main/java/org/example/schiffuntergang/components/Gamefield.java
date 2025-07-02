@@ -235,8 +235,6 @@ public class Gamefield extends GridPane {
         return enemy;
     }
 
-
-
     public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
         int length = ship.getLength();
 
@@ -454,10 +452,7 @@ public class Gamefield extends GridPane {
 
     public boolean hasShip(){
         System.out.println(placedShip.isEmpty());
-        if (!placedShip.isEmpty()){
-            return true;
-        }
-        return false;
+        return !placedShip.isEmpty();
     }
 
 
@@ -547,6 +542,10 @@ public class Gamefield extends GridPane {
         }
 
         return board;
+    }
+
+    public void setController(HelloController controller) {
+        this.control = controller;
     }
 
 }
