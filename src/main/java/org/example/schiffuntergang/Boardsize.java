@@ -44,9 +44,9 @@ public class Boardsize {
         createAndShowScene(false);
     }
 
-    public void showMulti() {
+    /*public void showMulti() {
         createAndShowScene(true);
-    }
+    }*/
 
     private void createAndShowScene(boolean isMultiplayerSetup) {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
@@ -215,7 +215,7 @@ public class Boardsize {
         });
         Button backtostart = new Button("Back to Menu");
         backtostart.setOnAction(e3 -> {
-            GameCreationScreen gameScreen = new GameCreationScreen(stage, isSinglePlayer);
+            GameCreationScreen gameScreen = new GameCreationScreen(stage);
             clickSound.play();
             gameScreen.show();
         });
@@ -245,5 +245,4 @@ public class Boardsize {
     }
 }
 
-=======
-}
+

@@ -59,6 +59,9 @@ public class HelloController {
     @FXML
     private HBox shipControlBox;
 
+    //@FXML
+    //VBox boxenV;
+
     @FXML
     private ImageView backgroundImage;
     @FXML
@@ -107,8 +110,12 @@ public class HelloController {
         saveBtn.setOnAction(e -> {
             StorageManager.saveFullGame(player, enemy, 0.8, true, true, "spielstand1");
         });
-        boxenV.getChildren().add(saveBtn);
+        shipControlBox.getChildren().add(saveBtn);
 
+        HBox spielefeldbox = new HBox(20, enemyBox, playerBox);
+        spielefeldbox.setAlignment(Pos.CENTER);
+        spielefeldbox.setPadding(new Insets(20));
+        rootPane.setCenter(spielefeldbox);
 
         // enemy ships random setzen
         while (enemy.getUsedCells() <= enemy.maxShipsC()) {
@@ -154,11 +161,11 @@ public class HelloController {
         }).start();
 
 
-        while(temp){
+        //while(temp){
 
-        }
+        //}
 
-        rootPane.getChildren().add(enemy);
+      /*  rootPane.getChildren().add(enemy);
         rootPane.getChildren().add(player);
 
 
@@ -181,7 +188,7 @@ public class HelloController {
             mlp.start();
         } catch(IOException e){
             System.out.println("IOException");
-        }
+        }*/
 
     }
 
@@ -202,7 +209,7 @@ public class HelloController {
             Button b = new Button("Länge " + len);
             b.setOnAction(e -> {
                 //if (canPlaceShipOfLength(len)) {
-                    length = len;
+                length = len;
                 //}
             });
 
@@ -211,10 +218,30 @@ public class HelloController {
 
             HBox row = new HBox(10, b, counter);
             row.setAlignment(Pos.CENTER);
-            boxenV.getChildren().add(row);
+            shipControlBox.getChildren().add(row);
         }
-        rootPane.getChildren().add(player);
-        rootPane.getChildren().add(enemy);
+       // rootPane.getChildren().add(player);
+        //rootPane.getChildren().add(enemy);
+        Label enemyLabel = new Label("Enemy");
+        enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox enemyBox = new VBox(10, enemyLabel, enemy);
+        enemyBox.setAlignment(Pos.CENTER);
+
+        Label playerLabel = new Label("You");
+        playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+        VBox playerBox = new VBox(10, playerLabel, player);
+        playerBox.setAlignment(Pos.CENTER);
+
+        Button saveBtn = new Button("Spiel speichern");
+        saveBtn.setOnAction(e -> {
+            StorageManager.saveFullGame(player, enemy, 0.8, true, true, "spielstand1");
+        });
+        shipControlBox.getChildren().add(saveBtn);
+
+        HBox spielefeldbox = new HBox(20, enemyBox, playerBox);
+        spielefeldbox.setAlignment(Pos.CENTER);
+        spielefeldbox.setPadding(new Insets(20));
+        rootPane.setCenter(spielefeldbox);
         new Thread(() ->{
             try {
                 mlp.start(); // alles Netzwerk-Zeug → eigener Thread
@@ -222,194 +249,202 @@ public class HelloController {
                 System.out.println("IOException");
             }
         }).start();
-            try{
-                mlp.start();
-            } catch(IOException e){
-                System.out.println("IOException");
-            }
+    }
+
+
+public int getLength(){
+    return length;
+}
+public boolean getDirection(){
+    return direction;
+}
+
+public void setSize(double x1, double y1){
+    x = x1;
+    y = y1;
+}
+
+public void setStage(Stage stage) {
+    this.stage = stage;
+
+    stage.addEventHandler(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
+        if (event.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
+            stage.setFullScreen(false);
         }
-    }
+    });
+}
 
-    public int getLength(){
-        return length;
-    }
-    public boolean getDirection(){
-        return direction;
-    }
+public boolean getPlayerturn(){
+    return playerturn;
+}
 
-    public void setSize(double x1, double y1){
-        x = x1;
-        y = y1;
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-
-        stage.addEventHandler(javafx.scene.input.KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
-                stage.setFullScreen(false);
-            }
-        });
-    }
-
-    public boolean getPlayerturn(){
-        return playerturn;
-    }
-
-    public void setPlayerturn(){
-        playerturn = !playerturn;
-    }
+public void setPlayerturn(){
+    playerturn = !playerturn;
+}
 
     /*public boolean canPlaceShipOfLength(int len) {
         return shipsPlaced[len] < maxPerShipLength;
     }*/
 
-    public void shipPlaced(int len) {
-        shipsPlaced[len]++;
-        updateCounter(len);
-    }
+public void shipPlaced(int len) {
+    shipsPlaced[len]++;
+    updateCounter(len);
+}
 
-    private void updateCounter(int len) {
-        if (shipCounters[len] != null) {
-            int remaining = maxPerShipLength - shipsPlaced[len];
-            shipCounters[len].setText("Verbleibend: " + remaining);
+private void updateCounter(int len) {
+    if (shipCounters[len] != null) {
+        int remaining = maxPerShipLength - shipsPlaced[len];
+        shipCounters[len].setText("Verbleibend: " + remaining);
 
-        }
-    }
-    public boolean isClientMode(){
-        return isClientMode;
-    }
-
-    public void setShipCountsFromNetwork(int[] lengths) {
-        for (int len = 1; len < lengths.length ; len++) {
-            shipsAllowed[len] = lengths[len];
-            final int lengleng = len;
-            Platform.runLater(() -> updateAllowedCounter(lengleng));
-        }
-    }
-    private void updateAllowedCounter(int len) {
-        //shipCounters[len].setText(shipsPlaced[len] + " / " + shipsAllowed[len]);
-    }
-    public boolean getReady(){
-        return readyToSendShips;
-    }
-
-    @FXML
-    private void onReadyClicked() throws IOException {
-        readyToSendShips = true;
-        mlp.sendShips();
-        System.out.println("Fertig gedrückt – bereit zum Senden der Schiffe");
-    }
-    public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
-        this.rootPane.getChildren().clear();
-
-        // Boards zur Anzeige hinzufügen
-        rootPane.getChildren().add(enemyBoard);
-        rootPane.getChildren().add(playerBoard);
-
-
-        VBox.setVgrow(enemyBoard, Priority.ALWAYS);
-        VBox.setVgrow(playerBoard, Priority.ALWAYS);
-        enemyBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        playerBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        // Optional: Musik- und Soundeinstellungen anwenden
-        BackgroundMusic.getInstance().setVolume(playerBoard.getMusicVolume());
-        SoundEffect.setVolume(playerBoard.getMusicVolume());
-
-        if (!playerBoard.isMusicEnabled())
-            BackgroundMusic.getInstance().stop();
-    }
-
-    public void setBoard(Gamefield e, Gamefield p){
-        player = p;
-        enemy = e;
-        temp = false;
-    }
-
-    private void setButtons(){
-        Button b2 = new Button("Länge 2");
-        Button b3 = new Button("Länge 3");
-        Button b4 = new Button("Länge 4");
-        Button b5 = new Button("Länge 5");
-        Button d = new Button("Horizontal");
-        Button d2 = new Button("Vertikal");
-        Button back = new Button("Back to Start");
-
-        b2.getStyleClass().add("option-button");
-        b3.getStyleClass().add("option-button");
-        b4.getStyleClass().add("option-button");
-        b5.getStyleClass().add("option-button");
-        d.getStyleClass().add("option-button");
-        d2.getStyleClass().add("option-button");
-
-        back.getStyleClass().add("control-button");
-
-        b2.setOnAction(e -> length = 2);
-        b3.setOnAction(e -> length = 3);
-        b4.setOnAction(e -> length = 4);
-        b5.setOnAction(e -> length = 5);
-        d.setOnAction(e->direction = false);
-        d2.setOnAction(e->direction = true);
-        back.setOnAction(e -> {
-                    StartScreen startScreen = new StartScreen(stage);
-                    startScreen.show();
-                }
-        );
-        shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back);
-        shipControlBox.setSpacing(10);
-    }
-
-    public void temp(){
-        temp = false;
-    }
-
-    public boolean checkIfAllShipsPlaced() {
-        for (int i = 2; i <= 5; i++) {
-            if (shipCounters[i] != null) {
-                String text = shipCounters[i].getText();
-                // Extrahiere die Zahl aus dem Text (z. B. "Verbleibend: 1")
-                String numberStr = text.replaceAll("[^0-9]", "");
-                int number = numberStr.isEmpty() ? 0 : Integer.parseInt(numberStr);
-
-                if (number > 0) {
-                    return false; // Noch nicht alle auf 0
-                }
-            }
-        }
-
-        // Wenn wir hier sind, sind alle bei 0 → Nachricht senden
-        return c != null;
-    }
-
-    public String getIP(){
-        return ipa;
-    }
-    public int getPort(){
-        return porta;
-    }
-
-    public void setupGameMult(Gamefield pl, Gamefield en){
-
-        rootPane.getChildren().add(en);
-        rootPane.getChildren().add(pl);
-        rootPane.setAlignment(Pos.CENTER);
-
-        VBox.setVgrow(en, Priority.ALWAYS);
-        VBox.setVgrow(pl, Priority.ALWAYS);
-        en.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        pl.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-        setButtons();
-
-
-        for (int i = 2; i <= 5; i++) {
-            Label counter = new Label("Empfangen: 0");
-            shipCounters[i] = counter;
-
-            HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
-            row.setAlignment(Pos.CENTER);
-            boxenV.getChildren().add(row);
-        }
     }
 }
+public boolean isClientMode(){
+    return isClientMode;
+}
+
+public void setShipCountsFromNetwork(int[] lengths) {
+    for (int len = 1; len < lengths.length ; len++) {
+        shipsAllowed[len] = lengths[len];
+        final int lengleng = len;
+        Platform.runLater(() -> updateAllowedCounter(lengleng));
+    }
+}
+private void updateAllowedCounter(int len) {
+    //shipCounters[len].setText(shipsPlaced[len] + " / " + shipsAllowed[len]);
+}
+public boolean getReady(){
+    return readyToSendShips;
+}
+
+@FXML
+private void onReadyClicked() throws IOException {
+    readyToSendShips = true;
+    mlp.sendShips();
+    System.out.println("Fertig gedrückt – bereit zum Senden der Schiffe");
+}
+public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
+    this.rootPane.getChildren().clear();
+
+    // Boards zur Anzeige hinzufügen
+    rootPane.getChildren().add(enemyBoard);
+    rootPane.getChildren().add(playerBoard);
+
+
+    VBox.setVgrow(enemyBoard, Priority.ALWAYS);
+    VBox.setVgrow(playerBoard, Priority.ALWAYS);
+    enemyBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+    playerBoard.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+    // Optional: Musik- und Soundeinstellungen anwenden
+    BackgroundMusic.getInstance().setVolume(playerBoard.getMusicVolume());
+    SoundEffect.setVolume(playerBoard.getMusicVolume());
+
+    if (!playerBoard.isMusicEnabled())
+        BackgroundMusic.getInstance().stop();
+}
+
+public void setBoard(Gamefield e, Gamefield p){
+    player = p;
+    enemy = e;
+    temp = false;
+}
+
+private void setButtons(){
+    Button b2 = new Button("Länge 2");
+    Button b3 = new Button("Länge 3");
+    Button b4 = new Button("Länge 4");
+    Button b5 = new Button("Länge 5");
+    Button d = new Button("Horizontal");
+    Button d2 = new Button("Vertikal");
+    Button back = new Button("Back to Start");
+
+    b2.getStyleClass().add("option-button");
+    b3.getStyleClass().add("option-button");
+    b4.getStyleClass().add("option-button");
+    b5.getStyleClass().add("option-button");
+    d.getStyleClass().add("option-button");
+    d2.getStyleClass().add("option-button");
+
+    back.getStyleClass().add("control-button");
+
+    b2.setOnAction(e -> length = 2);
+    b3.setOnAction(e -> length = 3);
+    b4.setOnAction(e -> length = 4);
+    b5.setOnAction(e -> length = 5);
+    d.setOnAction(e->direction = false);
+    d2.setOnAction(e->direction = true);
+    back.setOnAction(e -> {
+                StartScreen startScreen = new StartScreen(stage);
+                startScreen.show();
+            }
+    );
+    shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back);
+    shipControlBox.setSpacing(10);
+}
+
+public void temp(){
+    temp = false;
+}
+
+public boolean checkIfAllShipsPlaced() {
+    for (int i = 2; i <= 5; i++) {
+        if (shipCounters[i] != null) {
+            String text = shipCounters[i].getText();
+            // Extrahiere die Zahl aus dem Text (z. B. "Verbleibend: 1")
+            String numberStr = text.replaceAll("[^0-9]", "");
+            int number = numberStr.isEmpty() ? 0 : Integer.parseInt(numberStr);
+
+            if (number > 0) {
+                return false; // Noch nicht alle auf 0
+            }
+        }
+    }
+
+    // Wenn wir hier sind, sind alle bei 0 → Nachricht senden
+    return c != null;
+}
+
+public String getIP(){
+    return ipa;
+}
+public int getPort(){
+    return porta;
+}
+
+public void setupGameMult(Gamefield pl, Gamefield en){
+
+    Label enemyLabel = new Label("Enemy");
+    enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+    VBox enemyBox = new VBox(10, enemyLabel, en);
+    enemyBox.setAlignment(Pos.CENTER);
+
+    Label playerLabel = new Label("You");
+    playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
+    VBox playerBox = new VBox(10, playerLabel, pl);
+    playerBox.setAlignment(Pos.CENTER);
+
+    Button saveBtn = new Button("Spiel speichern");
+    saveBtn.setOnAction(e -> {
+        StorageManager.saveFullGame(pl, en, 0.8, true, true, "spielstand1");
+    });
+    shipControlBox.getChildren().add(saveBtn);
+
+    HBox spielefeldbox = new HBox(20, enemyBox, playerBox);
+    spielefeldbox.setAlignment(Pos.CENTER);
+    spielefeldbox.setPadding(new Insets(20));
+    rootPane.setCenter(spielefeldbox);
+
+    setButtons();
+
+
+    for (int i = 2; i <= 5; i++) {
+        Label counter = new Label("Empfangen: 0");
+        shipCounters[i] = counter;
+
+        HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
+        row.setAlignment(Pos.CENTER);
+        shipControlBox.getChildren().add(row);
+    }
+}
+}
+

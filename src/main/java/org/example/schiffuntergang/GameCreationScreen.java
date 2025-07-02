@@ -2,7 +2,9 @@ package org.example.schiffuntergang;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,11 +20,14 @@ import javafx.util.Duration;
 import org.example.schiffuntergang.ui.ParallaxLayer;
 import org.example.schiffuntergang.sounds.SoundEffect;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameCreationScreen {
     private final Stage stage;
+    private double x;
+    private double y;
 
     private final SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
     static {
@@ -135,6 +140,8 @@ public class GameCreationScreen {
     }
 
     private void showJoinGameScene() {
+        Stage connectStage = new Stage();
+        connectStage.setTitle("Mit Server verbinden");
         Label ipLabel = new Label("Server-IP:");
         TextField ipField = new TextField();
         ipField.setPromptText("e.g., 192.168.0.10");
@@ -147,14 +154,37 @@ public class GameCreationScreen {
         connectButton.setOnAction(e -> {
             clickSound.play();
             String ip = ipField.getText();
+            if (ip == null || ip.trim().isEmpty()) {
+                statusLabel.setText("Please enter a valid IP address!");
+                return; // Beendet die Aktion, wenn keine IP eingegeben wurde
+            }
             int port = 5000;
-
             statusLabel.setText("Connecting to " + ip + "...");
 
-            // HIER würde die Logik zum Laden der FXML und des Controllers hinkommen.
-            // Der `HelloController` würde erst HIER, nach dem Klick, durch den FXMLLoader erstellt werden.
-            // z.B. fxmlLoader.load() -> controller = fxmlLoader.getController() -> controller.setupMultiC(ip, port);
-            System.out.println("Hier würde die Verbindung zum Server aufgebaut und zur Spielansicht gewechselt.");
+            try {
+                // 1. Lade die FXML-Datei
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
+                Parent gameRoot = loader.load();
+
+                // 2. Hole den Controller, NACHDEM die FXML geladen wurde
+                HelloController gameController = loader.getController();
+
+                // 3. Konfiguriere den Controller mit den notwendigen Informationen
+                gameController.setStage(this.stage); // Übergib die HAUPT-Stage
+                gameController.setSize(10, 10);      // Übergib Dummy-Werte für die Größe
+                gameController.setupMultiC(ip, port);// Starte das Client-Setup
+
+                // 4. Erstelle eine neue Szene mit der geladenen Spielansicht
+                Scene gameScene = new Scene(gameRoot);
+
+                // 5. SETZE die neue Szene auf der HAUPT-Stage. Das tauscht den Inhalt aus.
+                this.stage.setScene(gameScene);
+                this.stage.setFullScreen(true); // Sicherstellen, dass das Fenster im Vollbild bleibt
+
+            } catch (IOException ex) {
+                statusLabel.setText("Error: Connection failed or game view could not be loaded.");
+                ex.printStackTrace();
+            }
         });
 
         backButton.setOnAction(e -> {

@@ -25,7 +25,7 @@ public class Gamefield extends GridPane {
     private final boolean enemy;
     private final Cell[][] cells;
     private int usedCells = 0;
-    private final HelloController control;
+    private HelloController control;
     private EnemyPlayer en;
     private MultiplayerLogic lo;
 
@@ -145,20 +145,20 @@ public class Gamefield extends GridPane {
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
                 // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
                 c.setOnMouseClicked(event -> {
-                    if (event.getButton() == MouseButton.PRIMARY && !enemy) {
+                            if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
-                        int len = control.getLength();
-                        if (getUsedCells() <= maxShipsC() && len > 0 ) {
-                            Ships ship = new Ships(len, len);
-                            if (placeShip(ship, x, y, control.getDirection())) {
-                                increaseCells(len);
-                                if (control.isClientMode()) {
-                                    control.shipPlaced(len);
-                                }
-                            }
-                        } else {
-                            System.out.println(maxShipsC());
-                            System.out.println("Maximale Anzahl an schiffen erreicht");
+                                int len = control.getLength();
+                                if (getUsedCells() <= maxShipsC() && len > 0) {
+                                    Ships ship = new Ships(len, len);
+                                    if (placeShip(ship, x, y, control.getDirection())) {
+                                        increaseCells(len);
+                                        if (control.isClientMode()) {
+                                            control.shipPlaced(len);
+                                        }
+                                    }
+                                } else {
+                                    System.out.println(maxShipsC());
+                                    System.out.println("Maximale Anzahl an schiffen erreicht");
                             /*Platform.runLater(() -> {
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                 alert.setTitle("Maximum erreicht");
@@ -167,22 +167,22 @@ public class Gamefield extends GridPane {
                                 alert.showAndWait();
                             });*/
 
-                        }
+                                }
 
 
-
-                    }else if(event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()){
-                        if (lo.getTurn()){
-                            lo.setX(x);
-                            lo.setY(y);
-                            System.out.println(x+ " "+y);
-                            try {
-                                lo.startShoot();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
+                            } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
+                                if (lo.getTurn()) {
+                                    lo.setX(x);
+                                    lo.setY(y);
+                                    System.out.println(x + " " + y);
+                                    try {
+                                        lo.startShoot();
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
                             }
-                        }
-                  
+                });
                 add(c, i, j);
             }
         }
@@ -289,7 +289,8 @@ public class Gamefield extends GridPane {
         Cell c = getCell(x, y);
         Ships s = c.getShip();
         if (c.isShot()) {
-            return false;
+            System.out.println("Bereits beschossen");
+            return;
         }
         c.setShot(true);
 
@@ -313,7 +314,6 @@ public class Gamefield extends GridPane {
                 en.revenge();
             }
         }
-        return true;
     }
     public boolean inBounds(int x, int y){
         return x >= 0 && y >= 0 && x < getWidth() && y < getHeight();
