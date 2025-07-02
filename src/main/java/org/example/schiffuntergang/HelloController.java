@@ -3,7 +3,6 @@ package org.example.schiffuntergang;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -16,7 +15,6 @@ import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.filemanagement.FileManager;
-import org.example.schiffuntergang.filemanagement.GameState;
 import org.example.schiffuntergang.filemanagement.SaveDataClass;
 import org.example.schiffuntergang.filemanagement.StorageManager;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
@@ -72,7 +70,6 @@ public class HelloController {
 
     @FXML
     private ImageView backgroundImage;
-
     @FXML
     public void initialize() {
         Image img = new Image(getClass().getResource("/images/gamebg.png").toExternalForm());
@@ -111,8 +108,6 @@ public class HelloController {
         remainingCell.setText("Verbleibende Bau-Punkte: " + remainingCells);
     }
     public void setup(){
-
-    public void setup() {
         // Create the game fields
         remainingCell = new Label();
         remainingCell.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: #0013b3;");
@@ -183,7 +178,6 @@ public class HelloController {
 
     public void setupMultiC(String ip, int port){
         ishost = false;
-    public void setupMultiC(String ip, int port) {
         ipa = ip;
         porta = port;
         Client ce = new Client();
@@ -192,7 +186,7 @@ public class HelloController {
         new Thread(() -> {
             try {
                 mlp.start(); // alles Netzwerk-Zeug → eigener Thread
-            } catch (IOException e) {
+            } catch(IOException e){
                 System.out.println("IOException");
             }
         }).start();
@@ -231,8 +225,6 @@ public class HelloController {
 
     public void setupMultiS(){
         ishost = true;
-    public void setupMultiS() {
-        isClientMode = true;
 
         Server se = new Server();
         mlp = new MultiplayerLogic(se, false, null, null);
@@ -267,14 +259,6 @@ public class HelloController {
                 shipControlBox.getChildren().add(b);
             }
         }*/
-       // rootPane.getChildren().add(player);
-            Label counter = new Label("Verbleibend: " + maxPerShipLength);
-            shipCounters[len] = counter;
-
-            HBox row = new HBox(10, b, counter);
-            row.setAlignment(Pos.CENTER);
-            shipControlBox.getChildren().add(row);
-        }
         // rootPane.getChildren().add(player);
         //rootPane.getChildren().add(enemy);
         Label enemyLabel = new Label("Enemy");
@@ -297,25 +281,24 @@ public class HelloController {
         spielefeldbox.setAlignment(Pos.CENTER);
         spielefeldbox.setPadding(new Insets(20));
         rootPane.setCenter(spielefeldbox);
-        new Thread(() -> {
+        new Thread(() ->{
             try {
                 mlp.start(); // alles Netzwerk-Zeug → eigener Thread
-            } catch (IOException e) {
+            } catch(IOException e){
                 System.out.println("IOException");
             }
         }).start();
     }
 
 
-    public int getLength() {
+    public int getLength(){
         return length;
     }
-
-    public boolean getDirection() {
+    public boolean getDirection(){
         return direction;
     }
 
-    public void setSize(double x1, double y1) {
+    public void setSize(double x1, double y1){
         x = x1;
         y = y1;
     }
@@ -330,11 +313,11 @@ public class HelloController {
         });
     }
 
-    public boolean getPlayerturn() {
+    public boolean getPlayerturn(){
         return playerturn;
     }
 
-    public void setPlayerturn() {
+    public void setPlayerturn(){
         playerturn = !playerturn;
     }
 
@@ -352,90 +335,60 @@ public class HelloController {
             int remaining = maxPerShipLength - shipsPlaced[len];
             shipCounters[len].setText("Verbleibend: " + remaining);
 
-    }
-}
-public boolean getHost(){
-    return ishost;
-}
         }
     }
-
-    public boolean isClientMode() {
-        return isClientMode;
+    public boolean getHost(){
+        return ishost;
     }
 
     public void setShipCountsFromNetwork(int[] lengths) {
-        for (int len = 1; len < lengths.length; len++) {
+        for (int len = 1; len < lengths.length ; len++) {
             shipsAllowed[len] = lengths[len];
             final int lengleng = len;
             Platform.runLater(() -> updateAllowedCounter(lengleng));
         }
     }
-
     private void updateAllowedCounter(int len) {
         //shipCounters[len].setText(shipsPlaced[len] + " / " + shipsAllowed[len]);
     }
-
-    public boolean getReady() {
+    public boolean getReady(){
         return readyToSendShips;
     }
 
-@FXML
-private void onReadyClicked() throws IOException {
+    @FXML
+    private void onReadyClicked() throws IOException {
     /*if (enemy != null && enemy.hasShip()){
         this.readyToSendShips = true;
         mlp.sendShips();
     }
-    @FXML
-    private void onReadyClicked() throws IOException {
 
-        if (player != null && player.hasShip()) {
-            // Nur wenn mindestens ein Schiff platziert wurde:
-            this.readyToSendShips = true;
+    if (player != null && player.hasShip()) {
+        // Nur wenn mindestens ein Schiff platziert wurde:
+        this.readyToSendShips = true;
 
-            if (mlp != null) {
-                mlp.sendShips();
-                System.out.println("Fertig! Schiffe werden gesendet.");
-            }
+        if (mlp != null) {
+            mlp.sendShips();
+            System.out.println("Fertig! Schiffe werden gesendet.");
+        }
 
-            // Optional: Nachricht für den Spieler ändern
-            if (messageLabel != null) {
-                messageLabel.setText("Warte auf Gegner...");
-            }
+        // Optional: Nachricht für den Spieler ändern
+        if (messageLabel != null) {
+            messageLabel.setText("Warte auf Gegner...");
+        }
 
-        } else {
-            // Wenn keine Schiffe platziert wurden:
-            System.out.println("Fehler: Bitte platziere zuerst mindestens ein Schiff!");
+    } else {
+        // Wenn keine Schiffe platziert wurden:
+        System.out.println("Fehler: Bitte platziere zuerst mindestens ein Schiff!");
 
-            // Visuelles Feedback für den Spieler geben
-            if (messageLabel != null) {
-                messageLabel.setText("Platziere zuerst ein Schiff!");
-            }
+        // Visuelles Feedback für den Spieler geben
+        if (messageLabel != null) {
+            messageLabel.setText("Platziere zuerst ein Schiff!");
+        }
 
     }*/
-    readyToSendShips = true;
-    mlp.sendShips();
-}
-public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
-    this.rootPane.getChildren().clear();
-        }
+        readyToSendShips = true;
+        mlp.sendShips();
     }
-
-    public void loadGameFromSave(GameState loadedState){
-        //this.rootPane.getChildren().clear();
-        player = Gamefield.fromData(loadedState.getPlayerBoardData(), this, this.mlp);
-        enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), this, this.mlp);
-        rootPane.getChildren().add(enemy);
-        rootPane.getChildren().add(player);
-
-        VBox.setVgrow(enemy, Priority.ALWAYS);
-        VBox.setVgrow(player, Priority.ALWAYS);
-        enemy.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        player.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-
-
-    }
-
     public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         this.rootPane.getChildren().clear();
 
@@ -458,7 +411,8 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
     }
 
 
-    private void setButtons() {
+
+    private void setButtons(){
         Button b2 = new Button("Länge 2");
         Button b3 = new Button("Länge 3");
         Button b4 = new Button("Länge 4");
@@ -467,7 +421,6 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         Button d2 = new Button("Vertikal");
         Button back = new Button("Back to Start");
         Button speichern = new Button("Speichern");
-        Button laden = new Button("Laden");
 
         b2.getStyleClass().add("option-button");
         b3.getStyleClass().add("option-button");
@@ -476,7 +429,6 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         d.getStyleClass().add("option-button");
         d2.getStyleClass().add("option-button");
         speichern.getStyleClass().add("control-button");
-        laden.getStyleClass().add("control-button");
 
         back.getStyleClass().add("control-button");
 
@@ -484,34 +436,24 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         b3.setOnAction(e -> length = 3);
         b4.setOnAction(e -> length = 4);
         b5.setOnAction(e -> length = 5);
-        d.setOnAction(e -> direction = false);
-        d2.setOnAction(e -> direction = true);
+        d.setOnAction(e->direction = false);
+        d2.setOnAction(e->direction = true);
         back.setOnAction(e -> {
                     StartScreen startScreen = new StartScreen(stage);
                     startScreen.show();
                 }
         );
-        speichern.setOnAction(e -> {
+        speichern.setOnAction(e ->{
             savedata = new SaveDataClass(player, enemy);
             savedata.prepareData();
             FileManager fileManager = new FileManager(true);
             fileManager.save(savedata);
         });
-
-        laden.setOnAction(e->{
-            FileManager fileManager = new FileManager(true);
-            try {
-                GameState gamestate = fileManager.load();
-                loadGameFromSave(gamestate);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back, speichern,laden);
+        shipControlBox.getChildren().addAll(b2, b3, b4, b5, d, d2, back, speichern);
         shipControlBox.setSpacing(10);
     }
 
-    public void temp() {
+    public void temp(){
         temp = false;
     }
 
@@ -533,15 +475,14 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         return c != null;
     }
 
-    public String getIP() {
+    public String getIP(){
         return ipa;
     }
-
-    public int getPort() {
+    public int getPort(){
         return porta;
     }
 
-    public void setupGameMult(Gamefield pl, Gamefield en) {
+    public void setupGameMult(Gamefield pl, Gamefield en){
 
         Label enemyLabel = new Label("Enemy");
         enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
@@ -571,11 +512,11 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
             Label counter = new Label("Empfangen: 0");
             shipCounters[i] = counter;
 
-        HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
-        row.setAlignment(Pos.CENTER);
-        shipControlBox.getChildren().add(row);
+            HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
+            row.setAlignment(Pos.CENTER);
+            shipControlBox.getChildren().add(row);
+        }
     }
-}
 
     public void setupClientPlacementUI(int[] shipCounts) {
         // Lösche die alte Button-Leiste, um sie neu aufzubauen
@@ -669,11 +610,4 @@ public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
         // kleiner als die erlaubte Anzahl?
         return shipsPlaced[len] < shipsAllowed[len];
     }
-            HBox row = new HBox(10, new Label("Länge " + i + ":"), counter);
-            row.setAlignment(Pos.CENTER);
-            shipControlBox.getChildren().add(row);
-        }
-    }
-
 }
-
