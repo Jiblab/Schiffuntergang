@@ -7,11 +7,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
-import org.example.schiffuntergang.Logic;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.sounds.*;
-import org.example.schiffuntergang.GameState;
-import org.example.schiffuntergang.SerializableShip;
+import org.example.schiffuntergang.filemanagement.GameState;
+import org.example.schiffuntergang.filemanagement.SerializableShip;
 
 import java.io.IOException;
 import java.util.ArrayList;

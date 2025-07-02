@@ -1,4 +1,4 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.filemanagement;
 
 import org.example.schiffuntergang.components.Position;
 

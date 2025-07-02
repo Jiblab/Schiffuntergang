@@ -3,7 +3,6 @@ package org.example.schiffuntergang;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -15,12 +14,11 @@ import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
-import org.example.schiffuntergang.EnemyPlayer;
+import org.example.schiffuntergang.filemanagement.StorageManager;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
 import org.example.schiffuntergang.sounds.SoundEffect;
 import javafx.geometry.Insets;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Random;
 

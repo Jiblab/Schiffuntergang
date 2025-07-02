@@ -1,6 +1,7 @@
-package org.example.schiffuntergang;
+package org.example.schiffuntergang.filemanagement;
 
 import javafx.util.Pair;
+import org.example.schiffuntergang.*;
 import org.example.schiffuntergang.components.*;
 import org.example.schiffuntergang.sounds.*;
 
@@ -8,7 +9,6 @@ import org.example.schiffuntergang.sounds.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import javax.swing.plaf.synth.SynthDesktopIconUI;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
