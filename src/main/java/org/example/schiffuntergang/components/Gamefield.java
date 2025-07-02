@@ -443,6 +443,10 @@ public class Gamefield extends GridPane {
         return board;
     }
 
+    public void setEnemy(EnemyPlayer e){
+        en = e;
+    }
+
     public void clearShips() {
         placedShip.clear();
         // ggf. auch das Spielfeld zurücksetzen, falls nötig

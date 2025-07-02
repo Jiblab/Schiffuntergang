@@ -99,6 +99,8 @@ public class StartScreen {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("hello-view.fxml")); // Pfad ggf. anpassen
                     Parent root = loader.load();
                     HelloController controller = loader.getController();
+                    controller.setStage(stage);
+                    controller.setSize(loadedState.getPlayerBoardData().getHeight(), loadedState.getPlayerBoardData().getWidth());
                     Gamefield player = Gamefield.fromData( loadedState.getPlayerBoardData(), controller, null);
                     Gamefield enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), controller, null);
 

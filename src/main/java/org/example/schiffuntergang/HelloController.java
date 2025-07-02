@@ -178,6 +178,7 @@ public class HelloController {
         player = loadedplayer;
         EnemyPlayer en = new EnemyPlayer(player);
         enemy = loadedenemy;
+        enemy.setEnemy(en);
 
 
 
