@@ -60,6 +60,8 @@ public class Gamefield extends GridPane {
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
                                 addShip(ship);
+                                control.updateRemainingCellsDisplay();
+
                             }
                         } else {
                             System.out.println(maxShipsC());
@@ -106,10 +108,16 @@ public class Gamefield extends GridPane {
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
                                 addShip(ship);
+
                             }
                         } else {
                             System.out.println(maxShipsC());
                             System.out.println("Maximale Anzahl an schiffen erreicht");
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Limit erreicht");
+                            alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
+                            alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
+                            alert.show();
                         }
 
 
@@ -148,35 +156,64 @@ public class Gamefield extends GridPane {
                             if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
                                 int len = control.getLength();
-                                if (getUsedCells() + len <= maxShipsC()) {
-                                    Ships ship = new Ships(len, len);
-                                    if (placeShip(ship, x, y, control.getDirection())) {
-                                        // Nur wenn das Platzieren erfolgreich war:
-                                        increaseCells(len); // Zähler für belegte Zellen erhöhen
-                                        addShip(ship);      // Schiff zur Liste der platzierten Schiffe hinzufügen
+                                System.out.println(len);
 
-                                        if (control.isClientMode()) {
-                                            control.shipPlaced(len);
+                                boolean isServer = controler.getHost(); // Der Server ist NICHT im Client-Modus
+
+                                if (isServer) {
+                                    // --- SERVER-LOGIK: Prüft gegen das Gesamtlimit an Zellen ---
+                                    if (getUsedCells() + len <= maxShipsC()) {
+                                        Ships ship = new Ships(len, len);
+                                        // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
+                                        if (placeShip(ship, x, y, control.getDirection())) {
+                                            increaseCells(len);
+                                            addShip(ship);
+                                            control.updateRemainingCellsDisplay(); // Label für verbleibende Punkte aktualisieren
                                         }
+                                    } else {
+                                        // Server hat das Limit erreicht
+                                        System.out.println("Limit an Bau-Punkten erreicht!");
+                                        Platform.runLater(() -> {
+                                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                                            alert.setTitle("Limit erreicht");
+                                            alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
+                                            alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
+                                            alert.showAndWait();
+                                        });
                                     }
                                 } else {
-                                    System.out.println("Limit erreicht! (" + getUsedCells() + "/" + (int)maxShipsC() + ")");
-                                    // Optional: Visuelles Feedback für den Spieler
-                                    Platform.runLater(() -> {
-                                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                                        alert.setTitle("Limit erreicht");
-                                        alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
-                                        alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
-                                        alert.showAndWait();
-                                    });
+                                    // --- CLIENT-LOGIK: Prüft gegen die vom Server gesendeten Regeln ---
+
+                                    if (control.canClientPlaceShip(len)) {
+                                        Ships ship = new Ships(len, len);
+                                        // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
+                                        if (placeShip(ship, x, y, control.getDirection())) {
+                                            increaseCells(len); // Zählt trotzdem die Zellen für Konsistenz
+                                            addShip(ship);
+                                            // Ruft die spezielle Update-Methode für den Client auf
+                                            control.clientPlacedShip(len);
+                                        }
+                                    } else {
+                                        // Client hat das Limit für diese Schiffslänge erreicht
+                                        System.out.println("Von Schiffslänge " + len + " können keine mehr platziert werden.");
+                                        Platform.runLater(() -> {
+                                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                            alert.setTitle("Limit für diese Länge erreicht");
+                                            alert.setHeaderText(null);
+                                            alert.setContentText("Sie haben bereits die maximale Anzahl an Schiffen der Länge " + len + " platziert.");
+                                            alert.showAndWait();
+                                        });
+                                    }
                                 }
 
-
-                            } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
-                                if (lo.getTurn()) {
-                                    lo.setX(x);
-                                    lo.setY(y);
-                                    System.out.println(x + " " + y);
+                                // ---- LOGIK FÜR DAS GEGNER-FELD (`enemy`) ----
+                            } else if (event.getButton() == MouseButton.PRIMARY && this.enemy) {
+                                // Diese Logik ist nur im Multiplayer relevant
+                                if (lo != null && control.getReady() && lo.getTurn()) {
+                                    // Wir schießen auf die angeklickte Koordinate (Spalte y, Reihe x)
+                                    lo.setX(x); // lo.setX erwartet die Spalten-Koordinate
+                                    lo.setY(y); // lo.setY erwartet die Reihen-Koordinate
+                                    System.out.println("Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
                                     try {
                                         lo.startShoot();
                                     } catch (IOException e) {
@@ -185,6 +222,7 @@ public class Gamefield extends GridPane {
                                 }
                             }
                 });
+
                 add(c, i, j);
             }
         }
@@ -203,14 +241,20 @@ public class Gamefield extends GridPane {
     public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
         int length = ship.getLength();
 
-        // 1. Randüberprüfung (ist jetzt logisch korrekt)
+
+        int startReihe = startX;
+        int startSpalte = startY;
+
+        // 1. Randüberprüfung
         if (vertical) {
-            if (startY + length > lang) { // lang ist die Höhe (Anzahl Reihen)
+            // Wenn das Schiff vertikal ist, wächst es entlang der Reihen (lang)
+            if (startReihe + length > lang) {
                 System.out.println("Schiff geht vertikal über den Rand.");
                 return false;
             }
         } else {
-            if (startX + length > breit) { // breit ist die Breite (Anzahl Spalten)
+            // Wenn das Schiff horizontal ist, wächst es entlang der Spalten (breit)
+            if (startSpalte + length > breit) {
                 System.out.println("Schiff geht horizontal über den Rand.");
                 return false;
             }
@@ -218,41 +262,38 @@ public class Gamefield extends GridPane {
 
         // 2. Überprüfung auf Kollisionen auf ALLEN Zellen des Schiffes
         for (int i = 0; i < length; i++) {
-            int currentX = vertical ? startX : startX + i;
-            int currentY = vertical ? startY + i : startY;
+            // Berechne die Indizes für die aktuelle Zelle
+            int reihenIndex = vertical ? startReihe + i : startReihe;
+            int spaltenIndex = vertical ? startSpalte : startSpalte + i;
 
-            // Durch die Korrektur in getCell() funktioniert dieser Aufruf jetzt wie erwartet!
-            Cell cellToCheck = getCell(currentX, currentY);
-            if (cellToCheck.getShip() != null) {
-                System.out.println("Kollision bei (" + currentX + ", " + currentY + ").");
+            // Rufe getCell mit (Reihen-Index, Spalten-Index) auf, passend zu Ihrer Implementierung
+            Cell cellToCheck = getCell(reihenIndex, spaltenIndex);
+
+            if (cellToCheck == null || cellToCheck.getShip() != null) {
+                System.out.println("Kollision bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ").");
                 return false;
             }
         }
 
         // 3. Wenn alle Prüfungen bestanden wurden, platziere das Schiff
         for (int i = 0; i < length; i++) {
-            int currentX = vertical ? startX : startX + i;
-            int currentY = vertical ? startY + i : startY;
+            // Berechne die Indizes erneut
+            int reihenIndex = vertical ? startReihe + i : startReihe;
+            int spaltenIndex = vertical ? startSpalte : startSpalte + i;
 
-            Cell cellToPlaceOn = getCell(currentX, currentY);
-            cellToPlaceOn.setShip(ship);
+            // Rufe getCell erneut auf, um das Schiff zu setzen
+            Cell cellToPlaceOn = getCell(reihenIndex, spaltenIndex);
+            if (cellToPlaceOn != null) {
+                cellToPlaceOn.setShip(ship);
 
-            if (!enemy) {
-                cellToPlaceOn.setFill(Color.WHITE);
-                cellToPlaceOn.setStroke(Color.GREEN);
-            } else {
-                // Für das unsichtbare Gegnerfeld. Grau ist vielleicht nicht ideal,
-                // da es suggeriert, dass dort etwas ist. Blau wäre konsistenter.
-                // Aber das ist eine Design-Entscheidung.
-                cellToPlaceOn.setFill(Color.GRAY);
+                if (!enemy) {
+                    cellToPlaceOn.setFill(Color.WHITE);
+                    cellToPlaceOn.setStroke(Color.GREEN);
+                }
             }
         }
 
-        // Dieser Aufruf gehört logisch eigentlich in die Methode, die placeShip aufruft,
-        // aber hier funktioniert er auch.
-        placedShip.add(ship);
-
-        System.out.println("Schiff platziert: Start(" + startX + ", " + startY + "), " + (vertical ? "vertikal" : "horizontal"));
+        System.out.println("Schiff platziert: Start(Reihe " + startReihe + ", Spalte " + startSpalte + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
 
@@ -409,7 +450,11 @@ public class Gamefield extends GridPane {
     }
 
     public boolean hasShip(){
-        return !placedShip.isEmpty();
+        System.out.println(placedShip.isEmpty());
+        if (!placedShip.isEmpty()){
+            return true;
+        }
+        return false;
     }
 
 }

@@ -37,7 +37,7 @@ public class HelloController {
     private final int maxPerShipLength = 3;
     private final int[] shipsPlaced = new int[6]; // Index = Schiffslänge
     private final Label[] shipCounters = new Label[6];
-    private boolean isClientMode = false;
+    private boolean ishost = false;
     private boolean readyToSendShips = false;
     private Gamefield enemy;
     private Gamefield player;
@@ -47,6 +47,8 @@ public class HelloController {
     private int[] shipsAllowed = new int[6];
 
     MultiplayerLogic mlp;
+    private final Label[] availableShipCounters = new Label[6];
+    private final Button[] shipLengthButtons = new Button[6];
 
     @FXML
     private AnchorPane anker;
@@ -59,7 +61,7 @@ public class HelloController {
 
     @FXML
     private HBox shipControlBox;
-
+    private Label remainingCell;
     //@FXML
     //VBox boxenV;
 
@@ -90,11 +92,35 @@ public class HelloController {
             messageLabel.setText(msg);
         }
     }
+
+    public void updateRemainingCellsDisplay() {
+        if (player == null || remainingCell == null) {
+            return;
+        }
+
+        int maxCells = (int) player.maxShipsC();
+        int usedCells = player.getUsedCells();
+        int remainingCells = maxCells - usedCells;
+
+        remainingCell.setText("Verbleibende Bau-Punkte: " + remainingCells);
+    }
     public void setup(){
         // Create the game fields
+        remainingCell = new Label();
+        remainingCell.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: #0013b3;");
+
         player = new Gamefield(false, this, (int) x, (int) y);
         EnemyPlayer en = new EnemyPlayer(player);
         enemy = new Gamefield(true, this, (int) x, (int) y, en);
+
+
+
+        updateRemainingCellsDisplay();
+
+
+        if (shipControlBox != null) {
+            shipControlBox.getChildren().add(0, remainingCell);
+        }
 
         // VBox für die Spielfelder mit label
         Label enemyLabel = new Label("Enemy");
@@ -148,6 +174,7 @@ public class HelloController {
     }
 
     public void setupMultiC(String ip, int port){
+        ishost = false;
         ipa = ip;
         porta = port;
         Client ce = new Client();
@@ -194,7 +221,7 @@ public class HelloController {
     }
 
     public void setupMultiS(){
-        isClientMode = true;
+        ishost = true;
 
         Server se = new Server();
         mlp = new MultiplayerLogic(se, false, null, null);
@@ -203,24 +230,32 @@ public class HelloController {
         mlp.setEn(enemy);
         mlp.setPl(player);
 
+        remainingCell = new Label();
+        remainingCell.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: #0013b3;");
+
+        // 2. Rufe die Update-Methode einmal auf, um den Startwert anzuzeigen
+        updateRemainingCellsDisplay();
+
+        // 3. Füge das Label zur shipControlBox hinzu
+        if (shipControlBox != null) {
+            shipControlBox.getChildren().clear(); // Entfernt alle alten Buttons, falls welche da sind
+            shipControlBox.getChildren().add(remainingCell);
+        }
+
         setButtons();
 
-        for (int i = 2; i <= 5; i++) {
-            int len = i;
+        /*for (int i = 2; i <= 5; i++) {
+            final int len = i; // final für die Verwendung im Lambda
             Button b = new Button("Länge " + len);
+            b.getStyleClass().add("option-button");
             b.setOnAction(e -> {
-                //if (canPlaceShipOfLength(len)) {
                 length = len;
-                //}
             });
 
-            Label counter = new Label("Verbleibend: " + maxPerShipLength);
-            shipCounters[len] = counter;
-
-            HBox row = new HBox(10, b, counter);
-            row.setAlignment(Pos.CENTER);
-            shipControlBox.getChildren().add(row);
-        }
+            if (shipControlBox != null) {
+                shipControlBox.getChildren().add(b);
+            }
+        }*/
        // rootPane.getChildren().add(player);
         //rootPane.getChildren().add(enemy);
         Label enemyLabel = new Label("Enemy");
@@ -299,8 +334,8 @@ private void updateCounter(int len) {
 
     }
 }
-public boolean isClientMode(){
-    return isClientMode;
+public boolean getHost(){
+    return ishost;
 }
 
 public void setShipCountsFromNetwork(int[] lengths) {
@@ -319,6 +354,10 @@ public boolean getReady(){
 
 @FXML
 private void onReadyClicked() throws IOException {
+    /*if (enemy != null && enemy.hasShip()){
+        this.readyToSendShips = true;
+        mlp.sendShips();
+    }
 
     if (player != null && player.hasShip()) {
         // Nur wenn mindestens ein Schiff platziert wurde:
@@ -343,7 +382,9 @@ private void onReadyClicked() throws IOException {
             messageLabel.setText("Platziere zuerst ein Schiff!");
         }
 
-    }
+    }*/
+    readyToSendShips = true;
+    mlp.sendShips();
 }
 public void loadGame(Gamefield playerBoard, Gamefield enemyBoard) {
     this.rootPane.getChildren().clear();
@@ -465,5 +506,98 @@ public void setupGameMult(Gamefield pl, Gamefield en){
         shipControlBox.getChildren().add(row);
     }
 }
+
+    public void setupClientPlacementUI(int[] shipCounts) {
+        // Lösche die alte Button-Leiste, um sie neu aufzubauen
+        if (shipControlBox != null) {
+            shipControlBox.getChildren().clear();
+            shipControlBox.setSpacing(10);
+        } else {
+            // Fallback, falls die FXML-Komponente nicht geladen wurde
+            System.err.println("shipControlBox ist null. UI kann nicht aufgebaut werden.");
+            return;
+        }
+
+        // Gehe durch die möglichen Schiffslängen (2 bis 5)
+        for (int len = 2; len <= 5; len++) {
+            int count = shipCounts[len]; // Hole die erlaubte Anzahl für diese Länge
+
+            // Wenn von dieser Länge 0 Schiffe erlaubt sind, erstelle gar keine UI dafür
+            if (count == 0) {
+                continue;
+            }
+
+            // --- UI-Komponenten erstellen ---
+
+            // 1. Das "Verfügbar"-Label
+            Label availableLabel = new Label("Verfügbar: " + count);
+            availableLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 12px;");
+            this.availableShipCounters[len] = availableLabel; // Speichere das Label für spätere Updates
+
+            // 2. Der Button zur Auswahl der Schiffslänge
+            Button lengthButton = new Button("Länge " + len);
+            lengthButton.getStyleClass().add("option-button");
+            final int currentLength = len; // Finale Kopie für Lambda
+            lengthButton.setOnAction(e -> {
+                length = currentLength;
+            });
+            this.shipLengthButtons[len] = lengthButton; // Speichere den Button zum Deaktivieren
+
+            // 3. Eine VBox, um Label und Button übereinander zu stapeln
+            VBox shipControlGroup = new VBox(5, availableLabel, lengthButton);
+            shipControlGroup.setAlignment(Pos.CENTER);
+
+            // Füge die Gruppe zur Haupt-Control-Box hinzu
+            shipControlBox.getChildren().add(shipControlGroup);
+        }
+
+        // Füge die restlichen, allgemeinen Buttons hinzu (Richtung, Zurück etc.)
+        Button d = new Button("Horizontal");
+        Button d2 = new Button("Vertikal");
+        Button back = new Button("Back to Start");
+        d.getStyleClass().add("option-button");
+        d2.getStyleClass().add("option-button");
+        back.getStyleClass().add("control-button");
+        d.setOnAction(e -> direction = false);
+        d2.setOnAction(e -> direction = true);
+        back.setOnAction(e -> { new StartScreen(stage).show(); });
+
+        shipControlBox.getChildren().addAll(d, d2, back);
+    }
+
+    public void clientPlacedShip(int len) {
+        if (len <= 0 || len >= shipsPlaced.length) return;
+
+        // Zähle das platzierte Schiff
+        shipsPlaced[len]++;
+
+        // Berechne, wie viele von dieser Sorte noch übrig sind
+        int allowedCount = shipsAllowed[len]; // Diese Info kommt vom Server
+        int remaining = allowedCount - shipsPlaced[len];
+
+        // Aktualisiere das "Verfügbar"-Label
+        if (availableShipCounters[len] != null) {
+            availableShipCounters[len].setText("Verfügbar: " + remaining);
+        }
+
+        // Wenn keine mehr übrig sind, deaktiviere den Button
+        if (remaining <= 0) {
+            if (shipLengthButtons[len] != null) {
+                shipLengthButtons[len].setDisable(true);
+            }
+        }
+    }
+    public void setShipRules(int[] shipCounts) {
+        this.shipsAllowed = shipCounts;
+    }
+
+    public boolean canClientPlaceShip(int len) {
+        if (len <= 0 || len >= shipsAllowed.length) {
+            return false;
+        }
+        // Ist die Anzahl der bereits platzierten Schiffe dieser Länge
+        // kleiner als die erlaubte Anzahl?
+        return shipsPlaced[len] < shipsAllowed[len];
+    }
 }
 
