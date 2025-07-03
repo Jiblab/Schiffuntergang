@@ -49,7 +49,7 @@ public class Gamefield extends GridPane {
         for (int i = 0; i < h; i++) {
 
             for (int j = 0; j < b; j++) {
-                Cell c = new Cell(j, i, this, 30, 30, controler);
+                Cell c = new Cell(i, j, this, 30, 30, controler);
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
