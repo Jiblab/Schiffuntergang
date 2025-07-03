@@ -3,7 +3,7 @@ package org.example.schiffuntergang.components;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
@@ -12,9 +12,17 @@ import org.example.schiffuntergang.filemanagement.GamefieldData;
 import org.example.schiffuntergang.sounds.*;
 import org.example.schiffuntergang.filemanagement.GameState;
 import org.example.schiffuntergang.filemanagement.SerializableShip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.image.Image;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 public class Gamefield extends GridPane {
     private final List<Ships> placedShip = new ArrayList<>();
@@ -30,13 +38,13 @@ public class Gamefield extends GridPane {
     private boolean multiplayer = false;
 
 
-
     public Gamefield(boolean enemy, HelloController controler, int h, int b) {
         lang = h;
         breit = b;
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
+        setupBackground();
 
         for (int i = 0; i < h; i++) {
 
@@ -45,7 +53,8 @@ public class Gamefield extends GridPane {
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
-                c.setFill(Color.BLUE);
+                c.setFill(new Color(0.1, 0.3, 0.8, 0.6));
+
                 final int x = i;
                 final int y = j;
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
@@ -58,7 +67,6 @@ public class Gamefield extends GridPane {
                             Ships ship = new Ships(control.getLength(), control.getLength());
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
-                                addShip(ship);
                                 control.updateRemainingCellsDisplay();
 
                             }
@@ -79,6 +87,8 @@ public class Gamefield extends GridPane {
         }
     }
 
+
+
     public Gamefield(boolean enemy, HelloController controler, int h, int b, EnemyPlayer e) {
         en = e;
         lang = h;
@@ -86,7 +96,7 @@ public class Gamefield extends GridPane {
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
-
+        setupBackground();
         for (int i = 0; i < h; i++) {
 
             for (int j = 0; j < b; j++) {
@@ -94,7 +104,7 @@ public class Gamefield extends GridPane {
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
-                c.setFill(Color.BLUE);
+                c.setFill(new Color(0.1, 0.3, 0.8, 0.6));
                 final int x = i;
                 final int y = j;
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
@@ -106,7 +116,6 @@ public class Gamefield extends GridPane {
                             Ships ship = new Ships(control.getLength(), control.getLength());
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
-                                addShip(ship);
 
                             }
                         } else {
@@ -138,6 +147,7 @@ public class Gamefield extends GridPane {
         this.enemy = enemy;
         this.control = controler;
         this.lo = l;
+        setupBackground();
 
         for (int i = 0; i < h; i++) {
 
@@ -146,7 +156,7 @@ public class Gamefield extends GridPane {
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
-                c.setFill(Color.BLUE);
+                c.setFill(new Color(0.1, 0.3, 0.8, 0.6));
                 final int x = i;
                 final int y = j;
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
@@ -166,7 +176,6 @@ public class Gamefield extends GridPane {
                                         // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
                                         if (placeShip(ship, x, y, control.getDirection())) {
                                             increaseCells(len);
-                                            addShip(ship);
                                             control.updateRemainingCellsDisplay(); // Label für verbleibende Punkte aktualisieren
                                         }
                                     } else {
@@ -188,7 +197,6 @@ public class Gamefield extends GridPane {
                                         // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
                                         if (placeShip(ship, x, y, control.getDirection())) {
                                             increaseCells(len); // Zählt trotzdem die Zellen für Konsistenz
-                                            addShip(ship);
                                             // Ruft die spezielle Update-Methode für den Client auf
                                             control.clientPlacedShip(len);
                                         }
@@ -227,6 +235,25 @@ public class Gamefield extends GridPane {
         }
     }
 
+    private void setupBackground() {
+        try {
+            // Load the image from resources. Make sure the path is correct!
+            Image backgroundImage = new Image(getClass().getResource("/images/Boardbg.png").toExternalForm());
+
+            BackgroundImage bgImage = new BackgroundImage(backgroundImage,
+                    BackgroundRepeat.NO_REPEAT, // Don't tile the image
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,  // Center the image
+                    new BackgroundSize(100, 100, true, true, false, true) // Stretch to cover the whole pane
+            );
+
+            this.setBackground(new Background(bgImage));
+        } catch (Exception e) {
+            System.err.println("Failed to load background image for Gamefield.");
+            // e.printStackTrace(); // Uncomment for debugging
+        }
+    }
+
 
     public Cell getCell(int x, int y) {
         return cells[x][y];
@@ -235,8 +262,6 @@ public class Gamefield extends GridPane {
     public boolean getStatus() {
         return enemy;
     }
-
-
 
     public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
         int length = ship.getLength();
@@ -292,6 +317,7 @@ public class Gamefield extends GridPane {
                 }
             }
         }
+        addShip(ship);
 
         System.out.println("Schiff platziert: Start(Reihe " + startReihe + ", Spalte " + startSpalte + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
@@ -318,34 +344,50 @@ public class Gamefield extends GridPane {
         usedCells += laenge;
     }
 
-    public void shoot(int x, int y){
+    public void shoot(int x, int y) {
+
         Cell c = getCell(x, y);
-        Ships s = c.getShip();
+        if (c == null) return; // Sicherheitsprüfung
+
+        // Fall 1: Feld wurde bereits beschossen
         if (c.isShot()) {
             System.out.println("Bereits beschossen");
+            // Nur eine Nachricht anzeigen, wenn der Spieler selbst auf ein bereits beschossenes Feld klickt
+            if (this.enemy && control != null) {
+                control.showNotification("Dieses Feld wurde bereits beschossen!", "info");
+            }
             return;
         }
-        c.setShot(true);
 
+        c.setShot(true);
+        Ships s = c.getShip();
+
+        // Fall 2: Ein Schiff wurde getroffen (s ist nicht null)
         if (s != null) {
             s.hit();
             c.setFill(Color.RED);
+            // SoundEffect.play("hit.wav");
+
             if (s.getHealth() == 0) {
+                // Fall 2a: Schiff ist versenkt
+                if (control != null) control.showNotification("Schiff versenkt!", "sunk");
                 deleteShip();
+            } else {
+                // Fall 2b: Normaler Treffer
+                if (control != null) control.showNotification("Treffer!", "hit");
             }
-            System.out.println(control.getPlayerturn());
-            if (this.enemy && !multiplayer){
-
-                System.out.println("nix hier in der if abfrage");
-                en.revenge();
-            }
-        } else {
+        }
+        // Fall 3: Fehlschuss (s ist null)
+        else {
             c.setFill(Color.BLACK);
-            System.out.println("Koordinaten x, dann y: "+x+" "+y);
-            if (this.enemy && !multiplayer){
+            // SoundEffect.play("miss.wav");
+            if (control != null) control.showNotification("Verfehlt!", "miss");
+        }
 
-                en.revenge();
-            }
+        // Fall 4: Gegner ist im Einzelspielermodus am Zug (nach Treffer ODER Fehlschuss)
+        if (this.enemy && !multiplayer) {
+            System.out.println("Einzelspieler: Gegner ist am Zug.");
+            en.revenge();
         }
     }
     public boolean inBounds(int x, int y){
@@ -455,10 +497,7 @@ public class Gamefield extends GridPane {
 
     public boolean hasShip(){
         System.out.println(placedShip.isEmpty());
-        if (!placedShip.isEmpty()){
-            return true;
-        }
-        return false;
+        return !placedShip.isEmpty();
     }
 
 
@@ -548,6 +587,10 @@ public class Gamefield extends GridPane {
         }
 
         return board;
+    }
+
+    public void setController(HelloController controller) {
+        this.control = controller;
     }
 
 }

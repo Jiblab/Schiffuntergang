@@ -108,7 +108,7 @@ public class Options {
         layout.setPadding(new Insets(30));
 
         adjustFontSize(back, 40);
-        back.prefWidthProperty().bind(stage.widthProperty().multiply(0.3));
+        back.prefWidthProperty().bind(stage.widthProperty().multiply(0.8));
         back.prefHeightProperty().bind(stage.heightProperty().multiply(0.1));
 
         return layout;
@@ -162,7 +162,14 @@ public class Options {
 
     void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
-        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';");
+        button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';" +
+                "-fx-background-color: #8b6248; " +
+                "-fx-text-fill: white; " +
+                "-fx-border-color: #402d21; " +
+                "-fx-border-width: 3px; " +
+                "-fx-background-radius: 5; " +
+                "-fx-border-radius: 5;");
+
     }
 
     private ImageView createFullscreenImageView(String path) {

@@ -23,14 +23,8 @@ import java.net.UnknownHostException;
 public class Boardsize {
     private final Stage stage;
     private final boolean isSinglePlayer;
-    private double x;
-    private double y;
 
-    public Boardsize(Stage stage, boolean isSinglePlayer) {
-        this.isSinglePlayer = isSinglePlayer;
-        this.stage = stage;
-    }
-
+    // Schriftart wird nur einmal beim Laden der Klasse initialisiert
     static {
         try {
             Font.loadFont(Boardsize.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
@@ -40,209 +34,144 @@ public class Boardsize {
         }
     }
 
+    public Boardsize(Stage stage, boolean isSinglePlayer) {
+        this.isSinglePlayer = isSinglePlayer;
+        this.stage = stage;
+    }
+
+    /**
+     * Zeigt den Einstellungsbildschirm für ein Einzelspieler-Spiel an.
+     */
     public void show() {
         createAndShowScene(false);
     }
 
-    /*public void showMulti() {
+    /**
+     * Zeigt den Einstellungsbildschirm für das Hosten eines Multiplayer-Spiels an.
+     */
+    public void showMulti() {
         createAndShowScene(true);
-    }*/
+    }
 
-    private void createAndShowScene(boolean isMultiplayerSetup) {
+    /**
+     * Die zentrale Methode, die die Benutzeroberfläche für die Spielfeldgröße erstellt und anzeigt.
+     *
+     * @param isMultiplayerHost True, wenn ein Multiplayer-Spiel gehostet wird (zeigt die IP an), sonst false.
+     */
+    private void createAndShowScene(boolean isMultiplayerHost) {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
 
-        //slider
-        Slider slider1 = new Slider(0, 30, 10);
-        // slider1.setShowTickLabels(true);
-        //slider1.setShowTickMarks(true);
+        // --- UI-Komponenten erstellen ---
+        Label widthLabel = new Label("Breite: 10");
+        Slider widthSlider = new Slider(5, 30, 10); // Mindestgröße 5 für sinnvolles Spiel
 
-        Slider slider2 = new Slider(0, 30, 10);
-        // slider2.setShowTickLabels(true);
-        //  slider2.setShowTickMarks(true);
+        Label heightLabel = new Label("Höhe: 10");
+        Slider heightSlider = new Slider(5, 30, 10);
 
-        Label label1 = new Label("Boardbreite: 10");
-        Label label2 = new Label("Boardhöhe: 10"); // "Boardsize" war doppelt, ich habe es in "Boardhöhe" geändert für Klarheit
-
-        slider1.valueProperty().addListener((obs, oldVal, newVal) ->
-                label1.setText("Boardbreite: " + String.format("%.0f", newVal.doubleValue()))
+        // Slider mit Labels verbinden
+        widthSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+                widthLabel.setText("Breite: " + newVal.intValue())
         );
-        slider2.valueProperty().addListener((obs, oldVal, newVal) ->
-                label2.setText("Boardhöhe: " + String.format("%.0f", newVal.doubleValue()))
+        heightSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+                heightLabel.setText("Höhe: " + newVal.intValue())
         );
 
-        Button start = new Button("Start Game");
-        start.getStyleClass().add("control-button");
-        start.setOnAction(e -> {
-            clickSound.play();
-            x = slider1.getValue();
-            y = slider2.getValue();
+        Button startButton = new Button("Start Game");
+        startButton.getStyleClass().add("control-button");
+
+        Button backButton = new Button("Back to Menu");
+        backButton.getStyleClass().add("control-button");
+
+        // --- Layout erstellen ---
+        VBox controlsLayout = new VBox(15, widthLabel, widthSlider, heightLabel, heightSlider, startButton, backButton);
+        controlsLayout.setPadding(new Insets(50));
+        controlsLayout.setAlignment(Pos.CENTER);
+        controlsLayout.maxWidthProperty().bind(stage.widthProperty().multiply(0.5));
+        VBox.setMargin(startButton, new Insets(40, 0, 0, 0)); // Abstand nach oben
+
+        // --- Bedingte Logik für Multiplayer-Host ---
+        if (isMultiplayerHost) {
+            Label ipInfoLabel = new Label("Deine IP-Adresse (für deine Freunde):");
+            TextField ipField = new TextField();
+            ipField.setEditable(false); // Nicht bearbeitbar
+            ipField.setFocusTraversable(false); // Kann nicht mit Tab ausgewählt werden
+            ipField.setStyle("-fx-opacity: 1.0; -fx-font-family: 'Press Start 2P';");
 
             try {
+                ipField.setText(InetAddress.getLocalHost().getHostAddress());
+            } catch (UnknownHostException e) {
+                ipField.setText("IP-Adresse konnte nicht ermittelt werden");
+            }
+
+            // Füge die IP-Anzeige ganz oben im Layout ein
+            controlsLayout.getChildren().add(0, ipInfoLabel);
+            controlsLayout.getChildren().add(1, ipField);
+        }
+
+        // --- Button-Aktionen definieren ---
+        startButton.setOnAction(e -> {
+            clickSound.play();
+            try {
+                // Die "Goldene Regel" des FXML-Ladens
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
                 Parent root = loader.load();
                 HelloController controller = loader.getController();
-                controller.setStage(stage);
-                controller.setSize(x, y);
 
-                if (isMultiplayerSetup) {
+                // Den Controller mit den gewählten Werten konfigurieren
+                controller.setStage(stage);
+                controller.setSize(widthSlider.getValue(), heightSlider.getValue());
+
+                // Die korrekte Setup-Methode basierend auf dem Spielmodus aufrufen
+                if (isMultiplayerHost) {
                     controller.setupMultiS();
                 } else {
                     controller.setup();
                 }
 
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
+                // Die neue Szene anzeigen
+                Scene gameScene = new Scene(root);
+
+                gameScene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        stage.setIconified(true); // This minimizes the window
+                    }
+                });
+
+                stage.setScene(gameScene);
                 stage.setFullScreen(true);
 
             } catch (IOException ex) {
+                System.err.println("Fehler beim Laden der Spielansicht (hello-view.fxml).");
                 ex.printStackTrace();
             }
         });
 
-        Button backtostart = new Button("Back to Menu");
-        backtostart.getStyleClass().add("control-button");
-        backtostart.setOnAction(e -> {
-
-            GameCreationScreen gameScreen = new GameCreationScreen(stage);
+        backButton.setOnAction(e -> {
             clickSound.play();
-            gameScreen.show();
+            new GameCreationScreen(stage).show();
         });
 
-//Layout
-
-        VBox controlsLayout = new VBox(15, label1, slider1, label2, slider2, start, backtostart);
-        controlsLayout.setPadding(new Insets(50));
-        controlsLayout.setAlignment(Pos.CENTER);
-        controlsLayout.maxWidthProperty().bind(stage.widthProperty().multiply(0.5));
-
-        StackPane rootPane = new StackPane();
+        // --- Szene zusammenbauen und anzeigen ---
+        StackPane rootPane = new StackPane(controlsLayout);
         rootPane.getStyleClass().add("background");
-        rootPane.getChildren().add(controlsLayout);
 
         Scene scene = new Scene(rootPane);
-
-        VBox.setMargin(start, new Insets(60, 0, 0, 0));
-
-        //css
-        scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource("/slider.css").toExternalForm());
-        scene.getStylesheets().add(getClass().getResource("/button.css").toExternalForm());
+        scene.getStylesheets().addAll(
+                getClass().getResource("/background.css").toExternalForm(),
+                getClass().getResource("/slider.css").toExternalForm(),
+                getClass().getResource("/button.css").toExternalForm()
+        );
 
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
                 stage.setResizable(true);
-                stage.setWidth(800);
-                stage.setHeight(600);
             }
         });
-
 
         stage.setScene(scene);
-        stage.setTitle("Boardsize");
-        stage.setFullScreen(true);
-        stage.show();
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
- 
-    public void showMulti(){
-        SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
-
-        String ipAddress = "Unbekannt";
-        try {
-            InetAddress inetAddress = InetAddress.getLocalHost();
-            ipAddress = inetAddress.getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-        TextField ipField = new TextField(ipAddress);
-        ipField.setEditable(false);
-        ipField.setFocusTraversable(false);
-        ipField.setStyle("-fx-opacity: 1.0;");
-
-        Slider slider1 = new Slider(0, 30, 10);
-        slider1.setShowTickLabels(true);
-        slider1.setShowTickMarks(true);
-
-        Slider slider2 = new Slider(0, 30, 10);
-        slider2.setShowTickLabels(true);
-        slider2.setShowTickMarks(true);
-
-        Label label1 = new Label("Boardbreite: 10");
-        Label label2 = new Label("Boardsize: 10");
-
-        slider1.valueProperty().addListener((obs, oldVal, newVal) ->
-                label1.setText("Boardbreite: " + String.format("%.0f", newVal.doubleValue()))
-        );
-
-        slider2.valueProperty().addListener((obs, oldVal, newVal) ->
-                label2.setText("Boardsize: " + String.format("%.0f", newVal.doubleValue()))
-        );
-
-        Button start = new Button("Start Game");
-
-        start.setOnAction(e2 -> {
-            clickSound.play();
-            x = slider1.getValue();
-            y = slider2.getValue();
-
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
-                Parent root = loader.load();
-                HelloController controller = loader.getController();
-                controller.setStage(stage);
-
-                // Optional: controller.buildGamefield(); falls Gamefield erst hier erzeugt wird
-                controller.setSize(x, y);
-                controller.setupMultiS();
-
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.setFullScreen(true);
-
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
-        Button backtostart = new Button("Back to Menu");
-        backtostart.setOnAction(e3 -> {
-            GameCreationScreen gameScreen = new GameCreationScreen(stage);
-            clickSound.play();
-            gameScreen.show();
-        });
-
-        VBox layout = new VBox(15,
-                new Label("Deine IP-Adresse:"), ipField,
-                label1, slider1,
-                label2, slider2,
-                start, backtostart
-        );
-        layout.setStyle("-fx-padding: 30px;");
-        layout.setAlignment(Pos.CENTER);
-
-        Scene scene = new Scene(layout, 300, 250);
-        scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ESCAPE) {
-                stage.setFullScreen(false);
-                stage.setResizable(true);
-                stage.setWidth(400);
-                stage.setHeight(300);
-            }
-        });
-        stage.setScene(scene);
-        stage.setTitle("Boardsize");
+        stage.setTitle("Spielfeldgröße wählen");
         stage.setFullScreen(true);
         stage.show();
     }
 }
-
-

@@ -177,6 +177,11 @@ public class GameCreationScreen {
                 // 4. Erstelle eine neue Szene mit der geladenen Spielansicht
                 Scene gameScene = new Scene(gameRoot);
 
+                gameScene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        stage.setIconified(true); // This minimizes the window
+                    }
+                });
                 // 5. SETZE die neue Szene auf der HAUPT-Stage. Das tauscht den Inhalt aus.
                 this.stage.setScene(gameScene);
                 this.stage.setFullScreen(true); // Sicherstellen, dass das Fenster im Vollbild bleibt

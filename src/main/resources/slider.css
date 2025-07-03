@@ -55,15 +55,15 @@
 
 /*der bewegliche Teil des Schalters */
 .toggle-switch .thumb {
-    -fx-background-color: #ff4136; /* rot wenn aus */
+    -fx-background-color: #b52225; /* rot wenn aus */
     -fx-background-radius: 0;
 }
 
 /* Schalter an */
 .toggle-switch:selected .thumb {
-    -fx-background-color: #2ecc40; /*Grün für an */
+    -fx-background-color: #09710e; /*Grün für an */
 }
 
 .toggle-switch:selected .switch {
-    -fx-background-color: #555555; /*heller Hintergrund, wenn an */
+    -fx-background-color: #8dbb8f; /*heller Hintergrund, wenn an */
 }

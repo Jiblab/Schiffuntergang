@@ -45,8 +45,8 @@ public class EnemyPlayer {
             // 3. HUNTING-Modus: Zufälligen, noch nicht beschossenen Punkt finden.
             int x, y;
             do {
-                x = rand.nextInt(playerBoard.getBreit());
-                y = rand.nextInt(playerBoard.getLang());
+                x = rand.nextInt(playerBoard.getLang());
+                y = rand.nextInt(playerBoard.getBreit());
             } while (playerBoard.getCell(x, y).isShot());
 
             shootAt(x, y);
@@ -72,8 +72,7 @@ public class EnemyPlayer {
 
                 if (!ship.isAlive()) {
                     System.out.println("Gegner hat ein Schiff versenkt!");
-                    // Schiff ist versenkt, alle Ziele, die mit diesem Schiff zu tun hatten, sind irrelevant.
-                    // Wir löschen die Prioritätsliste und kehren in den Jagd-Modus zurück.
+                    playerBoard.deleteShip();
                     priorityTargets.clear();
                     firstHit = null;
                     directionFound = false;

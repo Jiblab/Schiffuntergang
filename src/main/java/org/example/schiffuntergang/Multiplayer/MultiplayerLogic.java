@@ -13,7 +13,7 @@ import java.io.IOException;
 public class MultiplayerLogic {
     private Client cl;
     private Server s;
-    private boolean client;
+    private final boolean client;
     private Gamefield enemy;
     private Gamefield player;
     private int merkx;
@@ -172,9 +172,11 @@ public class MultiplayerLogic {
                         // Jetzt kannst du das Spielfeld erzeugen
                         player = new Gamefield(false, contr, cols, rows, this);  // z. B. true = eigenes Feld
                         enemy = new Gamefield(true, contr, cols, rows, this); // false = Gegnerfeld
+
                         Platform.runLater(() -> {
-                            contr.setupGameMult(player, enemy);
+                            contr.setupMultiplayerBoards(player, enemy);
                         });
+
                         cl.sendDone(); // Antwort an den Server
                         break;
                     case "load":
