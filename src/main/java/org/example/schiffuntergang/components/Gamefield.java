@@ -51,6 +51,7 @@ public class Gamefield extends GridPane {
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
                 // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
                 c.setOnMouseClicked(event -> {
+                    System.out.println("Gamefield: Klick auf: " + x + ", " + y);
                     if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
                         if (getUsedCells() + control.getLength() <= maxShipsC()) { //+ control.getlength damit das auf auf neue schiffe prüft
@@ -69,7 +70,7 @@ public class Gamefield extends GridPane {
 
                     } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
                         // shoot((int) c.getX(), (int) c.getY());
-                        shoot(c.x, c.y);
+                        shoot(x, y);
                     }
                 });
 
