@@ -131,7 +131,7 @@ public class HelloController {
 
         HBox notificationBox = new HBox(notificationLabel);
         notificationBox.setAlignment(Pos.CENTER);
-        notificationBox.setMinHeight(50); // Gibt der Leiste eine feste Höhe
+        notificationBox.setMinHeight(80); // Gibt der Leiste eine feste Höhe
 
         rootPane.setBottom(notificationBox);
     }
