@@ -147,16 +147,16 @@ public class HelloController {
             notificationLabel.setText(message);
             switch (type.toLowerCase()) {
                 case "hit":
-                    notificationLabel.setStyle("-fx-text-fill: #ffbf00; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px;"); // Gelb/Orange für Treffer
+                    notificationLabel.setStyle("-fx-text-fill: #029c58; -fx-font-family: 'Press Start 2P'; -fx-font-size: 50px;"); // grün für Treffer
                     break;
                 case "sunk":
-                    notificationLabel.setStyle("-fx-text-fill: #ff4d4d; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px; -fx-font-weight: bold;"); // Rot für Versenkt
+                    notificationLabel.setStyle("-fx-text-fill: #ea2020; -fx-font-family: 'Press Start 2P'; -fx-font-size: 50px; -fx-font-weight: bold;"); // Rot für Versenkt
                     break;
                 case "miss":
-                    notificationLabel.setStyle("-fx-text-fill: #b3b3b3; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px;"); // Grau für Fehlschuss
+                    notificationLabel.setStyle("-fx-text-fill: #ea7b20; -fx-font-family: 'Press Start 2P'; -fx-font-size: 50px;"); // orange für Fehlschuss
                     break;
                 default: // "info" oder unbekannt
-                    notificationLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-family: 'Press Start 2P'; -fx-font-size: 18px;"); // Weiß für allgemeine Infos
+                    notificationLabel.setStyle("-fx-text-fill: #f3070b; -fx-font-family: 'Press Start 2P'; -fx-font-size: 30px;");
                     break;
             }
 
@@ -201,6 +201,7 @@ public class HelloController {
         pauseButton.getStyleClass().add("option-button");
         pauseButton.setOnAction(e -> togglePauseMenu());
 
+
         // Set the pauseButton as the right element of the BorderPane.
         // We can add padding to the button itself to give it some space from the edge.
         BorderPane.setMargin(pauseButton, new Insets(0, 10, 0, 0)); // Right margin of 10px
@@ -231,6 +232,7 @@ public class HelloController {
         resumeButton.setOnAction(e -> togglePauseMenu()); // The same method hides the menu
 
         saveButton.setOnAction(e -> {
+            stage.setFullScreen(false);
             savedata = new SaveDataClass(player, enemy);
             savedata.prepareData();
             FileManager fileManager = new FileManager(true);
@@ -404,7 +406,7 @@ public class HelloController {
         player = new Gamefield(false, this, (int) x, (int) y, mlp);
         enemy = new Gamefield(true, this, (int) x, (int) y, mlp);
         Label waitingLabel = new Label("Warte auf Server...");
-        waitingLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: white;");
+        waitingLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
         VBox placeholderControls = new VBox(waitingLabel);
         placeholderControls.setPadding(new Insets(20));
         placeholderControls.setAlignment(Pos.CENTER);
@@ -452,7 +454,7 @@ public class HelloController {
         // Ein Platzhalter-Panel für die linke Seite erstellen,
         // während wir auf die Schiffsregeln vom Server warten.
         Label waitingLabel = new Label("Warte auf Schiffsregeln...");
-        waitingLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 12px; -fx-text-fill: white;");
+        waitingLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
         VBox placeholderControls = new VBox(waitingLabel);
         placeholderControls.setPadding(new Insets(20));
         placeholderControls.setAlignment(Pos.CENTER);
