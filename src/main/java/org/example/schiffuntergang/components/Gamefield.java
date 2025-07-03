@@ -66,7 +66,6 @@ public class Gamefield extends GridPane {
                             Ships ship = new Ships(control.getLength(), control.getLength());
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
-                                addShip(ship);
                                 control.updateRemainingCellsDisplay();
 
                             }
@@ -116,7 +115,6 @@ public class Gamefield extends GridPane {
                             Ships ship = new Ships(control.getLength(), control.getLength());
                             if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
-                                addShip(ship);
 
                             }
                         } else {
@@ -177,7 +175,6 @@ public class Gamefield extends GridPane {
                                         // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
                                         if (placeShip(ship, x, y, control.getDirection())) {
                                             increaseCells(len);
-                                            addShip(ship);
                                             control.updateRemainingCellsDisplay(); // Label für verbleibende Punkte aktualisieren
                                         }
                                     } else {
@@ -199,7 +196,6 @@ public class Gamefield extends GridPane {
                                         // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
                                         if (placeShip(ship, x, y, control.getDirection())) {
                                             increaseCells(len); // Zählt trotzdem die Zellen für Konsistenz
-                                            addShip(ship);
                                             // Ruft die spezielle Update-Methode für den Client auf
                                             control.clientPlacedShip(len);
                                         }
@@ -320,6 +316,7 @@ public class Gamefield extends GridPane {
                 }
             }
         }
+        addShip(ship);
 
         System.out.println("Schiff platziert: Start(Reihe " + startReihe + ", Spalte " + startSpalte + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
