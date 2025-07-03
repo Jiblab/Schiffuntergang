@@ -130,6 +130,13 @@ public class Boardsize {
 
                 // Die neue Szene anzeigen
                 Scene gameScene = new Scene(root);
+
+                gameScene.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        stage.setIconified(true); // This minimizes the window
+                    }
+                });
+
                 stage.setScene(gameScene);
                 stage.setFullScreen(true);
 

@@ -107,6 +107,13 @@ public class StartScreen {
                     controller.setup(player, enemy);  // eigene Methode
 
                     Scene scene = new Scene(root);
+
+                    scene.setOnKeyPressed(event -> {
+                        if (event.getCode() == KeyCode.ESCAPE) {
+                            stage.setIconified(true);
+                        }
+                    });
+
                     stage.setScene(scene);
                     stage.setFullScreen(true);
                     stage.show();

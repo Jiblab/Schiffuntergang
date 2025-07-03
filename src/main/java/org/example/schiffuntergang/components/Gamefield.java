@@ -3,7 +3,7 @@ package org.example.schiffuntergang.components;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
@@ -12,9 +12,17 @@ import org.example.schiffuntergang.filemanagement.GamefieldData;
 import org.example.schiffuntergang.sounds.*;
 import org.example.schiffuntergang.filemanagement.GameState;
 import org.example.schiffuntergang.filemanagement.SerializableShip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.image.Image;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 public class Gamefield extends GridPane {
     private final List<Ships> placedShip = new ArrayList<>();
@@ -30,13 +38,13 @@ public class Gamefield extends GridPane {
     private boolean multiplayer = false;
 
 
-
     public Gamefield(boolean enemy, HelloController controler, int h, int b) {
         lang = h;
         breit = b;
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
+        setupBackground();
 
         for (int i = 0; i < h; i++) {
 
@@ -45,7 +53,8 @@ public class Gamefield extends GridPane {
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
-                c.setFill(Color.BLUE);
+                c.setFill(new Color(0.1, 0.3, 0.8, 0.6));
+
                 final int x = i;
                 final int y = j;
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
@@ -78,6 +87,8 @@ public class Gamefield extends GridPane {
         }
     }
 
+
+
     public Gamefield(boolean enemy, HelloController controler, int h, int b, EnemyPlayer e) {
         en = e;
         lang = h;
@@ -85,7 +96,7 @@ public class Gamefield extends GridPane {
         cells = new Cell[h][b];
         this.enemy = enemy;
         this.control = controler;
-
+        setupBackground();
         for (int i = 0; i < h; i++) {
 
             for (int j = 0; j < b; j++) {
@@ -93,7 +104,7 @@ public class Gamefield extends GridPane {
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
-                c.setFill(Color.BLUE);
+                c.setFill(new Color(0.1, 0.3, 0.8, 0.6));
                 final int x = i;
                 final int y = j;
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
@@ -137,6 +148,7 @@ public class Gamefield extends GridPane {
         this.enemy = enemy;
         this.control = controler;
         this.lo = l;
+        setupBackground();
 
         for (int i = 0; i < h; i++) {
 
@@ -145,7 +157,7 @@ public class Gamefield extends GridPane {
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
-                c.setFill(Color.BLUE);
+                c.setFill(new Color(0.1, 0.3, 0.8, 0.6));
                 final int x = i;
                 final int y = j;
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
@@ -223,6 +235,25 @@ public class Gamefield extends GridPane {
 
                 add(c, i, j);
             }
+        }
+    }
+
+    private void setupBackground() {
+        try {
+            // Load the image from resources. Make sure the path is correct!
+            Image backgroundImage = new Image(getClass().getResource("/images/Boardbg.png").toExternalForm());
+
+            BackgroundImage bgImage = new BackgroundImage(backgroundImage,
+                    BackgroundRepeat.NO_REPEAT, // Don't tile the image
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,  // Center the image
+                    new BackgroundSize(100, 100, true, true, false, true) // Stretch to cover the whole pane
+            );
+
+            this.setBackground(new Background(bgImage));
+        } catch (Exception e) {
+            System.err.println("Failed to load background image for Gamefield.");
+            // e.printStackTrace(); // Uncomment for debugging
         }
     }
 

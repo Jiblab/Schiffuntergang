@@ -1,5 +1,8 @@
 package org.example.schiffuntergang;
 
+import javafx.scene.control.Slider;
+import org.controlsfx.control.ToggleSwitch;
+import org.example.schiffuntergang.StartScreen;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -56,6 +59,8 @@ public class HelloController {
     MultiplayerLogic mlp;
     private final Label[] availableShipCounters = new Label[6];
     private final Button[] shipLengthButtons = new Button[6];
+    private VBox pauseMenu;
+    private double previousVolume;
 
     private SaveDataClass savedata;
 
@@ -99,27 +104,17 @@ public class HelloController {
 
     // --- NEUE LAYOUT-STRUKTUR ---
 
-    /**
-     * Baut die gesamte Benutzeroberfläche mit den übergebenen Spielfeldern auf.
-     * Diese Methode ist der zentrale Punkt für den UI-Aufbau.
-     *
-     * @param playerBoard Das Spielfeld des Spielers.
-     * @param enemyBoard  Das Spielfeld des Gegners.
-     * @param controlNode Das linke Steuerpanel (kann je nach Spielmodus variieren).
-     */
     private void buildUI(Node playerBoard, Node enemyBoard, Node controlNode) {
         // 1. Header (oben)
         rootPane.setTop(createHeader());
 
         // 2. Spielfelder (Mitte)
-        Label enemyLabel = new Label("Enemy");
-        enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
-        VBox enemyBox = new VBox(10, enemyLabel, enemyBoard);
+
+        VBox enemyBox = new VBox(10, enemyBoard);
         enemyBox.setAlignment(Pos.CENTER);
 
-        Label playerLabel = new Label("You");
-        playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #0013b3;");
-        VBox playerBox = new VBox(10, playerLabel, playerBoard);
+
+        VBox playerBox = new VBox(10, playerBoard);
         playerBox.setAlignment(Pos.CENTER);
 
         HBox gameFieldsBox = new HBox(30, playerBox, enemyBox); // Player links, Enemy rechts
@@ -177,12 +172,14 @@ public class HelloController {
      *
      * @return Eine HBox, die als Header dient.
      */
-    private HBox createHeader() {
-        // WICHTIG: Ersetzen Sie die Pfade durch Ihre tatsächlichen Icon-Pfade!
-       /* ImageView playerIcon = new ImageView(new Image(getClass().getResource("/images/player_icon.png").toExternalForm()));
-        playerIcon.setFitHeight(40);
-        playerIcon.setFitWidth(40);*/
+    private BorderPane createHeader() {
+        // 1. The main container for the header is now a BorderPane.
+        BorderPane headerPane = new BorderPane();
+        headerPane.setPadding(new Insets(10));
+        headerPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
 
+        // 2. Create the title group (Player vs Enemy) and place it in the CENTER.
+        // We can still use an HBox for this little group to get the spacing right.
         Label playerLabel = new Label("Player");
         playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
 
@@ -192,17 +189,109 @@ public class HelloController {
         Label enemyLabel = new Label("Enemy");
         enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
 
-        /*ImageView enemyIcon = new ImageView(new Image(getClass().getResource("/images/enemy_icon.png").toExternalForm()));
-        enemyIcon.setFitHeight(40);
-        enemyIcon.setFitWidth(40);*/
+        HBox titleBox = new HBox(15, playerLabel, vsLabel, enemyLabel);
+        titleBox.setAlignment(Pos.CENTER); // Center the labels within their own HBox.
 
-        HBox headerBox = new HBox(15, /*playerIcon,*/ playerLabel, vsLabel, enemyLabel/*, enemyIcon*/);
-        headerBox.setAlignment(Pos.CENTER);
-        headerBox.setPadding(new Insets(10));
-        headerBox.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
+        // Set the titleBox as the center element of the BorderPane. It will be perfectly centered.
+        headerPane.setCenter(titleBox);
 
-        return headerBox;
+
+        // 3. Create the Pause Button and place it on the RIGHT.
+        Button pauseButton = new Button("Pause");
+        pauseButton.getStyleClass().add("option-button");
+        pauseButton.setOnAction(e -> togglePauseMenu());
+
+        // Set the pauseButton as the right element of the BorderPane.
+        // We can add padding to the button itself to give it some space from the edge.
+        BorderPane.setMargin(pauseButton, new Insets(0, 10, 0, 0)); // Right margin of 10px
+        headerPane.setRight(pauseButton);
+
+
+        return headerPane;
     }
+
+    private VBox createPauseMenu() {
+        // --- Buttons and Controls ---
+        Button resumeButton = new Button("Resume Game");
+        Button saveButton = new Button("Save Game");
+        Button exitButton = new Button("Exit to Menu");
+
+        // Volume Controls (reused from your Options class)
+        ToggleSwitch musicToggle = new ToggleSwitch("MUTE MUSIC");
+        Slider volumeSlider = new Slider(0, 100, SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50);
+        volumeSlider.setPrefWidth(250);
+
+        // --- Styling ---
+        for (Button btn : new Button[]{resumeButton, saveButton, exitButton}) {
+            btn.getStyleClass().add("control-button");
+            btn.setMaxWidth(Double.MAX_VALUE);
+        }
+
+        // --- Event Handlers ---
+        resumeButton.setOnAction(e -> togglePauseMenu()); // The same method hides the menu
+
+        saveButton.setOnAction(e -> {
+            savedata = new SaveDataClass(player, enemy);
+            savedata.prepareData();
+            FileManager fileManager = new FileManager(true);
+            fileManager.save(savedata);
+            showNotification("Game Saved!", "info");
+        });
+
+        exitButton.setOnAction(e -> new StartScreen(stage).show());
+
+        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            double vol = newVal.doubleValue();
+            SoundEffect.setVolume(vol);
+            BackgroundMusic.getInstance().setVolume(vol / 100.0);
+            musicToggle.setSelected(vol == 0);
+        });
+
+        musicToggle.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            if (isSelected) { // Muting
+                previousVolume = volumeSlider.getValue();
+                if (previousVolume > 0) volumeSlider.setValue(0);
+            } else { // Unmuting
+                if (volumeSlider.getValue() == 0) {
+                    volumeSlider.setValue(previousVolume > 0 ? previousVolume : 50);
+                }
+            }
+        });
+
+        // --- Layout ---
+        VBox menuLayout = new VBox(20, resumeButton, saveButton, musicToggle, volumeSlider, exitButton);
+        menuLayout.setAlignment(Pos.CENTER);
+        menuLayout.setPadding(new Insets(50));
+        menuLayout.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-background-radius: 10; -fx-border-color: #ffbf00; -fx-border-width: 2; -fx-border-radius: 10;");
+        menuLayout.setMaxSize(400, 500); // Give the menu a max size
+
+        return menuLayout;
+    }
+
+    private void togglePauseMenu() {
+        if (pauseMenu == null) {
+            pauseMenu = createPauseMenu();
+        }
+
+        boolean isPaused = anker.getChildren().contains(pauseMenu);
+
+        if (isPaused) {
+            // Unpause the game
+            anker.getChildren().remove(pauseMenu);
+            player.setDisable(false);
+            enemy.setDisable(false);
+        } else {
+            // Pause the game
+            anker.getChildren().add(pauseMenu);
+            // Center the menu inside the AnchorPane
+            AnchorPane.setTopAnchor(pauseMenu, (anker.getHeight() - pauseMenu.getMaxHeight()) / 2);
+            AnchorPane.setLeftAnchor(pauseMenu, (anker.getWidth() - pauseMenu.getMaxWidth()) / 2);
+
+            player.setDisable(true);
+            enemy.setDisable(true);
+        }
+    }
+
 
     /**
      * Erstellt das Standard-Steuerpanel für den Host und den Offline-Modus.
@@ -238,9 +327,9 @@ public class HelloController {
         // Buttons für die Ausrichtung (unverändert)
         Label directionLabel = new Label("Ausrichtung");
         directionLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: white;");
-        Button d_horizontal = new Button("Horizontal");
+        Button d_horizontal = new Button("Vertikal");
         d_horizontal.setOnAction(e -> direction = false);
-        Button d_vertical = new Button("Vertikal");
+        Button d_vertical = new Button("Horizontal");
         d_vertical.setOnAction(e -> direction = true);
 
         // CSS-Klassen und Breite zuweisen (unverändert)
@@ -248,16 +337,6 @@ public class HelloController {
             btn.getStyleClass().add("option-button");
             btn.setMaxWidth(Double.MAX_VALUE);
         }
-
-        // Spielsteuerungs-Buttons (unverändert)
-        Button speichern = new Button("Speichern");
-        speichern.getStyleClass().add("control-button");
-        speichern.setOnAction(e -> {
-            savedata = new SaveDataClass(player, enemy);
-            savedata.prepareData();
-            FileManager fileManager = new FileManager(true);
-            fileManager.save(savedata);
-        });
 
         Button fertigButton = new Button("Fertig");
         fertigButton.getStyleClass().add("control-button");
@@ -270,47 +349,24 @@ public class HelloController {
             }
         });
 
-        Button laden = new Button("Laden");
-        laden.getStyleClass().add("control-button");
-        laden.setOnAction(e -> {
-            FileManager fileManager = new FileManager(true);
-            try {
-                GameState loadedstate = fileManager.load();
-                loadGameFromSave(loadedstate);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
 
-        Button back = new Button("Back to Start");
-        back.getStyleClass().add("control-button");
-        back.setOnAction(e -> new StartScreen(stage).show());
-
-        for (Button btn : new Button[]{fertigButton, speichern, laden, back}) {
+        for (Button btn : new Button[]{fertigButton}) {
             btn.setMaxWidth(Double.MAX_VALUE);
         }
 
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
-        // Elemente zur VBox hinzufügen (Reihenfolge mit neuem Label)
         controlPanel.getChildren().addAll(
                 shipLengthLabel, b2, b3, b4, b5,
                 directionLabel, d_horizontal, d_vertical,
                 spacer,
-                fertigButton,
-                speichern, laden, back
+                fertigButton
         );
 
         return controlPanel;
     }
 
-
-    // --- ÜBERARBEITETE SETUP-METHODEN ---
-
-    /**
-     * Setup für ein Standard-Offline-Spiel.
-     */
     public void setup() {
         player = new Gamefield(false, this, (int) x, (int) y);
         EnemyPlayer en = new EnemyPlayer(player);
