@@ -5,6 +5,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
@@ -17,7 +19,6 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundSize;
-import javafx.scene.image.Image;
 
 import java.awt.*;
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class Gamefield extends GridPane {
         for (int i = 0; i < h; i++) {
 
             for (int j = 0; j < b; j++) {
-                Cell c = new Cell(i, j, this, 30, 30, controler);
+                Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
@@ -60,7 +61,6 @@ public class Gamefield extends GridPane {
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
                 // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
                 c.setOnMouseClicked(event -> {
-                    System.out.println("Gamefield: Klick auf: " + x + ", " + y);
                     if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
                         if (getUsedCells() + control.getLength() <= maxShipsC()) { //+ control.getlength damit das auf auf neue schiffe prüft
@@ -78,7 +78,7 @@ public class Gamefield extends GridPane {
 
                     } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
                         // shoot((int) c.getX(), (int) c.getY());
-                        shoot(x, y);
+                        shoot(c.x, c.y);
                     }
                 });
 
@@ -256,7 +256,11 @@ public class Gamefield extends GridPane {
 
 
     public Cell getCell(int x, int y) {
-        return cells[x][y];
+        // Add boundary checks to prevent crashes!
+        if (x >= 0 && x < breit && y >= 0 && y < lang) {
+            return cells[x][y];
+        }
+        return null;
     }
 
     public boolean getStatus() {
@@ -265,20 +269,16 @@ public class Gamefield extends GridPane {
 
     public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
         int length = ship.getLength();
-
-
-        int startReihe = startX;
-        int startSpalte = startY;
+        int startReihe = startY;
+        int startSpalte = startX;
 
         // 1. Randüberprüfung
         if (vertical) {
-            // Wenn das Schiff vertikal ist, wächst es entlang der Reihen (lang)
             if (startReihe + length > lang) {
                 System.out.println("Schiff geht vertikal über den Rand.");
                 return false;
             }
         } else {
-            // Wenn das Schiff horizontal ist, wächst es entlang der Spalten (breit)
             if (startSpalte + length > breit) {
                 System.out.println("Schiff geht horizontal über den Rand.");
                 return false;
@@ -287,12 +287,10 @@ public class Gamefield extends GridPane {
 
         // 2. Überprüfung auf Kollisionen auf ALLEN Zellen des Schiffes
         for (int i = 0; i < length; i++) {
-            // Berechne die Indizes für die aktuelle Zelle
             int reihenIndex = vertical ? startReihe + i : startReihe;
             int spaltenIndex = vertical ? startSpalte : startSpalte + i;
 
-            // Rufe getCell mit (Reihen-Index, Spalten-Index) auf, passend zu Ihrer Implementierung
-            Cell cellToCheck = getCell(reihenIndex, spaltenIndex);
+            Cell cellToCheck = getCell(spaltenIndex, reihenIndex);
 
             if (cellToCheck == null || cellToCheck.getShip() != null) {
                 System.out.println("Kollision bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ").");
@@ -307,18 +305,64 @@ public class Gamefield extends GridPane {
             int spaltenIndex = vertical ? startSpalte : startSpalte + i;
 
             // Rufe getCell erneut auf, um das Schiff zu setzen
+
             Cell cellToPlaceOn = getCell(reihenIndex, spaltenIndex);
             if (cellToPlaceOn != null) {
                 cellToPlaceOn.setShip(ship);
+            }
+        }
+        if (!enemy) { // Nur Bilder auf dem Spieler-Feld anzeigen
+            String imagePath = "";
+            switch (length) {
+                case 2:
+                    imagePath = "/images/shiplength2.png";
+                    break;
+                case 3:
+                    imagePath = "/images/shiplength3.png";
+                    break;
+                case 4:
+                    imagePath = "/images/shiplength4.png";
+                    break;
+                case 5:
+                    imagePath = "/images/shiplength5.png";
+                    break;
+            }
+            if (!imagePath.isEmpty()) {
+                try {
+                    Image shipImage = new Image(getClass().getResource(imagePath).toExternalForm());
+                    ImageView shipView = new ImageView(shipImage);
 
-                if (!enemy) {
-                    cellToPlaceOn.setFill(Color.WHITE);
-                    cellToPlaceOn.setStroke(Color.GREEN);
+                    shipView.setMouseTransparent(true);
+
+                    double imageWidth = length * 30.0;
+                    double imageHeight = 30.0;
+                    shipView.setFitWidth(imageWidth);
+                    shipView.setFitHeight(imageHeight);
+
+                    int colSpan = 1;
+                    int rowSpan = 1;
+
+                    if (vertical) {
+                        // Ein vertikales Schiff ist 1 Zelle breit und 'length' Zellen hoch
+                        shipView.setRotate(90);
+
+                        double translateX = (imageWidth - imageHeight) / 2;
+                        double translateY = (imageHeight - imageWidth) / 2;
+                        shipView.setTranslateX(translateX);
+                        shipView.setTranslateY(translateY);
+                        rowSpan = length;
+                    } else {
+                        colSpan = length;
+                    }
+                    ship.setShipImageView(shipView);
+                    this.add(shipView, startSpalte, startReihe, colSpan, rowSpan);
+                } catch (Exception e) {
+                    System.err.println("Fehler beim Laden des Schiff-Bildes: " + imagePath);
+                    e.printStackTrace();
                 }
             }
         }
         addShip(ship);
-
         System.out.println("Schiff platziert: Start(Reihe " + startReihe + ", Spalte " + startSpalte + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
