@@ -88,7 +88,6 @@ public class Gamefield extends GridPane {
     }
 
 
-
     public Gamefield(boolean enemy, HelloController controler, int h, int b, EnemyPlayer e) {
         en = e;
         lang = h;
@@ -162,72 +161,72 @@ public class Gamefield extends GridPane {
                 // Hier ein OnClickListener setzen, um jeden Klick abzufangen :P
                 // Ihr könnt hier dann mehrere Fälle einbauen wie rechtsklick zum Löschen etc...
                 c.setOnMouseClicked(event -> {
-                            if (event.getButton() == MouseButton.PRIMARY && !enemy) {
+                    if (event.getButton() == MouseButton.PRIMARY && !enemy) {
 
-                                int len = control.getLength();
-                                System.out.println(len);
+                        int len = control.getLength();
+                        System.out.println(len);
 
-                                boolean isServer = controler.getHost(); // Der Server ist NICHT im Client-Modus
+                        boolean isServer = controler.getHost(); // Der Server ist NICHT im Client-Modus
 
-                                if (isServer) {
-                                    // --- SERVER-LOGIK: Prüft gegen das Gesamtlimit an Zellen ---
-                                    if (getUsedCells() + len <= maxShipsC()) {
-                                        Ships ship = new Ships(len, len);
-                                        // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
-                                        if (placeShip(ship, x, y, control.getDirection())) {
-                                            increaseCells(len);
-                                            control.updateRemainingCellsDisplay(); // Label für verbleibende Punkte aktualisieren
-                                        }
-                                    } else {
-                                        // Server hat das Limit erreicht
-                                        System.out.println("Limit an Bau-Punkten erreicht!");
-                                        Platform.runLater(() -> {
-                                            Alert alert = new Alert(Alert.AlertType.WARNING);
-                                            alert.setTitle("Limit erreicht");
-                                            alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
-                                            alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
-                                            alert.showAndWait();
-                                        });
-                                    }
-                                } else {
-                                    // --- CLIENT-LOGIK: Prüft gegen die vom Server gesendeten Regeln ---
-
-                                    if (control.canClientPlaceShip(len)) {
-                                        Ships ship = new Ships(len, len);
-                                        // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
-                                        if (placeShip(ship, x, y, control.getDirection())) {
-                                            increaseCells(len); // Zählt trotzdem die Zellen für Konsistenz
-                                            // Ruft die spezielle Update-Methode für den Client auf
-                                            control.clientPlacedShip(len);
-                                        }
-                                    } else {
-                                        // Client hat das Limit für diese Schiffslänge erreicht
-                                        System.out.println("Von Schiffslänge " + len + " können keine mehr platziert werden.");
-                                        Platform.runLater(() -> {
-                                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                            alert.setTitle("Limit für diese Länge erreicht");
-                                            alert.setHeaderText(null);
-                                            alert.setContentText("Sie haben bereits die maximale Anzahl an Schiffen der Länge " + len + " platziert.");
-                                            alert.showAndWait();
-                                        });
-                                    }
+                        if (isServer) {
+                            // --- SERVER-LOGIK: Prüft gegen das Gesamtlimit an Zellen ---
+                            if (getUsedCells() + len <= maxShipsC()) {
+                                Ships ship = new Ships(len, len);
+                                // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
+                                if (placeShip(ship, x, y, control.getDirection())) {
+                                    increaseCells(len);
+                                    control.updateRemainingCellsDisplay(); // Label für verbleibende Punkte aktualisieren
                                 }
-
-                                // ---- LOGIK FÜR DAS GEGNER-FELD (`enemy`) ----
-                            } else if (event.getButton() == MouseButton.PRIMARY && this.enemy) {
-                                // Diese Logik ist nur im Multiplayer relevant
-                                if (lo != null && control.getReady() && lo.getTurn()) {
-                                    // Wir schießen auf die angeklickte Koordinate (Spalte y, Reihe x)
-                                    lo.setX(x); // lo.setX erwartet die Spalten-Koordinate
-                                    lo.setY(y); // lo.setY erwartet die Reihen-Koordinate
-                                    System.out.println("Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
-                                    try {
-                                        lo.startShoot();
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
+                            } else {
+                                // Server hat das Limit erreicht
+                                System.out.println("Limit an Bau-Punkten erreicht!");
+                                Platform.runLater(() -> {
+                                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                                    alert.setTitle("Limit erreicht");
+                                    alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
+                                    alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
+                                    alert.showAndWait();
+                                });
                             }
+                        } else {
+                            // --- CLIENT-LOGIK: Prüft gegen die vom Server gesendeten Regeln ---
+
+                            if (control.canClientPlaceShip(len)) {
+                                Ships ship = new Ships(len, len);
+                                // Wichtig: Parameter an placeShip sind (startX, startY), also (Spalte, Reihe) -> (y, x)
+                                if (placeShip(ship, x, y, control.getDirection())) {
+                                    increaseCells(len); // Zählt trotzdem die Zellen für Konsistenz
+                                    // Ruft die spezielle Update-Methode für den Client auf
+                                    control.clientPlacedShip(len);
+                                }
+                            } else {
+                                // Client hat das Limit für diese Schiffslänge erreicht
+                                System.out.println("Von Schiffslänge " + len + " können keine mehr platziert werden.");
+                                Platform.runLater(() -> {
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                    alert.setTitle("Limit für diese Länge erreicht");
+                                    alert.setHeaderText(null);
+                                    alert.setContentText("Sie haben bereits die maximale Anzahl an Schiffen der Länge " + len + " platziert.");
+                                    alert.showAndWait();
+                                });
+                            }
+                        }
+
+                        // ---- LOGIK FÜR DAS GEGNER-FELD (`enemy`) ----
+                    } else if (event.getButton() == MouseButton.PRIMARY && this.enemy) {
+                        // Diese Logik ist nur im Multiplayer relevant
+                        if (lo != null && control.getReady() && lo.getTurn()) {
+                            // Wir schießen auf die angeklickte Koordinate (Spalte y, Reihe x)
+                            lo.setX(x); // lo.setX erwartet die Spalten-Koordinate
+                            lo.setY(y); // lo.setY erwartet die Reihen-Koordinate
+                            System.out.println("Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
+                            try {
+                                lo.startShoot();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
                 });
 
                 add(c, i, j);
@@ -254,119 +253,49 @@ public class Gamefield extends GridPane {
         }
     }
 
-
-    public Cell getCell(int x, int y) {
-        // Add boundary checks to prevent crashes!
-        if (x >= 0 && x < breit && y >= 0 && y < lang) {
-            return cells[x][y];
+    public static Gamefield fromData(GamefieldData data, HelloController controller, MultiplayerLogic logic) {
+        Gamefield board;
+        if (logic != null) {
+            board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth(), logic);
+        } else {
+            // Adjust this if you have a separate constructor for single-player AI
+            System.out.println("height: " + data.getHeight() + " width: " + data.getWidth());
+            board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth());
         }
-        return null;
+
+        for (SerializableShip shipData : data.getShips()) {
+            Ships ship = new Ships(shipData.getLength(), shipData.getHealth());
+            board.placeShip(ship, shipData.getStartX(), shipData.getStartY(), shipData.isVertical());
+            board.increaseCells(ship.getLength()); // Ensure usedCells count is correct
+        }
+
+        // Re-apply all the shots
+        for (Position pos : data.getShotPositions()) {
+            Cell cell = board.getCell(pos.getX(), pos.getY());
+            if (cell != null) {
+                cell.setShot(true);
+                if (cell.getShip() != null) {
+                    cell.setFill(Color.RED);
+                } else {
+                    cell.setFill(Color.BLACK);
+                }
+            }
+        }
+
+        return board;
     }
 
     public boolean getStatus() {
         return enemy;
     }
 
-    public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
-        int length = ship.getLength();
-        int startReihe = startY;
-        int startSpalte = startX;
-
-        // 1. Randüberprüfung
-        if (vertical) {
-            if (startReihe + length > lang) {
-                System.out.println("Schiff geht vertikal über den Rand.");
-                return false;
-            }
-        } else {
-            if (startSpalte + length > breit) {
-                System.out.println("Schiff geht horizontal über den Rand.");
-                return false;
-            }
+    public Cell getCell(int x, int y) {
+        // Add boundary checks to prevent crashes!
+        if (x >= 0 && x < breit && y >= 0 && y < lang) {
+            return cells[y][x];
         }
-
-        // 2. Überprüfung auf Kollisionen auf ALLEN Zellen des Schiffes
-        for (int i = 0; i < length; i++) {
-            int reihenIndex = vertical ? startReihe + i : startReihe;
-            int spaltenIndex = vertical ? startSpalte : startSpalte + i;
-
-            Cell cellToCheck = getCell(spaltenIndex, reihenIndex);
-
-            if (cellToCheck == null || cellToCheck.getShip() != null) {
-                System.out.println("Kollision bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ").");
-                return false;
-            }
-        }
-
-        // 3. Wenn alle Prüfungen bestanden wurden, platziere das Schiff
-        for (int i = 0; i < length; i++) {
-            // Berechne die Indizes erneut
-            int reihenIndex = vertical ? startReihe + i : startReihe;
-            int spaltenIndex = vertical ? startSpalte : startSpalte + i;
-
-            // Rufe getCell erneut auf, um das Schiff zu setzen
-
-            Cell cellToPlaceOn = getCell(reihenIndex, spaltenIndex);
-            if (cellToPlaceOn != null) {
-                cellToPlaceOn.setShip(ship);
-            }
-        }
-        if (!enemy) { // Nur Bilder auf dem Spieler-Feld anzeigen
-            String imagePath = "";
-            switch (length) {
-                case 2:
-                    imagePath = "/images/shiplength2.png";
-                    break;
-                case 3:
-                    imagePath = "/images/shiplength3.png";
-                    break;
-                case 4:
-                    imagePath = "/images/shiplength4.png";
-                    break;
-                case 5:
-                    imagePath = "/images/shiplength5.png";
-                    break;
-            }
-            if (!imagePath.isEmpty()) {
-                try {
-                    Image shipImage = new Image(getClass().getResource(imagePath).toExternalForm());
-                    ImageView shipView = new ImageView(shipImage);
-
-                    shipView.setMouseTransparent(true);
-
-                    double imageWidth = length * 30.0;
-                    double imageHeight = 30.0;
-                    shipView.setFitWidth(imageWidth);
-                    shipView.setFitHeight(imageHeight);
-
-                    int colSpan = 1;
-                    int rowSpan = 1;
-
-                    if (vertical) {
-                        // Ein vertikales Schiff ist 1 Zelle breit und 'length' Zellen hoch
-                        shipView.setRotate(90);
-
-                        double translateX = (imageWidth - imageHeight) / 2;
-                        double translateY = (imageHeight - imageWidth) / 2;
-                        shipView.setTranslateX(translateX);
-                        shipView.setTranslateY(translateY);
-                        rowSpan = length;
-                    } else {
-                        colSpan = length;
-                    }
-                    ship.setShipImageView(shipView);
-                    this.add(shipView, startSpalte, startReihe, colSpan, rowSpan);
-                } catch (Exception e) {
-                    System.err.println("Fehler beim Laden des Schiff-Bildes: " + imagePath);
-                    e.printStackTrace();
-                }
-            }
-        }
-        addShip(ship);
-        System.out.println("Schiff platziert: Start(Reihe " + startReihe + ", Spalte " + startSpalte + "), " + (vertical ? "vertikal" : "horizontal"));
-        return true;
+        return null;
     }
-
 
     public boolean isEnemy() {
         return enemy;
@@ -434,18 +363,137 @@ public class Gamefield extends GridPane {
             en.revenge();
         }
     }
-    public boolean inBounds(int x, int y){
+
+    public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
+        int length = ship.getLength();
+        int startReihe = startY;
+        int startSpalte = startX;
+
+        // 1. Randüberprüfung
+        if (vertical) {
+            if (startReihe + length > lang) {
+                System.out.println("Schiff geht vertikal über den Rand.");
+                return false;
+            }
+        } else {
+            if (startSpalte + length > breit) {
+                System.out.println("Schiff geht horizontal über den Rand.");
+                return false;
+            }
+        }
+
+        // 2. Überprüfung auf Kollisionen auf ALLEN Zellen des Schiffes
+        for (int i = 0; i < length; i++) {
+            int reihenIndex = vertical ? startReihe + i : startReihe;
+            int spaltenIndex = vertical ? startSpalte : startSpalte + i;
+
+            Cell cellToCheck = getCell(spaltenIndex, reihenIndex);
+
+            if (cellToCheck == null || cellToCheck.getShip() != null) {
+                System.out.println("Kollision bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ").");
+                return false;
+            }
+        }
+
+        // 3. Wenn alle Prüfungen bestanden wurden, platziere das Schiff
+        for (int i = 0; i < length; i++) {
+            // Berechne die Indizes erneut
+            int reihenIndex = vertical ? startReihe + i : startReihe;
+            int spaltenIndex = vertical ? startSpalte : startSpalte + i;
+
+            // Rufe getCell erneut auf, um das Schiff zu setzen
+
+            Cell cellToPlaceOn = getCell(spaltenIndex, reihenIndex);
+            if (cellToPlaceOn != null) {
+                cellToPlaceOn.setShip(ship);
+            }
+        }
+        if (!enemy) { // Nur Bilder auf dem Spieler-Feld anzeigen
+            String imagePath = "";
+
+            if (vertical) {
+                switch (length) {
+                    case 2:
+                        imagePath = "/images/shipverticallength2.png";
+                        break;
+                    case 3:
+                        imagePath = "/images/shipverticallength3.png";
+                        break;
+                    case 4:
+                        imagePath = "/images/shipverticallength4.png";
+                        break;
+                    case 5:
+                        imagePath = "/images/shipverticallength5.png";
+                        break;
+                }
+            } else {
+                switch (length) {
+                    case 2:
+                        imagePath = "/images/shiplength2.png";
+                        break;
+                    case 3:
+                        imagePath = "/images/shiplength3.png";
+                        break;
+                    case 4:
+                        imagePath = "/images/shiplength4.png";
+                        break;
+                    case 5:
+                        imagePath = "/images/shiplength5.png";
+                        break;
+                }
+            }
+            if (!imagePath.isEmpty()) {
+                try {
+                    Image shipImage = new Image(getClass().getResource(imagePath).toExternalForm());
+                    ImageView shipView = new ImageView(shipImage);
+
+                    shipView.setMouseTransparent(true);
+                    // Wichtig: Verhindert, dass das Bild gestreckt wird, falls die Proportionen nicht exakt stimmen.
+                    shipView.setPreserveRatio(false);
+
+                    int colSpan = 1;
+                    int rowSpan = 1;
+
+                    // 2. Setze die korrekten Dimensionen für das Layout
+                    if (vertical) {
+                        // Ein vertikales Schiff ist 30px breit und 'length * 30' hoch
+                        shipView.setFitWidth(30.0);
+                        shipView.setFitHeight(length * 30.0);
+                        rowSpan = length;
+                    } else {
+                        // Ein horizontales Schiff ist 'length * 30' breit und 30px hoch
+                        shipView.setFitWidth(length * 30.0);
+                        shipView.setFitHeight(30.0);
+                        colSpan = length;
+                    }
+                    ship.setShipImageView(shipView);
+                    this.add(shipView, startSpalte, startReihe, colSpan, rowSpan);
+                } catch (Exception e) {
+                    System.err.println("Fehler beim Laden des Schiff-Bildes: " + imagePath);
+                    e.printStackTrace();
+                }
+            }
+        }
+        addShip(ship);
+        System.out.println("Schiff platziert: Start(Reihe " + startReihe + ", Spalte " + startSpalte + "), " + (vertical ? "vertikal" : "horizontal"));
+        return true;
+    }
+
+    public boolean inBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < getWidth() && y < getHeight();
     }
 
-    public int getLang(){
+    public int getLang() {
         return lang;
     }
-    public int getBreit(){
+
+    public int getBreit() {
         return breit;
     }
 
-    public void deleteShip(){
+    private boolean turn;
+
+    public void deleteShip() {
         Iterator<Ships> iterator = placedShip.listIterator();
         while (iterator.hasNext()) {
             Ships schiff = iterator.next();
@@ -459,10 +507,9 @@ public class Gamefield extends GridPane {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Spiel beendet");
                 alert.setHeaderText(null);
-                if (enemy){
+                if (enemy) {
                     alert.setContentText("Du gewinnst");
-                }
-                else {
+                } else {
                     alert.setContentText("Gegner gewinnt");
                 }
 
@@ -470,15 +517,13 @@ public class Gamefield extends GridPane {
             });
         }
     }
-    private boolean turn;
-    public void setTurn(boolean t){
+
+    public void setTurn(boolean t) {
         turn = t;
     }
-    public void setLogic(MultiplayerLogic l){
+
+    public void setLogic(MultiplayerLogic l) {
         lo = l;
-    }
-    public HelloController getControl(){
-        return control;
     }
 
     public int[] getShipLengths() {
@@ -492,15 +537,19 @@ public class Gamefield extends GridPane {
     public double getMusicVolume() {
         return BackgroundMusic.getInstance().getVolume();
     }
+
     public boolean isMusicEnabled() {
         return BackgroundMusic.getInstance().isPlaying();
     }
+
     public List<Ships> getShips() {
         return placedShip;
     }
+
     public void increaseUsedCells(int length) {
         this.usedCells += length;
     }
+
     public static Gamefield fromGameState(GameState state, boolean isEnemy) {
         // Dummy-Controller, da dieser im Konstruktor benötigt wird
         HelloController dummyController = new HelloController();
@@ -530,8 +579,8 @@ public class Gamefield extends GridPane {
         return board;
     }
 
-    public void setEnemy(EnemyPlayer e){
-        en = e;
+    public HelloController getControl() {
+        return control;
     }
 
     public void clearShips() {
@@ -539,11 +588,14 @@ public class Gamefield extends GridPane {
         // ggf. auch das Spielfeld zurücksetzen, falls nötig
     }
 
-    public boolean hasShip(){
+    public void setEnemy(EnemyPlayer e) {
+        en = e;
+    }
+
+    public boolean hasShip() {
         System.out.println(placedShip.isEmpty());
         return !placedShip.isEmpty();
     }
-
 
     public GamefieldData toData() {
         GamefieldData data = new GamefieldData();
@@ -565,12 +617,11 @@ public class Gamefield extends GridPane {
                     processedShips.add(ship); // Mark as processed
                     boolean isVertical = false;
                     // = (y + 1 < lang && getCell(x, y + 1).getShip() == ship) || y+1 >= breit || x+1 >= lang
-                    if(y+1 >= breit){
-                        if(getCell(x,y+1).getShip() == ship){
+                    if (y + 1 >= breit) {
+                        if (getCell(x, y + 1).getShip() == ship) {
                             isVertical = true;
                         }
                     }
-
 
 
                     SerializableShip serializableShip = new SerializableShip();
@@ -600,41 +651,9 @@ public class Gamefield extends GridPane {
         return data;
     }
 
-
-    public static Gamefield fromData(GamefieldData data, HelloController controller, MultiplayerLogic logic) {
-        Gamefield board;
-        if (logic != null) {
-            board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth(), logic);
-        } else {
-            // Adjust this if you have a separate constructor for single-player AI
-            System.out.println("height: "+data.getHeight()+" width: "+data.getWidth());
-            board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth());
-        }
-
-        for (SerializableShip shipData : data.getShips()) {
-            Ships ship = new Ships(shipData.getLength(), shipData.getHealth());
-            board.placeShip(ship, shipData.getStartX(), shipData.getStartY(), shipData.isVertical());
-            board.increaseCells(ship.getLength()); // Ensure usedCells count is correct
-        }
-
-        // Re-apply all the shots
-        for (Position pos : data.getShotPositions()) {
-            Cell cell = board.getCell(pos.getX(), pos.getY());
-            if (cell != null) {
-                cell.setShot(true);
-                if (cell.getShip() != null) {
-                    cell.setFill(Color.RED);
-                } else {
-                    cell.setFill(Color.BLACK);
-                }
-            }
-        }
-
-        return board;
-    }
-
     public void setController(HelloController controller) {
         this.control = controller;
     }
 
 }
+

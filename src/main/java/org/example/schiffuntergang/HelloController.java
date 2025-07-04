@@ -98,7 +98,7 @@ public class HelloController {
 
         // Den Text im UI-Thread aktualisieren, um Fehler zu vermeiden
         Platform.runLater(() -> {
-            remainingCell.setText("Bau-Punkte: " + remainingCells);
+            remainingCell.setText("Build Points: " + remainingCells);
         });
     }
 
@@ -313,23 +313,23 @@ public class HelloController {
 
 
         // Label für die Schiffslängen
-        Label shipLengthLabel = new Label("Schiffslänge");
+        Label shipLengthLabel = new Label("Shiplength");
         shipLengthLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: white;");
 
         // Buttons für die Schiffslängen (unverändert)
-        Button b2 = new Button("Länge 2");
+        Button b2 = new Button("Length 2");
         b2.setOnAction(e -> length = 2);
-        Button b3 = new Button("Länge 3");
+        Button b3 = new Button("Length 3");
         b3.setOnAction(e -> length = 3);
-        Button b4 = new Button("Länge 4");
+        Button b4 = new Button("Length 4");
         b4.setOnAction(e -> length = 4);
-        Button b5 = new Button("Länge 5");
+        Button b5 = new Button("Length 5");
         b5.setOnAction(e -> length = 5);
 
         // Buttons für die Ausrichtung (unverändert)
-        Label directionLabel = new Label("Ausrichtung");
+        Label directionLabel = new Label("Alignment");
         directionLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: white;");
-        Button d_horizontal = new Button("Vertikal");
+        Button d_horizontal = new Button("Vertical");
         d_horizontal.setOnAction(e -> direction = false);
         Button d_vertical = new Button("Horizontal");
         d_vertical.setOnAction(e -> direction = true);
@@ -340,7 +340,7 @@ public class HelloController {
             btn.setMaxWidth(Double.MAX_VALUE);
         }
 
-        Button fertigButton = new Button("Fertig");
+        Button fertigButton = new Button("Done Placing");
         fertigButton.getStyleClass().add("control-button");
         fertigButton.setOnAction(e -> {
             try {
@@ -479,27 +479,27 @@ public class HelloController {
 
         for (int len = 2; len <= 5; len++) {
             if (shipCounts[len] > 0) {
-                Label availableLabel = new Label("Verfügbar: " + shipCounts[len]);
+                Label availableLabel = new Label("Available: " + shipCounts[len]);
                 availableLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 12px; -fx-text-fill: white;");
                 this.availableShipCounters[len] = availableLabel;
 
-                Button lengthButton = new Button("Länge " + len);
+                Button lengthButton = new Button("Length " + len);
                 lengthButton.getStyleClass().add("option-button");
                 final int currentLength = len;
                 lengthButton.setOnAction(e -> this.length = currentLength);
                 lengthButton.setMaxWidth(Double.MAX_VALUE);
                 this.shipLengthButtons[len] = lengthButton;
 
-                VBox shipGroup = new VBox(5, new Label("Schiffslänge " + len), availableLabel, lengthButton);
+                VBox shipGroup = new VBox(5, new Label("Shiplength" + len), availableLabel, lengthButton);
                 shipGroup.setAlignment(Pos.CENTER);
                 controlPanel.getChildren().add(shipGroup);
             }
         }
 
         // Ausrichtungs-Buttons
-        Button d_horizontal = new Button("Horizontal");
+        Button d_horizontal = new Button("Vertical");
         d_horizontal.setOnAction(e -> direction = false);
-        Button d_vertical = new Button("Vertikal");
+        Button d_vertical = new Button("Horizontal");
         d_vertical.setOnAction(e -> direction = true);
         d_horizontal.getStyleClass().add("option-button");
         d_vertical.getStyleClass().add("option-button");
@@ -507,7 +507,7 @@ public class HelloController {
         d_vertical.setMaxWidth(Double.MAX_VALUE);
 
         // Ready-Button
-        Button readyButton = new Button("Fertig");
+        Button readyButton = new Button("Done Placing");
         readyButton.getStyleClass().add("control-button");
         readyButton.setMaxWidth(Double.MAX_VALUE);
         readyButton.setOnAction(e -> {
@@ -517,7 +517,7 @@ public class HelloController {
                 ioException.printStackTrace();
             }
         });
-        Button fertigButton = new Button("Fertig");
+        Button fertigButton = new Button("Done Placing");
         fertigButton.getStyleClass().add("control-button");
         fertigButton.setMaxWidth(Double.MAX_VALUE);
         fertigButton.setOnAction(e -> {
