@@ -7,23 +7,20 @@ import org.example.schiffuntergang.components.Position;
 import java.util.List;
 import java.util.ArrayList;
 
-// This is a simple POJO (Plain Old Java Object).
-// Gson can serialize this without any problems.
+
 public class GamefieldData {
 
     private int width;
     private int height;
     private boolean isEnemy;
     private List<SerializableShip> ships;
-    private List<Position> shotPositions; // To store coordinates of hit cells
+    private List<Position> shotPositions;
 
-    // A no-arg constructor is essential for deserialization
     public GamefieldData() {
         this.ships = new ArrayList<>();
         this.shotPositions = new ArrayList<>();
     }
 
-    // --- Getters and Setters for all fields ---
 
     public int getWidth() { return width; }
     public void setWidth(int width) { this.width = width; }
