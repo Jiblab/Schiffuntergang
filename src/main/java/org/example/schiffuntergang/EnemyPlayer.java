@@ -11,143 +11,135 @@ import java.util.random.RandomGenerator;
 
 public class EnemyPlayer {
 
-        private final Gamefield playerBoard;
-        private final Random rand = new Random();
+    private final Gamefield playerBoard;
+    private final Random rand = new Random();
+    private final List<int[]> priorityTargets = new ArrayList<>();
+    private int[] firstHit = null;
+    private boolean directionFound = false;
 
-        // Liste für "intelligente" Ziele. Ein Ziel ist ein int-Array {x, y}.
-        private final List<int[]> priorityTargets = new ArrayList<>();
+    public EnemyPlayer(Gamefield playerBoard) {
+        this.playerBoard = playerBoard;
+    }
 
-        // Speichert den ersten Treffer auf einem neuen Schiff, um die Richtung zu finden.
-        private int[] firstHit = null;
-        private boolean directionFound = false;
-
-        public EnemyPlayer(Gamefield playerBoard) {
-            this.playerBoard = playerBoard;
+    /**
+     * Hauptmethode für den Zug des Gegners.
+     */
+    public void revenge() {
+        if (!priorityTargets.isEmpty()) {
+            int[] target = priorityTargets.remove(priorityTargets.size() - 1);
+            shootAt(target[0], target[1]);
+            return;
         }
 
-        /**
-         * Hauptmethode für den Zug des Gegners.
-         */
-        public void revenge() {
-            // 1. Priorität: Gezielt ein angeschlagenes Schiff zerstören
-            if (!priorityTargets.isEmpty()) {
-                // Nimm das letzte Ziel aus der Liste (LIFO-Verhalten wie ein Stack)
-                int[] target = priorityTargets.remove(priorityTargets.size() - 1);
-                shootAt(target[0], target[1]);
-                return; // Zug beenden
+        firstHit = null;
+        directionFound = false;
+
+        // --- JAGD-MODUS ---
+        int x, y;
+        Cell targetCell;
+        do {
+            // KORREKTUR: x (Spalte) wird mit getLang() generiert, y (Reihe) mit getBreit().
+            // So wie es dein restlicher Code erwartet.
+            x = rand.nextInt(playerBoard.getLang());  // Annahme: getLang() = Anzahl Spalten
+            y = rand.nextInt(playerBoard.getBreit()); // Annahme: getBreit() = Anzahl Reihen
+
+            targetCell = playerBoard.getCell(x, y);
+
+            // SICHERHEITSPRÜFUNG: Es ist theoretisch möglich, dass getCell hier null zurückgibt,
+            // wenn die Annahmen über getLang/getBreit falsch sind. Das verhindert den Absturz.
+        } while (targetCell == null || targetCell.isShot());
+
+        shootAt(x, y);
+    }
+
+    /**
+     * Führt einen Schuss auf die angegebenen Koordinaten aus und aktualisiert den KI-Status.
+     */
+    private void shootAt(int x, int y) {
+        Cell cell = playerBoard.getCell(y, x);
+
+        // SICHERHEITSPRÜFUNG: Verhindert Absturz, falls eine ungültige Koordinate übergeben wird.
+        if (cell == null || cell.isShot()) {
+            // Wenn das Ziel ungültig ist oder schon beschossen wurde, versuche es einfach nochmal.
+            // Dies verhindert, dass die KI in einer Endlosschleife stecken bleibt, wenn alle Ziele in
+            // priorityTargets ungültig werden.
+            if(priorityTargets.isEmpty()) {
+                revenge(); // Starte einen neuen Jagd-Versuch
             }
-
-            // 2. Priorität: Wenn kein Ziel mehr in der Liste ist, sind wir wieder im Jagd-Modus.
-            // Alle Targeting-Variablen zurücksetzen.
-            firstHit = null;
-            directionFound = false;
-
-            // 3. HUNTING-Modus: Zufälligen, noch nicht beschossenen Punkt finden.
-            int x, y;
-            do {
-                x = rand.nextInt(playerBoard.getLang());
-                y = rand.nextInt(playerBoard.getBreit());
-            } while (playerBoard.getCell(x, y).isShot());
-
-            shootAt(x, y);
+            return;
         }
 
-        /**
-         * Führt einen Schuss auf die angegebenen Koordinaten aus und aktualisiert den KI-Status.
-         *
-         * @param x X-Koordinate
-         * @param y Y-Koordinate
-         */
-        private void shootAt(int x, int y) {
-            Cell cell = playerBoard.getCell(x, y);
-            if (cell.isShot()) return; // Doppelschüsse absolut verhindern
+        cell.setShot(true);
+        Ships ship = cell.getShip();
 
-            cell.setShot(true);
-            Ships ship = cell.getShip();
+        if (ship != null) { // TREFFER!
+            ship.hit();
+            cell.setFill(Color.RED);
+            System.out.println("Gegner trifft bei: (" + x + ", " + y + ")");
 
-            if (ship != null) { // TREFFER!
-                ship.hit();
-                cell.setFill(Color.RED);
-                System.out.println("Gegner trifft bei: (" + x + ", " + y + ")");
-
-                if (!ship.isAlive()) {
-                    System.out.println("Gegner hat ein Schiff versenkt!");
-                    playerBoard.deleteShip();
-                    priorityTargets.clear();
-                    firstHit = null;
-                    directionFound = false;
-                } else {
-                    // Schiff getroffen, aber nicht versenkt. Wir müssen klüger werden.
-                    handleHit(x, y);
-                }
-            } else { // WASSER
-                cell.setFill(Color.BLACK);
-                System.out.println("Gegner schießt Wasser bei: (" + x + ", " + y + ")");
-            }
-        }
-
-        /**
-         * Verarbeitet die Logik nach einem erfolgreichen Treffer.
-         */
-        private void handleHit(int x, int y) {
-            if (firstHit == null) {
-                // Dies ist der ERSTE Treffer auf ein neues Schiff.
-                firstHit = new int[]{x, y};
-                // Füge alle 4 Nachbarn als potenzielle Ziele hinzu.
-                addNeighborsToPriorityList(x, y);
+            if (!ship.isAlive()) {
+                System.out.println("Gegner hat ein Schiff versenkt!");
+                playerBoard.deleteShip();
+                priorityTargets.clear();
+                firstHit = null;
+                directionFound = false;
             } else {
-                // Dies ist ein ZWEITER oder weiterer Treffer auf dasselbe Schiff.
-                // Jetzt kennen wir die Richtung.
-                if (!directionFound) {
-                    directionFound = true;
-                    // Lösche alle alten Ziele, die nicht in der richtigen Richtung liegen.
-                    priorityTargets.clear();
-                }
+                handleHit(x, y);
+            }
+        } else { // WASSER
+            cell.setFill(Color.BLACK);
+            System.out.println("Gegner schießt Wasser bei: (" + x + ", " + y + ")");
+        }
+    }
 
-                // Bestimme die Achse (horizontal oder vertikal)
-                if (x == firstHit[0]) { // Vertikale Achse
-                    // Füge die nächsten Zellen oben und unten hinzu
-                    addTarget(x, y + 1);
-                    addTarget(x, y - 1);
-                } else { // Horizontale Achse
-                    // Füge die nächsten Zellen links und rechts hinzu
-                    addTarget(x + 1, y);
-                    addTarget(x - 1, y);
-                }
+    /**
+     * Verarbeitet die Logik nach einem erfolgreichen Treffer.
+     */
+    private void handleHit(int x, int y) {
+        if (firstHit == null) {
+            firstHit = new int[]{x, y};
+            addNeighborsToPriorityList(x, y);
+        } else {
+            if (!directionFound) {
+                directionFound = true;
+                priorityTargets.clear();
+            }
+            if (x == firstHit[0]) { // Vertikale Achse
+                addTarget(x, y + 1);
+                addTarget(x, y - 1);
+            } else { // Horizontale Achse
+                addTarget(x + 1, y);
+                addTarget(x - 1, y);
             }
         }
+    }
 
-        /**
-         * Fügt die vier Nachbarn eines Punktes zur Prioritätsliste hinzu, wenn sie gültig sind.
-         */
-        private void addNeighborsToPriorityList(int x, int y) {
-            List<int[]> neighbors = new ArrayList<>();
-            neighbors.add(new int[]{x + 1, y});
-            neighbors.add(new int[]{x - 1, y});
-            neighbors.add(new int[]{x, y + 1});
-            neighbors.add(new int[]{x, y - 1});
+    /**
+     * Fügt die vier Nachbarn eines Punktes zur Prioritätsliste hinzu.
+     */
+    private void addNeighborsToPriorityList(int x, int y) {
+        List<int[]> neighbors = new ArrayList<>();
+        neighbors.add(new int[]{x + 1, y});
+        neighbors.add(new int[]{x - 1, y});
+        neighbors.add(new int[]{x, y + 1});
+        neighbors.add(new int[]{x, y - 1});
 
-            // Mische die Nachbarn, damit die KI nicht vorhersagbar ist (z.B. immer erst rechts probiert)
-            Collections.shuffle(neighbors);
-
-            for (int[] neighbor : neighbors) {
-                addTarget(neighbor[0], neighbor[1]);
-            }
+        Collections.shuffle(neighbors);
+        for (int[] neighbor : neighbors) {
+            addTarget(neighbor[0], neighbor[1]);
         }
+    }
 
-        /**
-         * Fügt ein einzelnes Ziel zur Prioritätsliste hinzu, wenn es gültig und unbeschossen ist.
-         */
-        private void addTarget(int x, int y) {
-            if (x >= 0 && x < playerBoard.getBreit() && y >= 0 && y < playerBoard.getLang()) {
-                if (!playerBoard.getCell(x, y).isShot()) {
-                    priorityTargets.add(new int[]{x, y});
-                }
-            }
+    /**
+     * Fügt ein einzelnes Ziel zur Prioritätsliste hinzu, wenn es gültig und unbeschossen ist.
+     */
+    private void addTarget(int x, int y) {
+        // KORREKTUR: Zuerst die Zelle holen, dann prüfen. Das verhindert den NullPointerException.
+        Cell targetCell = playerBoard.getCell(x, y);
+        if (targetCell != null && !targetCell.isShot()) {
+            priorityTargets.add(new int[]{x, y});
         }
-
-        // Annahme: Ships Klasse hat eine isSunk() Methode
-        // public boolean isSunk() { return getHealth() == 0; }
+    }
     }
 
 
