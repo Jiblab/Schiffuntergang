@@ -111,4 +111,35 @@ public class FileManager {
     public void saveFromRemote(String id){
 
     }
+
+    //multiplayer
+    public void saveGameData(String jsonData, String filename) throws IOException {
+        String userHome = System.getProperty("user.home");
+        File saveDir = new File(userHome, "SchiffUntergangSaves");
+
+        // Erstellt Verzeichnis
+        if (!saveDir.exists()) {
+            if (saveDir.mkdirs()) {
+                System.out.println("[FileManager] Verzeichnis für Spielstände erstellt unter: " + saveDir.getAbsolutePath());
+            } else {
+                System.err.println("[FileManager] FEHLER: Konnte Verzeichnis für Spielstände nicht erstellen.");
+                saveDir = new File(userHome);
+            }
+        }
+
+        File fileToSave = new File(saveDir, filename);
+
+        try (FileWriter writer = new FileWriter(fileToSave)) {
+            writer.write(jsonData);
+            System.out.println("--------------------------------------------------");
+            System.out.println("[FileManager] Spielstand erfolgreich gespeichert!");
+            System.out.println("[FileManager] Dateiname: " + filename);
+            System.out.println("[FileManager] Speicherort: " + fileToSave.getAbsolutePath());
+            System.out.println("--------------------------------------------------");
+        } catch (IOException e) {
+            System.err.println("[FileManager] FEHLER beim Schreiben des Spielstands: " + fileToSave.getAbsolutePath());
+            throw e;
+        }
+    }
+
 }

@@ -10,6 +10,13 @@ import org.example.schiffuntergang.components.Ships;
 import javax.imageio.IIOException;
 import java.io.IOException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.example.schiffuntergang.filemanagement.FileManager;
+import org.example.schiffuntergang.filemanagement.GamefieldData;
+import org.example.schiffuntergang.filemanagement.GameState;
+
+
 public class MultiplayerLogic {
     private Client cl;
     private Server s;
@@ -121,6 +128,40 @@ public class MultiplayerLogic {
                             myturn = true; // Jetzt sind wir dran
                             break;
                         // ... andere cases
+                        case "save":
+                            try {
+                                System.out.println("\n[MultiplayerLogic] Remote-Speicherbefehl vom Gegner empfangen.");
+
+                                long saveId = Long.parseLong(p[1]);
+                                String filename = "mp_save_" + saveId + ".save";
+                                System.out.println("[MultiplayerLogic] Verarbeite Speicher-ID: " + saveId);
+
+                                GamefieldData playerData = player.toData();
+                                GamefieldData enemyData = enemy.toData();
+
+                                GameState remoteSaveState = new GameState();
+                                remoteSaveState.setPlayerBoardData(playerData);
+                                remoteSaveState.setEnemyBoardData(enemyData);
+                                remoteSaveState.setMultiplayer(true);
+                                remoteSaveState.setPlayerTurn(myturn);
+                                if (player != null) {
+                                    remoteSaveState.setMusikAktiv(player.isMusicEnabled());
+                                    remoteSaveState.setMusikVolume(player.getMusicVolume());
+                                }
+
+                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                String json = gson.toJson(remoteSaveState);
+
+                                System.out.println("[MultiplayerLogic] Versuche, das Spiel lokal nach Remote-Befehl zu speichern...");
+                                FileManager fm = new FileManager(false);
+                                fm.saveGameData(json, filename);
+
+                                Platform.runLater(() -> contr.showNotification("Spiel vom Gegner gespeichert!", "info"));
+
+                            } catch (Exception e) {
+                                System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
+                            }
+                            break;
                     }
                 } else {
                     // Wenn wir am Zug sind, warten wir auf eine UI-Aktion.
@@ -319,11 +360,6 @@ public class MultiplayerLogic {
 
     }
 
-
-    /*public void setmyturn(boolean turn) {
-        myturn = !turn;
-    }*/
-
     public boolean getTurn(){
         return myturn;
     }
@@ -351,5 +387,25 @@ public class MultiplayerLogic {
             t.setDaemon(true);
             t.start();
         }
+    }
+
+    //multiplayer
+    public void sendSaveCommand(long id) throws IOException {
+        if (client)
+            cl.sendSave(id);
+        else
+            s.sendSave(id);
+    }
+
+    /**
+     * Setzt den Zugstatus (turn) direkt.
+     * Diese Methode wird hauptsächlich beim Laden eines Multiplayer-Spielstands verwendet,
+     * um den korrekten Spielzug wiederherzustellen.
+     *
+     * @param isMyTurn true, wenn dieser Spieler nach dem Laden am Zug ist, andernfalls false.
+     */
+    public void setTurn(boolean isMyTurn) {
+        this.myturn = isMyTurn;
+        System.out.println("Spielzug nach Laden gesetzt: " + (isMyTurn ? "Ich bin dran." : "Gegner ist dran."));
     }
 }

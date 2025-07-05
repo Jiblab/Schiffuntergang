@@ -233,11 +233,18 @@ public class HelloController {
 
         saveButton.setOnAction(e -> {
             stage.setFullScreen(false);
-            savedata = new SaveDataClass(player, enemy);
-            savedata.prepareData();
-            FileManager fileManager = new FileManager(true);
-            fileManager.save(savedata);
-            showNotification("Game Saved!", "info");
+            if (mlp != null) {
+                // Multiplayer-Speicherlogik
+                SaveDataClass multiplayerSaveData = new SaveDataClass(player, enemy, mlp);
+                multiplayerSaveData.saveMultiplayerGame();
+            } else {
+                // Singleplayer-Speicherlogik (unverändert)
+                SaveDataClass singleplayerSaveData = new SaveDataClass(player, enemy);
+                FileManager fileManager = new FileManager(true);
+                fileManager.save(singleplayerSaveData);
+                showNotification("Spiel gespeichert!", "info");
+            }
+
         });
 
         exitButton.setOnAction(e -> new StartScreen(stage).show());
@@ -559,16 +566,27 @@ public class HelloController {
     }
 
     public void loadGameFromSave(GameState loadedState) {
-        Gamefield loadedPlayer = Gamefield.fromData(loadedState.getPlayerBoardData(), this, this.mlp);
-        Gamefield loadedEnemy = Gamefield.fromData(loadedState.getEnemyBoardData(), this, this.mlp);
+        //Felder erstellen
+        this.player = Gamefield.fromData(loadedState.getPlayerBoardData(), this, this.mlp);
+        this.enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), this, this.mlp);
 
-        // Benutze die dedizierte Setup-Methode für geladene Spiele
-        setup(loadedPlayer, loadedEnemy);
+        //Logik zuweisen
+        if (this.mlp != null) { //Multiplayer
+            this.player.setLogic(this.mlp);
+            this.enemy.setLogic(this.mlp);
+            this.mlp.setPl(this.player);
+            this.mlp.setEn(this.enemy);
+            this.mlp.setTurn(loadedState.isPlayerTurn()); //Welcher Spieler ist am Zug
+        } else { // Singleplayer
+            EnemyPlayer ki = new EnemyPlayer(this.player);
+            this.enemy.setEnemy(ki);
+        }
+        this.readyToSendShips = true;
 
-        // Optional: Musik/Sound-Einstellungen anwenden
-        BackgroundMusic.getInstance().setVolume(loadedPlayer.getMusicVolume());
-        SoundEffect.setVolume(loadedPlayer.getMusicVolume());
-        if (!loadedPlayer.isMusicEnabled()) {
+        setup(this.player, this.enemy);
+
+        BackgroundMusic.getInstance().setVolume(loadedState.getMusikVolume());
+        if (!loadedState.isMusikAktiv()) {
             BackgroundMusic.getInstance().stop();
         }
     }

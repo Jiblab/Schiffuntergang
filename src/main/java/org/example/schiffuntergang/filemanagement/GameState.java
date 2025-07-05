@@ -11,6 +11,9 @@ public class GameState {
     private boolean isPlayerTurn;
 
 
+    //mulitplayer
+    private boolean isMultiplayer;
+
 
     public GameState() {
     }
@@ -71,5 +74,14 @@ public class GameState {
 
     public void setPlayerTurn(boolean playerTurn) {
         isPlayerTurn = playerTurn;
+    }
+
+    //multiplayer
+    public boolean isMultiplayer() {
+        return isMultiplayer;
+    }
+
+    public void setMultiplayer(boolean multiplayer) {
+        isMultiplayer = multiplayer;
     }
 }

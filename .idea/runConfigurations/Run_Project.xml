@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Project" type="Application" factoryName="Application">
+  <configuration default="false" name="Run Project" type="Application" factoryName="Application" singleton="false">
     <option name="MAIN_CLASS_NAME" value="org.example.schiffuntergang.Launcher" />
     <module name="SchiffUntergang" />
     <option name="VM_PARAMETERS" value="--add-opens javafx.graphics/javafx.scene=com.google.gson" />

@@ -24,6 +24,8 @@ import javafx.stage.FileChooser;
 import org.example.schiffuntergang.components.Gamefield;
 import javafx.util.Pair;
 
+import java.io.IOException;
+
 
 public class StartScreen {
     private final Stage stage;
@@ -67,61 +69,47 @@ public class StartScreen {
             clickSound.play();
             gameScreen.show();
         });
+        // Innerhalb der show()-Methode, ersetzen Sie den gesamten load.setOnAction-Block
         load.setOnAction(e -> {
             clickSound.play();
+            stage.setFullScreen(false); // Verhindert Probleme mit dem FileChooser im Vollbild
 
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Load Game");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Speicherdaten", "*.save"));
-
-            java.io.File selectedFile = fileChooser.showOpenDialog(stage);
-            if (selectedFile != null) {
-                try {
-                    /*
-                    Pair<Gamefield, Gamefield> boards = StorageManager.loadFullGame(selectedFile.getAbsolutePath());
-                    Gamefield playerBoard = boards.getKey();
-                    Gamefield aiBoard = boards.getValue();
-
-                    // HelloController vorbereiten und laden
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HelloView.fxml")); // Pfad ggf. anpassen
-                    Parent root = loader.load();
-                    HelloController controller = loader.getController();
-                    controller.loadGame(playerBoard, aiBoard);  // eigene Methode
-
-                    Scene scene = new Scene(root);
-                    stage.setScene(scene);
+            FileManager fileManager = new FileManager(true); // true = mit Dialog
+            try {
+                GameState loadedState = fileManager.load();
+                if (loadedState == null) {
                     stage.setFullScreen(true);
-                    stage.show();
-
-                     */
-                    FileManager fileManager = new FileManager(true);
-                    GameState loadedState = fileManager.loadFromURI(selectedFile.getAbsolutePath());
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("hello-view.fxml")); // Pfad ggf. anpassen
-                    Parent root = loader.load();
-                    HelloController controller = loader.getController();
-                    controller.setStage(stage);
-                    controller.setSize(loadedState.getPlayerBoardData().getHeight(), loadedState.getPlayerBoardData().getWidth());
-                    Gamefield player = Gamefield.fromData( loadedState.getPlayerBoardData(), controller, null);
-                    Gamefield enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), controller, null);
-
-                    controller.setup(player, enemy);  // eigene Methode
-
-                    Scene scene = new Scene(root);
-
-                    scene.setOnKeyPressed(event -> {
-                        if (event.getCode() == KeyCode.ESCAPE) {
-                            stage.setIconified(true);
-                        }
-                    });
-
-                    stage.setScene(scene);
-                    stage.setFullScreen(true);
-                    stage.show();
-
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    return; // Benutzer hat abgebrochen
                 }
+
+                // --- Spielszene laden ---
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
+                Parent root = loader.load();
+                HelloController controller = loader.getController();
+                controller.setStage(stage);
+
+                // --- Spielmodus-spezifisches Setup ---
+                if (loadedState.isMultiplayer()) {
+                    // HINWEIS: Dies ist eine vereinfachte Logik.
+                    // Der ladende Spieler wird zum Host.
+                    // Eine vollständige Implementierung würde eine neue "load"-Nachricht an den Gegner erfordern.
+                    System.out.println("Multiplayer-Spielstand wird geladen. Starte als Host...");
+                    controller.setupMultiS(); // Server starten
+                    controller.loadGameFromSave(loadedState); // Geladene Daten anwenden
+
+                } else {
+                    // --- Singleplayer-Ladevorgang ---
+                    System.out.println("Singleplayer-Spielstand wird geladen...");
+                    controller.loadGameFromSave(loadedState); // Lädt die Daten und erstellt die Spielfelder
+                }
+
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.setFullScreen(true);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                // Hier sollte ein Alert für den Benutzer angezeigt werden
             }
         });
         options.setOnAction(e -> {

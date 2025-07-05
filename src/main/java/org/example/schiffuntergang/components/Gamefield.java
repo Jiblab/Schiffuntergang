@@ -474,6 +474,7 @@ public class Gamefield extends GridPane {
                 }
             }
         }
+        ship.setDirection(vertical);
         addShip(ship);
         System.out.println("Schiff platziert: Start(Reihe " + startReihe + ", Spalte " + startSpalte + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
@@ -603,45 +604,40 @@ public class Gamefield extends GridPane {
         data.setHeight(this.lang);
         data.setEnemy(this.enemy);
 
-
         List<SerializableShip> shipDataList = new ArrayList<>();
-        Set<Ships> processedShips = new HashSet<>(); // To avoid adding a ship multiple times
+        Set<Ships> processedShips = new HashSet<>();
 
-        for (int y = 0; y < breit; y++) {
-            for (int x = 0; x < lang; x++) {
-
+        // Durch alle Zellen iterieren, um die Startzelle jedes Schiffs zu finden
+        for (int y = 0; y < lang; y++) {       // y ist die Reihe
+            for (int x = 0; x < breit; x++) {  // x ist die Spalte
                 Cell cell = getCell(x, y);
                 Ships ship = cell.getShip();
 
                 if (ship != null && !processedShips.contains(ship)) {
-                    processedShips.add(ship); // Mark as processed
-                    boolean isVertical = false;
-                    // = (y + 1 < lang && getCell(x, y + 1).getShip() == ship) || y+1 >= breit || x+1 >= lang
-                    if (y + 1 >= breit) {
-                        if (getCell(x, y + 1).getShip() == ship) {
-                            isVertical = true;
-                        }
-                    }
+                    processedShips.add(ship); // Schiff als verarbeitet markieren
 
+                    // Finde die tatsächliche Startzelle des Schiffs
+                    // Dies ist wichtig, da der aktuelle (x, y) nur ein Teil des Schiffs sein könnte
+                    Cell startCell = findShipStartCell(ship);
 
                     SerializableShip serializableShip = new SerializableShip();
                     serializableShip.setLength(ship.getLength());
                     serializableShip.setHealth(ship.getHealth());
-                    serializableShip.setStartX(x);
-                    serializableShip.setStartY(y);
-                    serializableShip.setVertical(isVertical);
+                    serializableShip.setStartX(startCell.x); // Spalte der Startzelle
+                    serializableShip.setStartY(startCell.y); // Reihe der Startzelle
+                    serializableShip.setVertical(ship.getDirection()); // Korrekte Ausrichtung aus dem Schiffsobjekt
                     shipDataList.add(serializableShip);
                 }
             }
         }
         data.setShips(shipDataList);
 
-
-        // --- Populate Shot Positions ---
+        // Getroffene Positionen speichern (unverändert)
         List<Position> shotPositions = new ArrayList<>();
-        for (int y = 0; y < breit; y++) {
-            for (int x = 0; x < lang; x++) {
-                if (getCell(x, y).isShot()) {
+        for (int y = 0; y < lang; y++) {
+            for (int x = 0; x < breit; x++) {
+                Cell cell = getCell(x, y);
+                if (cell != null && cell.isShot()) {
                     shotPositions.add(new Position(x, y));
                 }
             }
@@ -649,6 +645,17 @@ public class Gamefield extends GridPane {
         data.setShotPositions(shotPositions);
 
         return data;
+    }
+
+    private Cell findShipStartCell(Ships ship) {
+        for (int y = 0; y < lang; y++) {
+            for (int x = 0; x < breit; x++) {
+                if (getCell(x, y).getShip() == ship) {
+                    return getCell(x, y);
+                }
+            }
+        }
+        return null; //Sollte nie passieren, wenn das Schiff auf dem Feld ist
     }
 
     public void setController(HelloController controller) {

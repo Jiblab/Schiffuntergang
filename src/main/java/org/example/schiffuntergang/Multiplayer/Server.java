@@ -92,6 +92,4 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     public String receiveMessage() throws IOException {
         return in.readLine();  // Nutze das in deinem GameLoop
     }
-
-
 }
