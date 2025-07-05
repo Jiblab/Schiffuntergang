@@ -129,7 +129,7 @@ public class Gamefield extends GridPane {
 
 
                     } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
-                        shoot(x, y);
+                        shoot(y, x); //hier geswapped
                     }
                 });
 
@@ -217,8 +217,8 @@ public class Gamefield extends GridPane {
                         // Diese Logik ist nur im Multiplayer relevant
                         if (lo != null && control.getReady() && lo.getTurn()) {
                             // Wir schießen auf die angeklickte Koordinate (Spalte y, Reihe x)
-                            lo.setX(x); // lo.setX erwartet die Spalten-Koordinate
-                            lo.setY(y); // lo.setY erwartet die Reihen-Koordinate
+                            lo.setX(y); // lo.setX erwartet die Spalten-Koordinate
+                            lo.setY(x); // lo.setY erwartet die Reihen-Koordinate
                             System.out.println("Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
                             try {
                                 lo.startShoot();
@@ -607,8 +607,8 @@ public class Gamefield extends GridPane {
         List<SerializableShip> shipDataList = new ArrayList<>();
         Set<Ships> processedShips = new HashSet<>(); // To avoid adding a ship multiple times
 
-        for (int y = 0; y < breit; y++) {
-            for (int x = 0; x < lang; x++) {
+        for (int y = 0; y < this.lang; y++) {
+            for (int x = 0; x < this.breit; x++) {
 
                 Cell cell = getCell(x, y);
                 Ships ship = cell.getShip();
@@ -639,8 +639,8 @@ public class Gamefield extends GridPane {
 
         // --- Populate Shot Positions ---
         List<Position> shotPositions = new ArrayList<>();
-        for (int y = 0; y < breit; y++) {
-            for (int x = 0; x < lang; x++) {
+        for (int y = 0; y < lang; y++) {
+            for (int x = 0; x < breit; x++) {
                 if (getCell(x, y).isShot()) {
                     shotPositions.add(new Position(x, y));
                 }
