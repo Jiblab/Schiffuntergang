@@ -95,7 +95,7 @@ public class SaveDataClass {
         }
 
         try {
-            System.out.println("[SaveDataClass] Sende Speicherbefehl an den Gegner mit ID: " + saveId);
+            System.out.println("[SaveDataClass] Sende Speicherbefehl an den Gegner mit der ID: " + saveId);
             logic.sendSaveCommand(saveId);
         } catch (IOException e) {
             System.err.println("[SaveDataClass] FEHLER: Senden des Speicherbefehls an den Gegner fehlgeschlagen: " + e.getMessage());

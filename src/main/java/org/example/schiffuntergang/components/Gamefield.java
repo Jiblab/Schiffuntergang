@@ -129,7 +129,7 @@ public class Gamefield extends GridPane {
 
 
                     } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
-                        shoot(x, y);
+                        shoot(y, x); //hier geswapped
                     }
                 });
 
@@ -217,8 +217,8 @@ public class Gamefield extends GridPane {
                         // Diese Logik ist nur im Multiplayer relevant
                         if (lo != null && control.getReady() && lo.getTurn()) {
                             // Wir schießen auf die angeklickte Koordinate (Spalte y, Reihe x)
-                            lo.setX(x); // lo.setX erwartet die Spalten-Koordinate
-                            lo.setY(y); // lo.setY erwartet die Reihen-Koordinate
+                            lo.setX(y); // lo.setX erwartet die Spalten-Koordinate
+                            lo.setY(x); // lo.setY erwartet die Reihen-Koordinate
                             System.out.println("Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
                             try {
                                 lo.startShoot();
@@ -604,40 +604,45 @@ public class Gamefield extends GridPane {
         data.setHeight(this.lang);
         data.setEnemy(this.enemy);
 
-        List<SerializableShip> shipDataList = new ArrayList<>();
-        Set<Ships> processedShips = new HashSet<>();
 
-        // Durch alle Zellen iterieren, um die Startzelle jedes Schiffs zu finden
-        for (int y = 0; y < lang; y++) {       // y ist die Reihe
-            for (int x = 0; x < breit; x++) {  // x ist die Spalte
+        List<SerializableShip> shipDataList = new ArrayList<>();
+        Set<Ships> processedShips = new HashSet<>(); // To avoid adding a ship multiple times
+
+        for (int y = 0; y < breit; y++) {
+            for (int x = 0; x < lang; x++) {
+
                 Cell cell = getCell(x, y);
                 Ships ship = cell.getShip();
 
                 if (ship != null && !processedShips.contains(ship)) {
-                    processedShips.add(ship); // Schiff als verarbeitet markieren
+                    processedShips.add(ship); // Mark as processed
+                    boolean isVertical = false;
+                    // = (y + 1 < lang && getCell(x, y + 1).getShip() == ship) || y+1 >= breit || x+1 >= lang
+                    if (y + 1 >= breit) {
+                        if (getCell(x, y + 1).getShip() == ship) {
+                            isVertical = true;
+                        }
+                    }
 
-                    // Finde die tatsächliche Startzelle des Schiffs
-                    // Dies ist wichtig, da der aktuelle (x, y) nur ein Teil des Schiffs sein könnte
-                    Cell startCell = findShipStartCell(ship);
 
                     SerializableShip serializableShip = new SerializableShip();
                     serializableShip.setLength(ship.getLength());
                     serializableShip.setHealth(ship.getHealth());
-                    serializableShip.setStartX(startCell.x); // Spalte der Startzelle
-                    serializableShip.setStartY(startCell.y); // Reihe der Startzelle
-                    serializableShip.setVertical(ship.getDirection()); // Korrekte Ausrichtung aus dem Schiffsobjekt
+                    serializableShip.setStartX(x);
+                    serializableShip.setStartY(y);
+                    serializableShip.setVertical(isVertical);
                     shipDataList.add(serializableShip);
                 }
             }
         }
         data.setShips(shipDataList);
 
-        // Getroffene Positionen speichern (unverändert)
+
+        // --- Populate Shot Positions ---
         List<Position> shotPositions = new ArrayList<>();
-        for (int y = 0; y < lang; y++) {
-            for (int x = 0; x < breit; x++) {
-                Cell cell = getCell(x, y);
-                if (cell != null && cell.isShot()) {
+        for (int y = 0; y < breit; y++) {
+            for (int x = 0; x < lang; x++) {
+                if (getCell(x, y).isShot()) {
                     shotPositions.add(new Position(x, y));
                 }
             }
