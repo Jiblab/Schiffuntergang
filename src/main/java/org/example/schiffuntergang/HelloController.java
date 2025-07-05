@@ -2,7 +2,6 @@ package org.example.schiffuntergang;
 
 import javafx.scene.control.Slider;
 import org.controlsfx.control.ToggleSwitch;
-import org.example.schiffuntergang.StartScreen;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -17,6 +16,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.example.schiffuntergang.Multiplayer.Client;
+import org.example.schiffuntergang.Multiplayer.KiPlayerController;
 import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.Multiplayer.Server;
 import org.example.schiffuntergang.components.Gamefield;
@@ -61,6 +61,8 @@ public class HelloController {
     private final Button[] shipLengthButtons = new Button[6];
     private VBox pauseMenu;
     private double previousVolume;
+    private KiPlayerController kiController;
+    private boolean ki = false;
 
     private SaveDataClass savedata;
 
@@ -436,6 +438,7 @@ public class HelloController {
         ishost = true;
 
         Server se = new Server();
+
         mlp = new MultiplayerLogic(se, false, null, null);
         player = new Gamefield(false, this, (int) x, (int) y, mlp);
         enemy = new Gamefield(true, this, (int) x, (int) y, mlp);
@@ -455,21 +458,44 @@ public class HelloController {
 
     public void setupMultiplayerBoards(Gamefield playerBoard, Gamefield enemyBoard) {
         // Die Spielfelder des Controllers auf die neuen Objekte setzen
-        this.player = playerBoard;
-        this.enemy = enemyBoard;
+        if (!ki){
+            this.player = playerBoard;
+            this.enemy = enemyBoard;
 
-        // Ein Platzhalter-Panel für die linke Seite erstellen,
-        // während wir auf die Schiffsregeln vom Server warten.
-        Label waitingLabel = new Label("Warte auf Schiffsregeln...");
-        waitingLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
-        VBox placeholderControls = new VBox(waitingLabel);
-        placeholderControls.setPadding(new Insets(20));
-        placeholderControls.setAlignment(Pos.CENTER);
-        placeholderControls.setMinWidth(200);
-        placeholderControls.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
+            // Ein Platzhalter-Panel für die linke Seite erstellen,
+            // während wir auf die Schiffsregeln vom Server warten.
+            Label waitingLabel = new Label("Warte auf Schiffsregeln...");
+            waitingLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
+            VBox placeholderControls = new VBox(waitingLabel);
+            placeholderControls.setPadding(new Insets(20));
+            placeholderControls.setAlignment(Pos.CENTER);
+            placeholderControls.setMinWidth(200);
+            placeholderControls.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
 
-        // Die zentrale UI-Aufbau-Methode mit den neuen Spielfeldern und dem Platzhalter aufrufen
-        buildUI(this.player, this.enemy, placeholderControls);
+            // Die zentrale UI-Aufbau-Methode mit den neuen Spielfeldern und dem Platzhalter aufrufen
+            buildUI(this.player, this.enemy, placeholderControls);
+        }
+        else{
+            this.player = playerBoard;
+            this.enemy = enemyBoard;
+
+            // Erstelle ein Platzhalter-Panel oder das finale Control-Panel
+            VBox controlPanel = createControlPanel(); // Oder ein "Warte..."-Label
+
+            buildUI(this.player, this.enemy, controlPanel);
+            player.setDisable(true);
+            enemy.setDisable(true);
+
+            // *** DER ENTSCHEIDENDE PUNKT FÜR DEN CLIENT ***
+            // Wenn die Anwendung im KI-Modus läuft, starte hier den KIPlayerController
+            if (kiController == null && !ishost) { // Prüfen, ob der Controller noch nicht existiert
+                EnemyPlayer ki = new EnemyPlayer(enemyBoard);
+                kiController = new KiPlayerController(mlp, ki, playerBoard, enemyBoard, this);
+                kiController.start();
+            }
+        }
+
+
     }
 
     /**
@@ -545,6 +571,81 @@ public class HelloController {
         // Ersetze das "Warte..."-Panel durch das richtige Steuerpanel
         Platform.runLater(() -> rootPane.setLeft(controlPanel));
     }
+
+    public void setupKivsKi(boolean asHost, String ip, int port) {
+        this.ishost = asHost;
+        ki = true;
+
+        // Spielfelder und MultiplayerLogic wie gewohnt initialisieren
+        // Wichtig: Wir übergeben noch keine Spielfelder an MultiplayerLogic,
+        // da diese erst später erstellt werden.
+        if (asHost) {
+            s = new Server();
+            player = new Gamefield(false, this, (int) x, (int) y); // Annahme: Standardgröße 10x10
+            enemy = new Gamefield(true, this, (int) x, (int) y);
+            mlp = new MultiplayerLogic(s, false, enemy, player);
+        } else {
+            ipa = ip;
+            porta = port;
+            c = new Client();
+            // Die Spielfelder werden für den Client erst nach dem "size"-Befehl erstellt.
+            mlp = new MultiplayerLogic(c, true, null, null);
+        }
+
+        mlp.setController(this);
+
+        // Starte den Netzwerk-Thread von MultiplayerLogic
+        new Thread(() -> {
+            try {
+                mlp.start(); // Startet den Server oder verbindet den Client
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        // Wenn es ein Host ist, können wir den KI-Controller sofort starten.
+        if (asHost) {
+            EnemyPlayer ki = new EnemyPlayer(enemy); // KI, die auf das Gegnerfeld schießt
+            kiController = new KiPlayerController(mlp, ki, player, enemy, this);
+            kiController.start();
+            buildUI(player, enemy, createControlPanel()); // UI aufbauen
+            player.setDisable(true); // Verhindert manuelle Klicks
+            enemy.setDisable(true);
+        }
+
+    }
+
+
+
+
+
+
+    private void placeShipsRandomlyOnBoard(Gamefield board) {
+        Random rand = new Random();
+
+        double maxCells = board.maxShipsC();
+        if (maxCells <= 0) maxCells = 17; // Standardwert für ein 10x10 Feld
+
+        while (board.getUsedCells() < maxCells) {
+            int shipLength = 2 + rand.nextInt(4); // Längen 2-5
+            boolean vertical = rand.nextBoolean();
+
+            int xMax = board.getLang() - (vertical ? 1 : shipLength);
+            int yMax = board.getBreit() - (vertical ? shipLength : 1);
+
+            if (xMax < 0 || yMax < 0) continue;
+
+            int xPos = rand.nextInt(xMax + 1);
+            int yPos = rand.nextInt(yMax + 1);
+
+            Ships ship = new Ships(shipLength, shipLength); // Annahme: Konstruktor ist (length, health)
+            if (board.placeShip(ship, xPos, yPos, vertical)) {
+
+            }
+        }
+        System.out.println("Schiffe auf Board platziert. Anzahl Zellen: " + board.getUsedCells());
+    }
+
 
 
     // --- RESTLICHER CODE (größtenteils unverändert) ---

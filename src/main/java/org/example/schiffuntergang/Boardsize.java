@@ -43,14 +43,17 @@ public class Boardsize {
      * Zeigt den Einstellungsbildschirm für ein Einzelspieler-Spiel an.
      */
     public void show() {
-        createAndShowScene(false);
+        createAndShowScene(false, false);
     }
 
     /**
      * Zeigt den Einstellungsbildschirm für das Hosten eines Multiplayer-Spiels an.
      */
-    public void showMulti() {
-        createAndShowScene(true);
+    public void showMulti(boolean ki) {
+        if(ki){
+            createAndShowScene(true, true);
+        }
+        createAndShowScene(true, false);
     }
 
     /**
@@ -58,7 +61,7 @@ public class Boardsize {
      *
      * @param isMultiplayerHost True, wenn ein Multiplayer-Spiel gehostet wird (zeigt die IP an), sonst false.
      */
-    private void createAndShowScene(boolean isMultiplayerHost) {
+    private void createAndShowScene(boolean isMultiplayerHost, boolean ki) {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
 
         // --- UI-Komponenten erstellen ---
@@ -123,7 +126,13 @@ public class Boardsize {
 
                 // Die korrekte Setup-Methode basierend auf dem Spielmodus aufrufen
                 if (isMultiplayerHost) {
-                    controller.setupMultiS();
+                    if (ki){
+                        controller.setupKivsKi(true, null, 0);
+                    }
+                    else {
+                        controller.setupMultiS();
+                    }
+
                 } else {
                     controller.setup();
                 }

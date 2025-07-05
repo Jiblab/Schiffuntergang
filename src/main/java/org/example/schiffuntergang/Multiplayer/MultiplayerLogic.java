@@ -30,6 +30,8 @@ public class MultiplayerLogic {
     private HelloController contr;
     private boolean myturn;
     private boolean firstturn = true;
+    private boolean serverKiReady = false;
+    private boolean clientKiReady = false;
 
     public MultiplayerLogic(Client c, boolean client1, Gamefield en, Gamefield pl){
         cl = c;
@@ -407,5 +409,53 @@ public class MultiplayerLogic {
     public void setTurn(boolean isMyTurn) {
         this.myturn = isMyTurn;
         System.out.println("Spielzug nach Laden gesetzt: " + (isMyTurn ? "Ich bin dran." : "Gegner ist dran."));
+    }
+
+    public void kiShoot(int targetX, int targetY) throws IOException {
+        if (!myturn) {
+            System.err.println("WARNUNG: KI versucht zu schießen, obwohl sie nicht am Zug ist.");
+            return;
+        }
+        // Die globalen x und y Koordinaten setzen, die von `startShoot` verwendet werden
+        this.x = targetX;
+        this.y = targetY;
+
+        // Die existierende Methode aufrufen, die "shot x y" an den Gegner sendet.
+        startShoot();
+    }
+
+    public synchronized void kiIsReady() {
+        try {
+            if (client) {
+                clientKiReady = true;
+                System.out.println("MultiplayerLogic: Client-KI ist bereit.");
+                // Der Client hat seine Schiffe platziert, jetzt sendet er "done" als Antwort
+                // auf die "ships"-Nachricht, die er vom Server erhalten haben muss.
+                cl.sendDone();
+            } else {
+                serverKiReady = true;
+                System.out.println("MultiplayerLogic: Server-KI ist bereit.");
+                // Der Server ist bereit. Er kann jetzt seine Schiffe senden.
+                sendShipsForKi(); // <- NEUE, nicht-blockierende Sendemethode
+            }
+
+            // Wenn beide KIs bereit sind, startet das eigentliche Spiel.
+            if (serverKiReady && clientKiReady) {
+                System.out.println("MultiplayerLogic: Beide KIs sind bereit. Starte Spiel-Loop.");
+                s.sendReady(); // Server sagt dem Client, dass es losgeht.
+                startMultiplayerloop();
+            }
+        } catch (IOException e) {
+            System.err.println("Fehler in kiIsReady: " + e.getMessage());
+        }
+    }
+
+    // Eine neue Methode, die nur sendet, ohne auf eine Antwort zu warten.
+    private void sendShipsForKi() throws IOException {
+        if (!client) {
+            int[] shipLengths = player.getShipLengths();
+            s.sendShips(shipLengths);
+            System.out.println("Server: Schiffe an Client-KI gesendet.");
+        }
     }
 }

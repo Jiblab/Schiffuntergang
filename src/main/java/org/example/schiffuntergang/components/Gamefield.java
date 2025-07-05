@@ -442,14 +442,21 @@ public class Gamefield extends GridPane {
                         shipView.setFitWidth(30.0);
                         shipView.setFitHeight(length * 30.0);
                         rowSpan = length;
+
                     } else {
                         // Ein horizontales Schiff ist 'length * 30' breit und 30px hoch
                         shipView.setFitWidth(length * 30.0);
                         shipView.setFitHeight(30.0);
                         colSpan = length;
+
                     }
+                    final int fcolSpan = colSpan;
+                    final int frowSpan = rowSpan;
                     ship.setShipImageView(shipView);
-                    this.add(shipView, startX, startY, colSpan, rowSpan);
+                    Platform.runLater(() -> {
+                        // Diese Zeile verursacht den Fehler, wenn sie nicht im runLater-Block ist.
+                        this.add(shipView, startX, startY, fcolSpan, frowSpan);
+                    });
                 } catch (Exception e) {
                     System.err.println("Fehler beim Laden des Schiff-Bildes: " + imagePath);
                     e.printStackTrace();
@@ -647,6 +654,38 @@ public class Gamefield extends GridPane {
 
     public void setController(HelloController controller) {
         this.control = controller;
+    }
+
+    public int getShipCount() {
+        return placedShip.size();
+    }
+
+    public void redrawAllCells() {
+        // Dieser Aufruf stellt sicher, dass der gesamte Block auf dem
+        // JavaFX Application Thread ausgeführt wird.
+        Platform.runLater(() -> {
+            System.out.println("DEBUG: Redraw für " + (isEnemy() ? "Gegner" : "Spieler") + "-Feld wird ausgeführt.");
+            for (int y = 0; y < lang; y++) { // Reihen
+                for (int x = 0; x < breit; x++) { // Spalten
+                    Cell cell = getCell(x, y); // Holt cells[y][x]
+                    if (cell == null) continue;
+
+                    // Logik, um zu entscheiden, welche Farbe die Zelle haben soll
+                    if (cell.isShot()) {
+                        // Getroffene Felder sind immer rot oder schwarz
+                        cell.setFill(cell.getShip() != null ? Color.RED : Color.BLACK);
+                    } else if (cell.getShip() != null && !isEnemy()) {
+                        // Nicht-getroffene, EIGENE Schiffe sind weiß
+                        cell.setFill(Color.WHITE);
+                        cell.setStroke(Color.GREEN);
+                    } else {
+                        // Leere Felder oder unentdeckte Gegner-Felder sind blau
+                        cell.setFill(new Color(0.1, 0.3, 0.8, 0.6));
+                        cell.setStroke(Color.BLACK);
+                    }
+                }
+            }
+        });
     }
 
 }

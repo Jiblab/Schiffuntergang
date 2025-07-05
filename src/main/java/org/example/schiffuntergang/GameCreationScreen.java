@@ -106,17 +106,31 @@ public class GameCreationScreen {
         Button createGame = new Button("Host Game");
         Button findGame = new Button("Join Game");
         Button backButton = new Button("Back");
+        Button createAI = new Button("Host Game Computer");
+        Button joinAi = new Button("Join Game Computer");
+
+        joinAi.setOnAction(e->{
+            clickSound.play();
+            showJoinGameScene(true);
+        });
+
+        createAI.setOnAction(e->{
+            clickSound.play();
+            // Leitet direkt zum Boardsize-Screen im Multiplayer-Modus
+            Boardsize boardsize = new Boardsize(stage, false);
+            boardsize.showMulti(true);
+        });
 
         createGame.setOnAction(e -> {
             clickSound.play();
             // Leitet direkt zum Boardsize-Screen im Multiplayer-Modus
             Boardsize boardsize = new Boardsize(stage, false);
-            boardsize.showMulti();
+            boardsize.showMulti(false);
         });
 
         findGame.setOnAction(e -> {
             clickSound.play();
-            showJoinGameScene(); // Wechselt zur nächsten Szene
+            showJoinGameScene(false); // Wechselt zur nächsten Szene
         });
 
         backButton.setOnAction(e -> {
@@ -124,7 +138,7 @@ public class GameCreationScreen {
             this.show(); // Kehrt zum vorherigen Bildschirm zurück (GameCreationScreen)
         });
 
-        VBox layout = new VBox(20, createGame, findGame, backButton);
+        VBox layout = new VBox(20, createGame, findGame, backButton, createAI, joinAi);
         layout.setAlignment(Pos.CENTER);
         // Hintergrundklasse für einheitliches Aussehen hinzufügen
         layout.getStyleClass().add("background");
@@ -139,7 +153,7 @@ public class GameCreationScreen {
         stage.setFullScreen(true);
     }
 
-    private void showJoinGameScene() {
+    private void showJoinGameScene(boolean ki) {
         Stage connectStage = new Stage();
         connectStage.setTitle("Mit Server verbinden");
         Label ipLabel = new Label("Server-IP:");
@@ -171,8 +185,14 @@ public class GameCreationScreen {
 
                 // 3. Konfiguriere den Controller mit den notwendigen Informationen
                 gameController.setStage(this.stage); // Übergib die HAUPT-Stage
-                gameController.setSize(10, 10);      // Übergib Dummy-Werte für die Größe
-                gameController.setupMultiC(ip, port);// Starte das Client-Setup
+                gameController.setSize(10, 10);// Übergib Dummy-Werte für die Größe
+
+                if (ki){
+                    gameController.setupKivsKi(false, ip, port);
+                }else{
+                    gameController.setupMultiC(ip, port);// Starte das Client-Setup
+                }
+
 
                 // 4. Erstelle eine neue Szene mit der geladenen Spielansicht
                 Scene gameScene = new Scene(gameRoot);
@@ -350,7 +370,7 @@ public class GameCreationScreen {
             //System.out.println("Spiel erstellen geklickt!");
             clickSound.play();
             Boardsize boardsize = new Boardsize(stage, true);
-            boardsize.showMulti();
+            boardsize.showMulti(false);
             multiplayerStage.close();
         });
 
