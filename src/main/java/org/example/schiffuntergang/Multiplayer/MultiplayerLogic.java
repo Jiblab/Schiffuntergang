@@ -32,6 +32,7 @@ public class MultiplayerLogic {
     private boolean firstturn = true;
     private boolean serverKiReady = false;
     private boolean clientKiReady = false;
+    private KiPlayerController kicontr;
 
     public MultiplayerLogic(Client c, boolean client1, Gamefield en, Gamefield pl){
         cl = c;
@@ -189,6 +190,9 @@ public class MultiplayerLogic {
             //das thread ding von chat mal übernommen und ausprobiert aber funktioniert auch d
 
             System.out.println("While schleife fürs warten verlassen");
+            /*if (contr.getKi()){
+                kicontr.start();
+            }*/
 
         }
         else {// man ist client und joined
@@ -457,5 +461,9 @@ public class MultiplayerLogic {
             s.sendShips(shipLengths);
             System.out.println("Server: Schiffe an Client-KI gesendet.");
         }
+    }
+
+    public void setKicontroler(KiPlayerController ki){
+        kicontr = ki;
     }
 }

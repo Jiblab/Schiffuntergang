@@ -53,7 +53,10 @@ public class Boardsize {
         if(ki){
             createAndShowScene(true, true);
         }
-        createAndShowScene(true, false);
+        else {
+            createAndShowScene(true, false);
+        }
+
     }
 
     /**

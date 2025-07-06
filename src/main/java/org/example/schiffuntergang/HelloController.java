@@ -574,44 +574,68 @@ public class HelloController {
 
     public void setupKivsKi(boolean asHost, String ip, int port) {
         this.ishost = asHost;
-        ki = true;
+        this.ki = true; // Wichtig: Markiere, dass es ein KI-Spiel ist
 
-        // Spielfelder und MultiplayerLogic wie gewohnt initialisieren
-        // Wichtig: Wir übergeben noch keine Spielfelder an MultiplayerLogic,
-        // da diese erst später erstellt werden.
+        // Erstelle die notwendigen Objekte für die Logik
         if (asHost) {
             s = new Server();
-            player = new Gamefield(false, this, (int) x, (int) y); // Annahme: Standardgröße 10x10
+            // Spielfelder für den Host sofort erstellen
+            player = new Gamefield(false, this, (int) x, (int) y);
             enemy = new Gamefield(true, this, (int) x, (int) y);
             mlp = new MultiplayerLogic(s, false, enemy, player);
         } else {
-            ipa = ip;
+            ipa = ip; // IP für den Client speichern
             porta = port;
             c = new Client();
-            // Die Spielfelder werden für den Client erst nach dem "size"-Befehl erstellt.
+            // Spielfelder für den Client sind noch null, das ist korrekt
             mlp = new MultiplayerLogic(c, true, null, null);
         }
 
         mlp.setController(this);
 
-        // Starte den Netzwerk-Thread von MultiplayerLogic
-        new Thread(() -> {
+        // Der zentrale Thread, der die gesamte Initialisierung steuert
+        Thread gameSetupThread = new Thread(() -> {
             try {
-                mlp.start(); // Startet den Server oder verbindet den Client
+                // Schritt 1: Führe den blockierenden Start-Handshake aus (size/done)
+                // Dieser Aufruf blockiert, bis der Handshake für Host ODER Client fertig ist.
+                System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: Rufe mlp.start() auf...");
+                mlp.start();
+                System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: mlp.start() ist beendet.");
+
+                // Schritt 2: Starte den KI-Controller, falls er existiert.
+                // Für den Host wurde er vorher erstellt.
+                // Für den Client wurde er während mlp.start() in setupMultiplayerBoards erstellt.
+                if (this.kiController != null) {
+                    System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: kiController gefunden. Starte ihn jetzt.");
+                    this.kiController.start();
+                } else {
+                    System.err.println("[" + (asHost ? "Host" : "Client") + "] FEHLER: kiController ist nach mlp.start() immer noch null!");
+                }
+
             } catch (IOException e) {
+                System.err.println("Fehler im Haupt-Setup-Thread: " + e.getMessage());
                 e.printStackTrace();
             }
-        }).start();
+        });
+        gameSetupThread.setDaemon(true);
 
-        // Wenn es ein Host ist, können wir den KI-Controller sofort starten.
+        // Erstelle den KI-Controller für den Host, BEVOR der Thread gestartet wird.
         if (asHost) {
-            EnemyPlayer ki = new EnemyPlayer(enemy); // KI, die auf das Gegnerfeld schießt
-            kiController = new KiPlayerController(mlp, ki, player, enemy, this);
-            kiController.start();
-            buildUI(player, enemy, createControlPanel()); // UI aufbauen
-            player.setDisable(true); // Verhindert manuelle Klicks
+            System.out.println("[Host] setupKivsKi: Erstelle Host KI-Controller.");
+            EnemyPlayer ki = new EnemyPlayer(enemy);
+            this.kiController = new KiPlayerController(mlp, ki, player, enemy, this);
+            mlp.setKicontroler(this.kiController);
+
+            // UI sofort aufbauen
+            buildUI(player, enemy, createControlPanel());
+            player.setDisable(true);
             enemy.setDisable(true);
         }
+        // Für den Client wird der kiController erst in setupMultiplayerBoards erstellt.
+        // Das ist richtig so.
+
+        System.out.println("[" + (asHost ? "Host" : "Client") + "] setupKivsKi: Starte gameSetupThread.");
+        gameSetupThread.start();
 
     }
 
@@ -773,5 +797,9 @@ public class HelloController {
 
     public void setShipRules(int[] shipCounts) {
         this.shipsAllowed = shipCounts;
+    }
+
+    public boolean getKi(){
+        return ki;
     }
 }
