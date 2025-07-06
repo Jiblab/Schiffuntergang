@@ -276,6 +276,19 @@ public class MultiplayerLogic {
                         break;
                     case "load":
                         //lade ID
+                        Platform.runLater(() -> {
+                            // Code to be executed on the JavaFX Application Thread
+                            System.out.println("Running on the JavaFX Application Thread.");
+                            long saveId = Long.parseLong(p1[1]);
+                            try{
+                                FileManager fm = new FileManager(false);
+                                GameState loadedstate = fm.loadfromid(saveId);
+                                loadGameFromSave(loadedstate, null);
+                            }catch(Exception e){
+                                System.err.println("Fehler beim Verarbeiten des Loads: "+e.getMessage());
+                            }
+                        });
+
                         break;
                     case "ships":
                         int[] receivedShipCounts = new int[6];
