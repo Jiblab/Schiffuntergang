@@ -197,7 +197,7 @@ public class MultiplayerLogic {
         }
     }
 
-    public void loadGameFromSave(GameState loadedState, HelloController ctr) {
+    public void loadGameFromSave(GameState loadedState, HelloController ctr) throws IOException {
         if(ctr != null){
             setController(ctr);
         }
@@ -220,6 +220,8 @@ public class MultiplayerLogic {
         if (!loadedState.isMusikAktiv()) {
             BackgroundMusic.getInstance().stop();
         }
+
+        startGameFlow();
     }
     public void start() throws IOException {
         if (!client){ //man selber ist host
