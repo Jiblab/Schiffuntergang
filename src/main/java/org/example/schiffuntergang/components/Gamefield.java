@@ -62,7 +62,7 @@ public class Gamefield extends GridPane {
 
                         if (getUsedCells() + control.getLength() <= maxShipsC()) { //+ control.getlength damit das auf auf neue schiffe prüft
                             Ships ship = new Ships(control.getLength(), control.getLength());
-                            if (placeShip(ship, y, x, control.getDirection())) {
+                            if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
                                 control.updateRemainingCellsDisplay();
 
@@ -77,7 +77,7 @@ public class Gamefield extends GridPane {
                         shoot(x, y);
                     }
                 });
-                add(c, j, i);
+                add(c, i, j);
             }
         }
     }
