@@ -141,7 +141,7 @@ public class MultiplayerLogic {
                                 GameState remoteSaveState = new GameState();
                                 remoteSaveState.setPlayerBoardData(playerData);
                                 remoteSaveState.setEnemyBoardData(enemyData);
-                                remoteSaveState.setMultiplayer(true);
+                                remoteSaveState.setMultiplayer(true, saveId);
                                 remoteSaveState.setPlayerTurn(myturn);
                                 if (player != null) {
                                     remoteSaveState.setMusikAktiv(player.isMusicEnabled());

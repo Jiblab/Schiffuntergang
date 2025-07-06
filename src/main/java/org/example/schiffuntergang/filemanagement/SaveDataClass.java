@@ -57,7 +57,7 @@ public class SaveDataClass {
 
     public String getDatenzumspeichern() {
         GameState completeGameState = createGameState();
-        completeGameState.setMultiplayer(false); // Explizit als Singleplayer markieren
+        completeGameState.setMultiplayer(false, 0); // Explizit als Singleplayer markieren
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(completeGameState);
@@ -76,7 +76,7 @@ public class SaveDataClass {
         System.out.println("[SaveDataClass] Generierte Speicher-ID: " + saveId);
 
         GameState completeGameState = createGameState();
-        completeGameState.setMultiplayer(true);
+        completeGameState.setMultiplayer(true, saveId);
         completeGameState.setPlayerTurn(logic.getTurn());
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

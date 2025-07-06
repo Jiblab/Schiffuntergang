@@ -12,6 +12,7 @@ module org.example.schiffuntergang {
     requires com.almasb.fxgl.all;
     requires java.desktop;
     requires com.google.gson;
+    requires annotations;
 
     opens org.example.schiffuntergang to javafx.fxml,com.google.gson;
     opens org.example.schiffuntergang.components to com.google.gson;
