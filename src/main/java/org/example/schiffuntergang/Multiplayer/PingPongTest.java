@@ -15,7 +15,6 @@ public class PingPongTest {
 
     static boolean client;
 
-    // Standardeingabestrom ebenfalls als BufferedReader verpacken.
     static BufferedReader usr =
             new BufferedReader(new InputStreamReader(System.in));
 

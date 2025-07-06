@@ -1,26 +1,15 @@
 package org.example.schiffuntergang.components;
 
-/**
- * Repräsentiert eine einfache Koordinate (x, y) auf dem Spielfeld.
- * Wird verwendet für Schiffspositionen, Trefferpunkte, etc.
- */
 public class Position {
 
     private int x;
     private int y;
 
-    /**
-     * Konstruktor zur Initialisierung einer Position mit x- und y-Wert.
-     *
-     * @param x horizontale Koordinate
-     * @param y vertikale Koordinate
-     */
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    // Getter
     public int getX() {
         return x;
     }
@@ -29,7 +18,6 @@ public class Position {
         return y;
     }
 
-    // Setter
     public void setX(int x) {
         this.x = x;
     }
@@ -46,8 +34,7 @@ public class Position {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Position)) return false;
-        Position other = (Position) obj;
+        if (!(obj instanceof Position other)) return false;
         return this.x == other.x && this.y == other.y;
     }
 

@@ -21,8 +21,6 @@ public class Cell extends Rectangle {
         this.board = board;
         this.control = controler;
 
-        //setOnMouseClicked(event -> onCellClicked(event));
-
     }
 
     public Gamefield getBoard(){

@@ -1,18 +1,13 @@
 
-/*SLIDER*/
-
-/* track */
 .slider .track {
-    -fx-background-color: #333333; /* dunkelgrau */
+    -fx-background-color: #333333;
     -fx-background-radius: 0;
-    -fx-pref-height: 15px;          /* dicke */
-    -fx-border-color: #111111;     /* fast schwarz */
+    -fx-pref-height: 15px;
+    -fx-border-color: #111111;
     -fx-border-width: 2px;
 }
-
-/* Der quadratische Regler*/
 .slider .thumb {
-    -fx-background-color: #7b68ee; /* Rot */
+    -fx-background-color: #7b68ee;
     -fx-background-radius: 0;
     -fx-pref-width: 24px;
     -fx-pref-height: 24px;
@@ -22,48 +17,35 @@
 }
 
 .slider:hover .thumb {
-    -fx-background-color: #b0e0e6; /* orange Hover */
+    -fx-background-color: #b0e0e6;
 }
 
-/* Gedrückt-Effekt */
 .slider .thumb:pressed {
-    -fx-background-color: #ffffff; /* Weiß, wenn gedrückt*/
+    -fx-background-color: #ffffff;
 }
-
-/*LABELS */
-
-/* Stil für alle Labels in der Szene */
 .label {
     -fx-font-family: "Press Start 2P";
     -fx-font-size: 16px;
     -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 1, 1); /* schatten für lesbarkeit */
+    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 1, 1);
     -fx-font-smoothing-type: gray;
 }
-/* Toggle */
 .toggle-switch {
     -fx-padding: 5px;
 }
-
-/* Die Schiene des Schalters */
 .toggle-switch .switch {
-    -fx-background-color: #333333; /* dunkelgrauer Slider */
-    -fx-background-radius: 0;      /* Keine Rundungen */
+    -fx-background-color: #333333;
+    -fx-background-radius: 0;
     -fx-border-color: black;
     -fx-border-width: 2px;
 }
-
-/*der bewegliche Teil des Schalters */
 .toggle-switch .thumb {
-    -fx-background-color: #b52225; /* rot wenn aus */
+    -fx-background-color: #b52225;
     -fx-background-radius: 0;
 }
-
-/* Schalter an */
 .toggle-switch:selected .thumb {
-    -fx-background-color: #09710e; /*Grün für an */
+    -fx-background-color: #09710e;
 }
-
 .toggle-switch:selected .switch {
-    -fx-background-color: #8dbb8f; /*heller Hintergrund, wenn an */
+    -fx-background-color: #8dbb8f;
 }

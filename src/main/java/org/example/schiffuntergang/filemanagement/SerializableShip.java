@@ -11,8 +11,6 @@ public class SerializableShip {
     public SerializableShip() {
 
     }
-
-
     public SerializableShip(int startX, int startY, int length, boolean vertical, int health) {
         this.startX = startX;
         this.startY = startY;

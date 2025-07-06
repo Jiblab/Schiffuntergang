@@ -86,14 +86,11 @@ public class HelloController {
         anker.getStylesheets().add(getClass().getResource("/button.css").toExternalForm());
     }
 
-    /* Diese Methode wird vom Gamefield aufgerufen, wenn ein Schiff platziert wird.
-     */
     public void updateRemainingCellsDisplay() {
         // Sicherheitsprüfung, falls die Methode zu früh aufgerufen wird
         if (player == null || remainingCell == null) {
             return;
         }
-
         int maxCells = (int) player.maxShipsC();
         int usedCells = player.getUsedCells();
         int remainingCells = maxCells - usedCells;
@@ -104,17 +101,13 @@ public class HelloController {
         });
     }
 
-    // --- NEUE LAYOUT-STRUKTUR ---
-
+    // ab hier layout
     private void buildUI(Node playerBoard, Node enemyBoard, Node controlNode) {
-        // 1. Header (oben)
-        rootPane.setTop(createHeader());
 
-        // 2. Spielfelder (Mitte)
+        rootPane.setTop(createHeader());
 
         VBox enemyBox = new VBox(10, enemyBoard);
         enemyBox.setAlignment(Pos.CENTER);
-
 
         VBox playerBox = new VBox(10, playerBoard);
         playerBox.setAlignment(Pos.CENTER);
@@ -124,28 +117,27 @@ public class HelloController {
         gameFieldsBox.setPadding(new Insets(20));
         rootPane.setCenter(gameFieldsBox);
 
-        // 3. Steuerleiste (links)
         rootPane.setLeft(controlNode);
 
         //Messages für treffer, verfehlt, etc
-        notificationLabel = new Label(); // Label initialisieren
+        notificationLabel = new Label();
         notificationLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 18px; -fx-padding: 10px;");
 
         HBox notificationBox = new HBox(notificationLabel);
         notificationBox.setAlignment(Pos.CENTER);
-        notificationBox.setMinHeight(80); // Gibt der Leiste eine feste Höhe
+        notificationBox.setMinHeight(80);
 
         rootPane.setBottom(notificationBox);
     }
 
     public void showNotification(String message, String type) {
         Platform.runLater(() -> {
-            // Stoppt einen laufenden Timer, falls eine neue Nachricht schnell hinterherkommt
+
             if (notificationTimer != null) {
                 notificationTimer.stop();
             }
 
-            // Setzt Text und Farbe basierend auf dem Typ
+            //styling für die notificiations
             notificationLabel.setText(message);
             switch (type.toLowerCase()) {
                 case "hit":
@@ -162,26 +154,19 @@ public class HelloController {
                     break;
             }
 
-            // Timer starten, um die Nachricht auszublenden
             notificationTimer = new PauseTransition(Duration.seconds(3));
             notificationTimer.setOnFinished(event -> notificationLabel.setText(""));
             notificationTimer.play();
         });
     }
 
-    /**
-     * Erstellt den Header mit "Player vs Enemy" und Icons.
-     *
-     * @return Eine HBox, die als Header dient.
-     */
+
     private BorderPane createHeader() {
-        // 1. The main container for the header is now a BorderPane.
+
         BorderPane headerPane = new BorderPane();
         headerPane.setPadding(new Insets(10));
         headerPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
 
-        // 2. Create the title group (Player vs Enemy) and place it in the CENTER.
-        // We can still use an HBox for this little group to get the spacing right.
         Label playerLabel = new Label("Player");
         playerLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
 
@@ -192,55 +177,48 @@ public class HelloController {
         enemyLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
 
         HBox titleBox = new HBox(15, playerLabel, vsLabel, enemyLabel);
-        titleBox.setAlignment(Pos.CENTER); // Center the labels within their own HBox.
+        titleBox.setAlignment(Pos.CENTER);
 
-        // Set the titleBox as the center element of the BorderPane. It will be perfectly centered.
         headerPane.setCenter(titleBox);
 
 
-        // 3. Create the Pause Button and place it on the RIGHT.
+//pause button
         Button pauseButton = new Button("Pause");
         pauseButton.getStyleClass().add("option-button");
         pauseButton.setOnAction(e -> togglePauseMenu());
 
-
-        // Set the pauseButton as the right element of the BorderPane.
-        // We can add padding to the button itself to give it some space from the edge.
-        BorderPane.setMargin(pauseButton, new Insets(0, 10, 0, 0)); // Right margin of 10px
+        BorderPane.setMargin(pauseButton, new Insets(0, 10, 0, 0));
         headerPane.setRight(pauseButton);
-
 
         return headerPane;
     }
 
     private VBox createPauseMenu() {
-        // --- Buttons and Controls ---
+
         Button resumeButton = new Button("Resume Game");
         Button saveButton = new Button("Save Game");
         Button exitButton = new Button("Exit to Menu");
 
-        // Volume Controls (reused from your Options class)
+
         ToggleSwitch musicToggle = new ToggleSwitch("MUTE MUSIC");
         Slider volumeSlider = new Slider(0, 100, SoundEffect.getVolume() > 0 ? SoundEffect.getVolume() : 50);
         volumeSlider.setPrefWidth(250);
 
-        // --- Styling ---
         for (Button btn : new Button[]{resumeButton, saveButton, exitButton}) {
             btn.getStyleClass().add("control-button");
             btn.setMaxWidth(Double.MAX_VALUE);
         }
 
-        // --- Event Handlers ---
         resumeButton.setOnAction(e -> togglePauseMenu()); // The same method hides the menu
 
         saveButton.setOnAction(e -> {
             stage.setFullScreen(false);
             if (mlp != null) {
-                // Multiplayer-Speicherlogik
+                // Multiplayer speicherlogik
                 SaveDataClass multiplayerSaveData = new SaveDataClass(player, enemy, mlp);
                 multiplayerSaveData.saveMultiplayerGame();
             } else {
-                // Singleplayer-Speicherlogik (unverändert)
+                // Singleplayer sppeicherlogik
                 SaveDataClass singleplayerSaveData = new SaveDataClass(player, enemy);
                 FileManager fileManager = new FileManager(true);
                 fileManager.save(singleplayerSaveData);
@@ -269,7 +247,6 @@ public class HelloController {
             }
         });
 
-        // --- Layout ---
         VBox menuLayout = new VBox(20, resumeButton, saveButton, musicToggle, volumeSlider, exitButton);
         menuLayout.setAlignment(Pos.CENTER);
         menuLayout.setPadding(new Insets(50));
@@ -303,12 +280,6 @@ public class HelloController {
         }
     }
 
-
-    /**
-     * Erstellt das Standard-Steuerpanel für den Host und den Offline-Modus.
-     *
-     * @return Eine VBox mit allen Steuerelementen.
-     */
     private VBox createControlPanel() {
         VBox controlPanel = new VBox(15);
         controlPanel.setPadding(new Insets(20));
@@ -320,12 +291,10 @@ public class HelloController {
         remainingCell.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 12px; -fx-text-fill: #a0ff9e; -fx-padding: 0 0 10 0;");
         controlPanel.getChildren().add(remainingCell);
 
-
-        // Label für die Schiffslängen
         Label shipLengthLabel = new Label("Shiplength");
         shipLengthLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: white;");
 
-        // Buttons für die Schiffslängen (unverändert)
+        //Schiffslängen
         Button b2 = new Button("Length 2");
         b2.setOnAction(e -> length = 2);
         Button b3 = new Button("Length 3");
@@ -335,7 +304,7 @@ public class HelloController {
         Button b5 = new Button("Length 5");
         b5.setOnAction(e -> length = 5);
 
-        // Buttons für die Ausrichtung (unverändert)
+        //Ausrichtung
         Label directionLabel = new Label("Alignment");
         directionLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: white;");
         Button d_horizontal = new Button("Vertical");
@@ -343,12 +312,10 @@ public class HelloController {
         Button d_vertical = new Button("Horizontal");
         d_vertical.setOnAction(e -> direction = true);
 
-        // CSS-Klassen und Breite zuweisen (unverändert)
         for (Button btn : new Button[]{b2, b3, b4, b5, d_horizontal, d_vertical}) {
             btn.getStyleClass().add("option-button");
             btn.setMaxWidth(Double.MAX_VALUE);
         }
-
         Button fertigButton = new Button("Done Placing");
         fertigButton.getStyleClass().add("control-button");
         fertigButton.setOnAction(e -> {
@@ -356,15 +323,12 @@ public class HelloController {
                 onReadyClicked();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
-                // Hier wäre ein Alert für den User gut
             }
         });
-
 
         for (Button btn : new Button[]{fertigButton}) {
             btn.setMaxWidth(Double.MAX_VALUE);
         }
-
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
@@ -374,7 +338,6 @@ public class HelloController {
                 spacer,
                 fertigButton
         );
-
         return controlPanel;
     }
 
@@ -387,22 +350,17 @@ public class HelloController {
         updateRemainingCellsDisplay();
     }
 
-    /**
-     * Setup nach dem Laden eines Spielstands.
-     */
+    //setup nach laden des spiels
     public void setup(Gamefield loadedPlayer, Gamefield loadedEnemy) {
         this.player = loadedPlayer;
         this.enemy = loadedEnemy;
-        // Wichtig: Die Controller-Referenz in den geladenen Feldern aktualisieren!
         this.player.setController(this);
         this.enemy.setController(this);
         buildUI(player, enemy, createControlPanel());
         updateRemainingCellsDisplay();
     }
 
-    /**
-     * Setup für einen Multiplayer-Client.
-     */
+    //setup multiplayer-client
     public void setupMultiC(String ip, int port) {
         ishost = false;
         ipa = ip;
@@ -411,7 +369,6 @@ public class HelloController {
         mlp = new MultiplayerLogic(ce, true, null, null);
         mlp.setController(this);
 
-        // Leeres UI initialisieren, während auf Server-Daten gewartet wird
         player = new Gamefield(false, this, (int) x, (int) y, mlp);
         enemy = new Gamefield(true, this, (int) x, (int) y, mlp);
         Label waitingLabel = new Label("Warte auf Server...");
@@ -431,9 +388,7 @@ public class HelloController {
         }).start();
     }
 
-    /**
-     * Setup für einen Multiplayer-Server (Host).
-     */
+    //setup multiplayer-server
     public void setupMultiS() {
         ishost = true;
 
@@ -457,13 +412,11 @@ public class HelloController {
     }
 
     public void setupMultiplayerBoards(Gamefield playerBoard, Gamefield enemyBoard) {
-        // Die Spielfelder des Controllers auf die neuen Objekte setzen
+
         if (!ki){
             this.player = playerBoard;
             this.enemy = enemyBoard;
 
-            // Ein Platzhalter-Panel für die linke Seite erstellen,
-            // während wir auf die Schiffsregeln vom Server warten.
             Label waitingLabel = new Label("Warte auf Schiffsregeln...");
             waitingLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20px; -fx-text-fill: white;");
             VBox placeholderControls = new VBox(waitingLabel);
@@ -472,23 +425,19 @@ public class HelloController {
             placeholderControls.setMinWidth(200);
             placeholderControls.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
 
-            // Die zentrale UI-Aufbau-Methode mit den neuen Spielfeldern und dem Platzhalter aufrufen
             buildUI(this.player, this.enemy, placeholderControls);
         }
         else{
             this.player = playerBoard;
             this.enemy = enemyBoard;
-
-            // Erstelle ein Platzhalter-Panel oder das finale Control-Panel
-            VBox controlPanel = createControlPanel(); // Oder ein "Warte..."-Label
+            VBox controlPanel = createControlPanel();
 
             buildUI(this.player, this.enemy, controlPanel);
             player.setDisable(true);
             enemy.setDisable(true);
 
-            // *** DER ENTSCHEIDENDE PUNKT FÜR DEN CLIENT ***
-            // Wenn die Anwendung im KI-Modus läuft, starte hier den KIPlayerController
-            if (kiController == null && !ishost) { // Prüfen, ob der Controller noch nicht existiert
+            // KI-Modus
+            if (kiController == null && !ishost) { //existenz des controllers checken
                 EnemyPlayer ki = new EnemyPlayer(enemyBoard);
                 kiController = new KiPlayerController(mlp, ki, playerBoard, enemyBoard, this);
                 mlp.setKicontroler(kiController);
@@ -499,9 +448,6 @@ public class HelloController {
 
     }
 
-    /**
-     * Baut das Steuerpanel für den Client, nachdem die Schiffsregeln vom Server empfangen wurden.
-     */
     public void setupClientPlacementUI(int[] shipCounts) {
         this.shipsAllowed = shipCounts;
 
@@ -530,17 +476,16 @@ public class HelloController {
             }
         }
 
-        // Ausrichtungs-Buttons
-        Button d_horizontal = new Button("Vertical");
+        // Ausrichtungs buttons
+        Button d_horizontal = new Button("Horizontsl");
         d_horizontal.setOnAction(e -> direction = false);
-        Button d_vertical = new Button("Horizontal");
+        Button d_vertical = new Button("Vertical");
         d_vertical.setOnAction(e -> direction = true);
         d_horizontal.getStyleClass().add("option-button");
         d_vertical.getStyleClass().add("option-button");
         d_horizontal.setMaxWidth(Double.MAX_VALUE);
         d_vertical.setMaxWidth(Double.MAX_VALUE);
 
-        // Ready-Button
         Button readyButton = new Button("Done Placing");
         readyButton.getStyleClass().add("control-button");
         readyButton.setMaxWidth(Double.MAX_VALUE);
@@ -557,7 +502,7 @@ public class HelloController {
         fertigButton.setOnAction(e -> {
             try {
                 onReadyClicked();
-                fertigButton.setDisable(true); // Verhindert doppeltes Klicken
+                fertigButton.setDisable(true);
                 fertigButton.setText("Warte auf Host...");
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -569,18 +514,15 @@ public class HelloController {
 
         controlPanel.getChildren().addAll(spacer, d_horizontal, d_vertical, readyButton);
 
-        // Ersetze das "Warte..."-Panel durch das richtige Steuerpanel
         Platform.runLater(() -> rootPane.setLeft(controlPanel));
     }
 
     public void setupKivsKi(boolean asHost, String ip, int port) {
         this.ishost = asHost;
-        this.ki = true; // Wichtig: Markiere, dass es ein KI-Spiel ist
+        this.ki = true;
 
-        // Erstelle die notwendigen Objekte für die Logik
         if (asHost) {
             s = new Server();
-            // Spielfelder für den Host sofort erstellen
             player = new Gamefield(false, this, (int) x, (int) y);
             enemy = new Gamefield(true, this, (int) x, (int) y);
             mlp = new MultiplayerLogic(s, false, enemy, player);
@@ -588,18 +530,15 @@ public class HelloController {
             ipa = ip; // IP für den Client speichern
             porta = port;
             c = new Client();
-            // Spielfelder für den Client sind noch null, das ist korrekt
             mlp = new MultiplayerLogic(c, true, null, null);
         }
 
-        // Erstelle den KI-Controller für den Host, BEVOR der Thread gestartet wird.
         if (asHost) {
             System.out.println("[Host] setupKivsKi: Erstelle Host KI-Controller.");
             EnemyPlayer ki = new EnemyPlayer(enemy);
             kiController = new KiPlayerController(mlp, ki, player, enemy, this);
             mlp.setKicontroler(kiController);
 
-            // UI sofort aufbauen
             buildUI(player, enemy, createControlPanel());
             player.setDisable(true);
             enemy.setDisable(true);
@@ -607,18 +546,13 @@ public class HelloController {
 
         mlp.setController(this);
 
-        // Der zentrale Thread, der die gesamte Initialisierung steuert
         Thread gameSetupThread = new Thread(() -> {
             try {
-                // Schritt 1: Führe den blockierenden Start-Handshake aus (size/done)
-                // Dieser Aufruf blockiert, bis der Handshake für Host ODER Client fertig ist.
+                //start handshake
                 System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: Rufe mlp.start() auf...");
                 mlp.start();
                 System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: mlp.start() ist beendet.");
 
-                // Schritt 2: Starte den KI-Controller, falls er existiert.
-                // Für den Host wurde er vorher erstellt.
-                // Für den Client wurde er während mlp.start() in setupMultiplayerBoards erstellt.
                 if (this.kiController != null) {
                     System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: kiController gefunden. Starte ihn jetzt.");
                     this.kiController.start();
@@ -632,10 +566,6 @@ public class HelloController {
             }
         });
         gameSetupThread.setDaemon(true);
-
-
-        // Für den Client wird der kiController erst in setupMultiplayerBoards erstellt.
-        // Das ist richtig so.
 
         System.out.println("[" + (asHost ? "Host" : "Client") + "] setupKivsKi: Starte gameSetupThread.");
         gameSetupThread.start();

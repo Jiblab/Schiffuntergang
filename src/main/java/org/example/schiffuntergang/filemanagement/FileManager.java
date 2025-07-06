@@ -15,26 +15,17 @@ import java.util.Map;
 public class FileManager {
 
     JFileChooser fileChooser = new JFileChooser();
-    private boolean newSave;
+    private final boolean newSave;
     private SaveDataClass saveData;
 
-    /** Konstruktor des FileManagers
-     * Hier wird die Datei vorbereitet
-     * @param newFile Hiermit bestimmt man, ob ein neues Save vorbereitet werden soll
-     */
     public FileManager(boolean newFile){
         newSave = newFile;
 
     }
 
-    /** Hier werden die Aktionen des Spielers und des Gegners temporär gespeichert
-     * @param action Hier übergeben, was gemacht wurde
-     * @deprecated Es würde aber mehr Sinn machen, einen Snapshot vom Spiel zu speichern, als jeden Schritt
-     */
     public void getAction(String action) {
 
     }
-
     public GameState loadFromURI(String filepath) throws IOException {
 
             File file = new File(filepath);
@@ -103,11 +94,6 @@ public class FileManager {
         }
     }
 
-
-    /**
-     * Falls online-Spieler "save XXXX" schickt, soll bei uns lokal das Speichern ausgelöst werden
-     * @param id Die Dateiname vom remote
-     */
     public void saveFromRemote(String id){
 
     }
@@ -117,7 +103,7 @@ public class FileManager {
         String userHome = System.getProperty("user.home");
         File saveDir = new File(userHome, "SchiffUntergangSaves");
 
-        // Erstellt Verzeichnis
+        // erstellt verzeichnis
         if (!saveDir.exists()) {
             if (saveDir.mkdirs()) {
                 System.out.println("[FileManager] Verzeichnis für Spielstände erstellt unter: " + saveDir.getAbsolutePath());

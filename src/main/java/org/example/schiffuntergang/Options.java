@@ -53,7 +53,6 @@ public class Options {
 
         Scene scene = new Scene(parallaxRoot, 400, 300);
 
-        //CSS
         scene.getStylesheets().add(getClass().getResource("/slider.css").toExternalForm());
 
         scene.setOnKeyPressed(e -> {
@@ -115,7 +114,6 @@ public class Options {
     }
 
     private List<ParallaxLayer> createAndAddBackgroundLayers(StackPane root) {
-        // --- Alle Ebenen instanziieren ---
         ImageView background = createFullscreenImageView("/images/0.png");
         ImageView ocean = createFullscreenImageView("/images/1.png");
         ImageView beach = createFullscreenImageView("/images/4.png");
@@ -129,10 +127,8 @@ public class Options {
         ParallaxLayer cloud2 = new ParallaxLayer("/images/10.png", 0.8, stage);
         ParallaxLayer cloud3 = new ParallaxLayer("/images/11.png", 1.2, stage);
 
-        // --- Die Liste der animierten Ebenen für die Timeline vorbereiten ---
         List<ParallaxLayer> animatedLayers = List.of(ocean1, ocean2, cloud1, cloud2, cloud3);
 
-        // --- Alle Ebenen in der EXAKT KORREKTEN Reihenfolge zum StackPane hinzufügen ---
         root.getChildren().addAll(
                 background,
                 ocean,

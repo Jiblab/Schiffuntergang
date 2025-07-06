@@ -10,7 +10,7 @@ import java.net.URL;
 
 public class BackgroundMusic {
     private static BackgroundMusic instance;
-    private MediaPlayer mediaPlayer;
+    private final MediaPlayer mediaPlayer;
     private Timeline fadeInTimeline;
     private Timeline fadeOutTimeline;
 
@@ -63,7 +63,6 @@ public class BackgroundMusic {
         fadeInTimeline.play();
     }
 
-    // Fade-out effect to gradually decrease volume
     public void fadeOut() {
         fadeOutTimeline = new Timeline(
                 new KeyFrame(Duration.millis(100), event -> {

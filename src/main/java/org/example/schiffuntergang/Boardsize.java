@@ -24,7 +24,6 @@ public class Boardsize {
     private final Stage stage;
     private final boolean isSinglePlayer;
 
-    // Schriftart wird nur einmal beim Laden der Klasse initialisiert
     static {
         try {
             Font.loadFont(Boardsize.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
@@ -39,42 +38,27 @@ public class Boardsize {
         this.stage = stage;
     }
 
-    /**
-     * Zeigt den Einstellungsbildschirm für ein Einzelspieler-Spiel an.
-     */
     public void show() {
         createAndShowScene(false, false);
     }
 
-    /**
-     * Zeigt den Einstellungsbildschirm für das Hosten eines Multiplayer-Spiels an.
-     */
+    //screen für multiplayer einstellungen
     public void showMulti(boolean ki) {
-        if(ki){
-            createAndShowScene(true, true);
-        }
-        else {
-            createAndShowScene(true, false);
-        }
+        createAndShowScene(true, ki);
 
     }
 
-    /**
-     * Die zentrale Methode, die die Benutzeroberfläche für die Spielfeldgröße erstellt und anzeigt.
-     *
-     * @param isMultiplayerHost True, wenn ein Multiplayer-Spiel gehostet wird (zeigt die IP an), sonst false.
-     */
     private void createAndShowScene(boolean isMultiplayerHost, boolean ki) {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
 
-        // --- UI-Komponenten erstellen ---
+
         Label widthLabel = new Label("Breite: 10");
         Slider widthSlider = new Slider(5, 30, 10); // Mindestgröße 5 für sinnvolles Spiel
 
         Label heightLabel = new Label("Höhe: 10");
         Slider heightSlider = new Slider(5, 30, 10);
 
-        // Slider mit Labels verbinden
+
         widthSlider.valueProperty().addListener((obs, oldVal, newVal) ->
                 widthLabel.setText("Breite: " + newVal.intValue())
         );
@@ -88,14 +72,14 @@ public class Boardsize {
         Button backButton = new Button("Back to Menu");
         backButton.getStyleClass().add("control-button");
 
-        // --- Layout erstellen ---
+
         VBox controlsLayout = new VBox(15, widthLabel, widthSlider, heightLabel, heightSlider, startButton, backButton);
         controlsLayout.setPadding(new Insets(50));
         controlsLayout.setAlignment(Pos.CENTER);
         controlsLayout.maxWidthProperty().bind(stage.widthProperty().multiply(0.5));
         VBox.setMargin(startButton, new Insets(40, 0, 0, 0)); // Abstand nach oben
 
-        // --- Bedingte Logik für Multiplayer-Host ---
+
         if (isMultiplayerHost) {
             Label ipInfoLabel = new Label("Deine IP-Adresse (für deine Freunde):");
             TextField ipField = new TextField();
@@ -109,25 +93,24 @@ public class Boardsize {
                 ipField.setText("IP-Adresse konnte nicht ermittelt werden");
             }
 
-            // Füge die IP-Anzeige ganz oben im Layout ein
+
             controlsLayout.getChildren().add(0, ipInfoLabel);
             controlsLayout.getChildren().add(1, ipField);
         }
 
-        // --- Button-Aktionen definieren ---
+
         startButton.setOnAction(e -> {
             clickSound.play();
             try {
-                // Die "Goldene Regel" des FXML-Ladens
+
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
                 Parent root = loader.load();
                 HelloController controller = loader.getController();
 
-                // Den Controller mit den gewählten Werten konfigurieren
                 controller.setStage(stage);
                 controller.setSize(widthSlider.getValue(), heightSlider.getValue());
 
-                // Die korrekte Setup-Methode basierend auf dem Spielmodus aufrufen
+
                 if (isMultiplayerHost) {
                     if (ki){
                         controller.setupKivsKi(true, null, 0);
@@ -140,7 +123,7 @@ public class Boardsize {
                     controller.setup();
                 }
 
-                // Die neue Szene anzeigen
+
                 Scene gameScene = new Scene(root);
 
                 gameScene.setOnKeyPressed(event -> {
@@ -163,7 +146,6 @@ public class Boardsize {
             new GameCreationScreen(stage).show();
         });
 
-        // --- Szene zusammenbauen und anzeigen ---
         StackPane rootPane = new StackPane(controlsLayout);
         rootPane.getStyleClass().add("background");
 

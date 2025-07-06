@@ -7,8 +7,8 @@ import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 
 public class Logic {
-    private Gamefield board;
-    private EnemyPlayer en;
+    private final Gamefield board;
+    private final EnemyPlayer en;
 
     public Logic(Gamefield b, EnemyPlayer p){
         board = b;
@@ -19,7 +19,6 @@ public class Logic {
     public boolean placeShip(Ships ship, int x, int y, boolean vertical) {
         int length = ship.getLength();
 
-        // 1. Randüberprüfung
         if (vertical) {
             if (y + length > board.getLang()) {
                 System.out.println("Schiff geht vertikal über den Rand.");
@@ -32,7 +31,6 @@ public class Logic {
             }
         }
 
-        // 2. Überprüfung auf Kollisionen
         for (int i = 0; i < length; i++) {
             int xi;
             int yi;
@@ -93,8 +91,6 @@ public class Logic {
                 en.revenge();
 
             }
-
-
         }
         else {
             c.setFill(Color.BLACK);

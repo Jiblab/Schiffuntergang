@@ -53,7 +53,6 @@ public class StartScreen {
         Button options = new Button("OPTIONS");
         Button exit = new Button("EXIT");
 
-        // Initial Vollbild
         stage.setFullScreen(true);
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
 
@@ -63,42 +62,35 @@ public class StartScreen {
             }
         });
 
-        // Button-Verhalten
         start.setOnAction(e -> {
             GameCreationScreen gameScreen = new GameCreationScreen(stage);
             clickSound.play();
             gameScreen.show();
         });
-        // Innerhalb der show()-Methode, ersetzen Sie den gesamten load.setOnAction-Block
+
         load.setOnAction(e -> {
             clickSound.play();
-            stage.setFullScreen(false); // Verhindert Probleme mit dem FileChooser im Vollbild
+            stage.setFullScreen(false);
 
-            FileManager fileManager = new FileManager(true); // true = mit Dialog
+            FileManager fileManager = new FileManager(true);
             try {
                 GameState loadedState = fileManager.load();
                 if (loadedState == null) {
                     stage.setFullScreen(true);
-                    return; // Benutzer hat abgebrochen
+                    return;
                 }
 
-                // --- Spielszene laden ---
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
                 Parent root = loader.load();
                 HelloController controller = loader.getController();
                 controller.setStage(stage);
 
-                // --- Spielmodus-spezifisches Setup ---
-                if (loadedState.isMultiplayer()) {
-                    // HINWEIS: Dies ist eine vereinfachte Logik.
-                    // Der ladende Spieler wird zum Host.
-                    // Eine vollständige Implementierung würde eine neue "load"-Nachricht an den Gegner erfordern.
-                    System.out.println("Multiplayer-Spielstand wird geladen. Starte als Host...");
-                    controller.setupMultiS(); // Server starten
-                    controller.loadGameFromSave(loadedState); // Geladene Daten anwenden
 
+                if (loadedState.isMultiplayer()) {
+                    System.out.println("Multiplayer-Spielstand wird geladen. Starte als Host...");
+                    controller.setupMultiS();
+                    controller.loadGameFromSave(loadedState);
                 } else {
-                    // --- Singleplayer-Ladevorgang ---
                     System.out.println("Singleplayer-Spielstand wird geladen...");
                     controller.loadGameFromSave(loadedState); // Lädt die Daten und erstellt die Spielfelder
                 }
@@ -109,7 +101,6 @@ public class StartScreen {
 
             } catch (IOException ex) {
                 ex.printStackTrace();
-                // Hier sollte ein Alert für den Benutzer angezeigt werden
             }
         });
         options.setOnAction(e -> {
@@ -121,7 +112,6 @@ public class StartScreen {
             clickSound.play();
             System.exit(0);
         });
-
 
         VBox buttonBox = new VBox(15, modeLabel, start, load, options, exit);
         buttonBox.setAlignment(Pos.CENTER);
@@ -168,7 +158,6 @@ public class StartScreen {
 
         Scene scene = new Scene(parallaxRoot);
 
-        // ESC → Fenster verkleinern
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
                 stage.setFullScreen(false);
@@ -178,13 +167,12 @@ public class StartScreen {
             }
         });
 
-        // Szene setzen
         stage.setScene(scene);
         stage.setFullScreen(true);
         stage.setTitle("Startbildschirm");
         stage.show();
 
-        // Parallax-Aktualisierung
+        // Parallax
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
             ocean1.update();
             ocean2.update();
@@ -205,8 +193,6 @@ public class StartScreen {
                 "-fx-border-width: 3px; " +
                 "-fx-background-radius: 5; " +
                 "-fx-border-radius: 5;");
-        // BackgroundImage image = new BackgroundImage(new Image(getClass().getResourceAsStream("/images/button_texture.png")),BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,new BackgroundSize(button.getWidth(), button.getHeight(), false, false, false, true));
-        //button.setBackground(new Background(image));
     }
 
     private ImageView createFullscreenImageView(String path) {

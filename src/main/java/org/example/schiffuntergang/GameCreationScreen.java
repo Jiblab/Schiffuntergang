@@ -46,7 +46,7 @@ public class GameCreationScreen {
     private Timeline parallaxTimeline;
 
     public void show() {
-        // Aufteilung in Helfermethoden für bessere Lesbarkeit
+
         List<ParallaxLayer> parallaxLayers = new ArrayList<>();
         StackPane parallaxRoot = createParallaxBackground(parallaxLayers);
 
@@ -100,7 +100,6 @@ public class GameCreationScreen {
         return buttonBox;
     }
 
-    // --- NEUE METHODEN FÜR MULTIPLAYER-NAVIGATION ---
 
     private void showMultiplayerMenuScene() {
         Button createGame = new Button("Host Game");
@@ -116,35 +115,33 @@ public class GameCreationScreen {
 
         createAI.setOnAction(e->{
             clickSound.play();
-            // Leitet direkt zum Boardsize-Screen im Multiplayer-Modus
             Boardsize boardsize = new Boardsize(stage, false);
             boardsize.showMulti(true);
         });
 
         createGame.setOnAction(e -> {
             clickSound.play();
-            // Leitet direkt zum Boardsize-Screen im Multiplayer-Modus
             Boardsize boardsize = new Boardsize(stage, false);
             boardsize.showMulti(false);
         });
 
         findGame.setOnAction(e -> {
             clickSound.play();
-            showJoinGameScene(false); // Wechselt zur nächsten Szene
+            showJoinGameScene(false);
         });
 
         backButton.setOnAction(e -> {
             clickSound.play();
-            this.show(); // Kehrt zum vorherigen Bildschirm zurück (GameCreationScreen)
+            this.show();
         });
 
         VBox layout = new VBox(20, createGame, findGame, backButton, createAI, joinAi);
         layout.setAlignment(Pos.CENTER);
-        // Hintergrundklasse für einheitliches Aussehen hinzufügen
+
         layout.getStyleClass().add("background");
 
+
         Scene scene = new Scene(layout);
-        // Stylesheet für den Hintergrund laden
         scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
         setupEscapeKey(scene);
 
@@ -170,41 +167,35 @@ public class GameCreationScreen {
             String ip = ipField.getText();
             if (ip == null || ip.trim().isEmpty()) {
                 statusLabel.setText("Please enter a valid IP address!");
-                return; // Beendet die Aktion, wenn keine IP eingegeben wurde
+                return;
             }
             int port = 5000;
             statusLabel.setText("Connecting to " + ip + "...");
 
             try {
-                // 1. Lade die FXML-Datei
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
                 Parent gameRoot = loader.load();
 
-                // 2. Hole den Controller, NACHDEM die FXML geladen wurde
                 HelloController gameController = loader.getController();
 
-                // 3. Konfiguriere den Controller mit den notwendigen Informationen
-                gameController.setStage(this.stage); // Übergib die HAUPT-Stage
-                gameController.setSize(10, 10);// Übergib Dummy-Werte für die Größe
+                gameController.setStage(this.stage);
+                gameController.setSize(10, 10);
 
                 if (ki){
                     gameController.setupKivsKi(false, ip, port);
                 }else{
-                    gameController.setupMultiC(ip, port);// Starte das Client-Setup
+                    gameController.setupMultiC(ip, port);
                 }
 
-
-                // 4. Erstelle eine neue Szene mit der geladenen Spielansicht
                 Scene gameScene = new Scene(gameRoot);
 
                 gameScene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
-                        stage.setIconified(true); // This minimizes the window
+                        stage.setIconified(true);
                     }
                 });
-                // 5. SETZE die neue Szene auf der HAUPT-Stage. Das tauscht den Inhalt aus.
                 this.stage.setScene(gameScene);
-                this.stage.setFullScreen(true); // Sicherstellen, dass das Fenster im Vollbild bleibt
+                this.stage.setFullScreen(true);
 
             } catch (IOException ex) {
                 statusLabel.setText("Error: Connection failed or game view could not be loaded.");
@@ -214,7 +205,7 @@ public class GameCreationScreen {
 
         backButton.setOnAction(e -> {
             clickSound.play();
-            showMultiplayerMenuScene(); // Zurück zum Multiplayer-Menü
+            showMultiplayerMenuScene();
         });
 
         VBox layout = new VBox(15, ipLabel, ipField, connectButton, backButton, statusLabel);
@@ -229,8 +220,6 @@ public class GameCreationScreen {
         stage.setTitle("Join Game");
         stage.setFullScreen(true);
     }
-
-    // --- Helfermethoden (unverändert, aber jetzt besser strukturiert) ---
 
     private void startParallaxAnimation(List<ParallaxLayer> layers) {
         this.parallaxTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
@@ -290,7 +279,6 @@ public class GameCreationScreen {
     }
 
     private ImageView createFullscreenImageView(String path) {
-        // Hinweis: Es ist besser, hier eine Fehlerbehandlung einzubauen, falls das Bild nicht gefunden wird.
         Image image = new Image(getClass().getResourceAsStream(path));
         ImageView imageView = new ImageView(image);
         imageView.setPreserveRatio(false);
@@ -301,7 +289,6 @@ public class GameCreationScreen {
     }
 
     private void showMultiplayerWindowAndCloseCurrent() {
-        // Neues Fenster (Stage) erstellen
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
         Stage multiplayerStage = new Stage();
         multiplayerStage.setTitle("Multiplayer");
@@ -315,9 +302,8 @@ public class GameCreationScreen {
         vbox.setPrefWidth(300);
         vbox.setPrefHeight(200);
 
-        // Button-Logik
         findGame.setOnAction(e -> {
-            //System.out.println("Game finden geklickt!");
+
             Stage connectStage = new Stage();
             connectStage.setTitle("Mit Server verbinden");
 
@@ -330,7 +316,7 @@ public class GameCreationScreen {
             connectButton.setOnAction(ev -> {
                 clickSound.play();
                 String ip = ipField.getText();
-                int port = 5000; // Passe ggf. den Port an
+                int port = 5000;
 
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
@@ -338,7 +324,6 @@ public class GameCreationScreen {
                     HelloController controller1 = loader.getController();
                     controller1.setStage(connectStage);
 
-                    // Optional: controller.buildGamefield(); falls Gamefield erst hier erzeugt wird
                     controller1.setSize(x, y);
                     controller1.setupMultiC(ip, port);
 
@@ -350,8 +335,6 @@ public class GameCreationScreen {
                     ex.printStackTrace();
                 }
 
-                    //connectStage.close();
-
             });
 
             VBox vbox2 = new VBox(15, ipLabel, ipField, connectButton, statusLabel);
@@ -361,13 +344,13 @@ public class GameCreationScreen {
 
             Scene scene = new Scene(vbox2);
             connectStage.setScene(scene);
-            connectStage.setFullScreen(true); // Optional: im Vollbild öffnen
+            connectStage.setFullScreen(true);
             connectStage.show();
 
         });
 
         createGame.setOnAction(e -> {
-            //System.out.println("Spiel erstellen geklickt!");
+
             clickSound.play();
             Boardsize boardsize = new Boardsize(stage, true);
             boardsize.showMulti(false);
@@ -384,13 +367,10 @@ public class GameCreationScreen {
         Scene scene = new Scene(vbox);
         multiplayerStage.setScene(scene);
 
-        // Direkt im Vollbild öffnen
         multiplayerStage.setFullScreen(true);
 
-        // Multiplayer-Fenster öffnen
         multiplayerStage.show();
 
-        // Altes Fenster schließen
         stage.close();
 
     }

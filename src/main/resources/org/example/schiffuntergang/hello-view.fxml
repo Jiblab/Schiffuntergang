@@ -14,34 +14,27 @@
             fx:controller="org.example.schiffuntergang.HelloController">
 
     <children>
-        <!-- Hintergrundbild, das den gesamten Bereich füllt -->
+
         <ImageView fx:id="backgroundImage" fitHeight="632.0" fitWidth="829.0" pickOnBounds="true"
                    preserveRatio="false"/>
 
-        <!-- Diese BorderPane ist der Haupt-Layout-Container und füllt den gesamten Anker -->
         <BorderPane fx:id="rootPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                     AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 
-            <!-- Der Center-Bereich wird durch Ihren Java-Code mit den Spielfeldern befüllt -->
             <center>
-                <!-- absichtlich leer -->
             </center>
 
-
-            <!-- Der Bottom-Bereich enthält ALLE Steuerelemente -->
             <bottom>
                 <VBox alignment="CENTER" spacing="15.0">
                     <padding>
                         <Insets bottom="20.0" top="10.0"/>
                     </padding>
                     <children>
-                        <!-- Nachrichts-Label -->
-                        <Label fx:id="messageLabel" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
 
-                        <!-- Dieser HBox ist der neue Container für Ihre Buttons -->
+                    <Label fx:id="messageLabel" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+
                         <HBox fx:id="shipControlBox" alignment="CENTER" spacing="10.0"/>
 
-                        <!-- Fertig-Button -->
                         <Button fx:id="readyButton" onAction="#onReadyClicked" text="Fertig"/>
                     </children>
                 </VBox>

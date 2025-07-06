@@ -56,7 +56,6 @@ public class MultiplayerLogic {
         }
         else {
             int[] shipLengths = player.getShipLengths();
-            //int[] shipLengths = {5,4,3};
             s.sendShips(shipLengths);
             System.out.println("Schiffe gesendet");
             String messagedone = s.receiveMessage();
@@ -79,11 +78,8 @@ public class MultiplayerLogic {
                     firstturn = false;
                 }
             }
-            // The 'else' block was missing, but the core logic is inside the while loop.
-            // Let's assume the firstturn logic is handled and we proceed to the main loop.
 
             while (true) {
-                // Nur auf Nachrichten lauschen, wenn man nicht am Zug ist
                 if (!myturn) {
                     String m = s.receiveMessage();
                     String[] p = m.split(" ");
@@ -91,7 +87,7 @@ public class MultiplayerLogic {
                         case "shot": // Der Client hat auf uns geschossen
                             Cell c = player.getCell(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
 
-                            // Fall 1: Zelle wurde bereits beschossen
+                            //Zelle wurde bereits beschossen
                             if (c.isShot()) {
                                 s.sendAnswer(0);
                                 System.out.println("Schon getroffen, sende 0");
@@ -115,12 +111,12 @@ public class MultiplayerLogic {
                             Cell ce = enemy.getCell(x, y);
                             if (p[1].equals("0")) { // Fehlschuss
                                 Platform.runLater(() -> ce.setFill(Color.BLACK));
-                                // Unser Zug ist vorbei. Wir übergeben mit "pass".
+                                // Unser Zug ist vorbei -> übergeben mit "pass"
                                 System.out.println("Fehlschuss. Sende pass.");
                                 s.sendPass();
-                            } else { // Treffer (1) oder Versenkt (2)
+                            } else { // Treffer (1) oder versenkt (2)
                                 Platform.runLater(() -> ce.setFill(Color.RED));
-                                // Es ist immer noch unser Zug! Wir setzen myturn wieder auf true.
+                                //immer noch unser Zug -> myturn wieder auf true.
                                 System.out.println("Treffer/Versenkt. Ich bin wieder dran.");
                                 myturn = true;
                             }
@@ -130,7 +126,7 @@ public class MultiplayerLogic {
                             System.out.println("habe pass bekommen");
                             myturn = true; // Jetzt sind wir dran
                             break;
-                        // ... andere cases
+                        //andere cases
                         case "save":
                             try {
                                 System.out.println("\n[MultiplayerLogic] Remote-Speicherbefehl vom Gegner empfangen.");
@@ -201,8 +197,6 @@ public class MultiplayerLogic {
             System.out.println("Server: Größen geschickt mit Werten von: "+player.getBreit()+" "+player.getLang());
             String message = s.receiveMessage();
             System.out.println(message);
-            //hier sollen die platzierten schiffe dann rübergeschickt werden vielleicht am besten mit einem button oder so
-            //das thread ding von chat mal übernommen und ausprobiert aber funktioniert auch d
 
             System.out.println("While schleife fürs warten verlassen");
             /*if (contr.getKi()){
@@ -231,9 +225,8 @@ public class MultiplayerLogic {
                         System.out.println("bin in case size");
                         rows = Integer.parseInt(p1[1]);
                         cols = Integer.parseInt(p1[2]);
-                        // Jetzt kannst du das Spielfeld erzeugen
-                        player = new Gamefield(false, contr, cols, rows, this);  // z. B. true = eigenes Feld
-                        enemy = new Gamefield(true, contr, cols, rows, this); // false = Gegnerfeld
+                        player = new Gamefield(false, contr, cols, rows, this);
+                        enemy = new Gamefield(true, contr, cols, rows, this);
 
                         Platform.runLater(() -> {
                             contr.setupMultiplayerBoards(player, enemy);
@@ -245,7 +238,7 @@ public class MultiplayerLogic {
                         //lade ID
                         break;
                     case "ships":
-                        int[] receivedShipCounts = new int[6]; // Index = Länge, Wert = Anzahl
+                        int[] receivedShipCounts = new int[6];
                         for (int j = 1; j < p1.length; j++) {
                             int len = Integer.parseInt(p1[j]);
                             if (len < receivedShipCounts.length) {
@@ -253,11 +246,10 @@ public class MultiplayerLogic {
                             }
                         }
 
-                        // Übergib dieses Zähler-Array an den Controller
-                        final int[] finalCounts = receivedShipCounts; // Finale Kopie für Lambda
+                        final int[] finalCounts = receivedShipCounts;
                         Platform.runLater(() -> {
-                            contr.setShipRules(finalCounts); // Eine neue Methode im Controller
-                            contr.setupClientPlacementUI(finalCounts); // Baut die UI auf
+                            contr.setShipRules(finalCounts);
+                            contr.setupClientPlacementUI(finalCounts);
                         });
 
                         cl.sendDone();
