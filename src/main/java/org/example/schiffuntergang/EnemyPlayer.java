@@ -164,6 +164,20 @@ public class EnemyPlayer {
         return new int[]{x, y};
     }
 
+    public void processShotResult(int x, int y, boolean hit, boolean sunk) {
+        if (sunk) {
+            System.out.println("KI-INFO: Gegnerisches Schiff versenkt! Setze Zielliste zurück.");
+            priorityTargets.clear();
+            firstHit = null;
+            directionFound = false;
+        } else if (hit) {
+            System.out.println("KI-INFO: Treffer bei (" + x + ", " + y + "). Aktualisiere Prioritätsziele.");
+            // Ruft die bestehende Logik auf, um Nachbarfelder zu Zielen zu machen.
+            handleHit(x, y);
+        }
+        // Bei einem Fehlschuss muss nichts getan werden.
+    }
+
 }
 
 
