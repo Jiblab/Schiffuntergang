@@ -66,7 +66,6 @@ public class HelloController {
 
     private SaveDataClass savedata;
 
-    // FXML-Referenzen
     @FXML
     private AnchorPane anker;
     @FXML
@@ -74,7 +73,7 @@ public class HelloController {
     @FXML
     private ImageView backgroundImage;
     @FXML
-    private Label messageLabel; // Falls Sie dieses Label noch verwenden
+    private Label messageLabel;
 
     @FXML
     public void initialize() {
@@ -87,7 +86,7 @@ public class HelloController {
     }
 
     public void updateRemainingCellsDisplay() {
-        // Sicherheitsprüfung, falls die Methode zu früh aufgerufen wird
+        // Sicherheitsprüfung falls die Methode zu früh aufgerufen wird
         if (player == null || remainingCell == null) {
             return;
         }
@@ -95,7 +94,6 @@ public class HelloController {
         int usedCells = player.getUsedCells();
         int remainingCells = maxCells - usedCells;
 
-        // Den Text im UI-Thread aktualisieren, um Fehler zu vermeiden
         Platform.runLater(() -> {
             remainingCell.setText("Build Points: " + remainingCells);
         });
@@ -112,7 +110,7 @@ public class HelloController {
         VBox playerBox = new VBox(10, playerBoard);
         playerBox.setAlignment(Pos.CENTER);
 
-        HBox gameFieldsBox = new HBox(30, playerBox, enemyBox); // Player links, Enemy rechts
+        HBox gameFieldsBox = new HBox(30, playerBox, enemyBox);
         gameFieldsBox.setAlignment(Pos.CENTER);
         gameFieldsBox.setPadding(new Insets(20));
         rootPane.setCenter(gameFieldsBox);
@@ -251,7 +249,7 @@ public class HelloController {
         menuLayout.setAlignment(Pos.CENTER);
         menuLayout.setPadding(new Insets(50));
         menuLayout.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8); -fx-background-radius: 10; -fx-border-color: #ffbf00; -fx-border-width: 2; -fx-border-radius: 10;");
-        menuLayout.setMaxSize(400, 500); // Give the menu a max size
+        menuLayout.setMaxSize(400, 500);
 
         return menuLayout;
     }
@@ -264,14 +262,13 @@ public class HelloController {
         boolean isPaused = anker.getChildren().contains(pauseMenu);
 
         if (isPaused) {
-            // Unpause the game
+            // unpause
             anker.getChildren().remove(pauseMenu);
             player.setDisable(false);
             enemy.setDisable(false);
         } else {
-            // Pause the game
+            //pause
             anker.getChildren().add(pauseMenu);
-            // Center the menu inside the AnchorPane
             AnchorPane.setTopAnchor(pauseMenu, (anker.getHeight() - pauseMenu.getMaxHeight()) / 2);
             AnchorPane.setLeftAnchor(pauseMenu, (anker.getWidth() - pauseMenu.getMaxWidth()) / 2);
 
@@ -307,9 +304,9 @@ public class HelloController {
         //Ausrichtung
         Label directionLabel = new Label("Alignment");
         directionLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 14px; -fx-text-fill: white;");
-        Button d_horizontal = new Button("Vertical");
+        Button d_horizontal = new Button("Horizontal");
         d_horizontal.setOnAction(e -> direction = false);
-        Button d_vertical = new Button("Horizontal");
+        Button d_vertical = new Button("Vertical");
         d_vertical.setOnAction(e -> direction = true);
 
         for (Button btn : new Button[]{b2, b3, b4, b5, d_horizontal, d_vertical}) {
@@ -477,7 +474,7 @@ public class HelloController {
         }
 
         // Ausrichtungs buttons
-        Button d_horizontal = new Button("Horizontsl");
+        Button d_horizontal = new Button("Horizontal");
         d_horizontal.setOnAction(e -> direction = false);
         Button d_vertical = new Button("Vertical");
         d_vertical.setOnAction(e -> direction = true);
@@ -571,12 +568,6 @@ public class HelloController {
         gameSetupThread.start();
 
     }
-
-
-
-
-
-
     private void placeShipsRandomlyOnBoard(Gamefield board) {
         Random rand = new Random();
 
@@ -604,9 +595,6 @@ public class HelloController {
     }
 
 
-
-    // --- RESTLICHER CODE (größtenteils unverändert) ---
-
     private void placeEnemyShipsRandomly() {
         while (enemy.getUsedCells() <= enemy.maxShipsC()) {
             int shipLength = 2 + rand.nextInt(4);
@@ -622,20 +610,18 @@ public class HelloController {
             }
         }
     }
-
     public void loadGameFromSave(GameState loadedState) {
-        //Felder erstellen
+
         this.player = Gamefield.fromData(loadedState.getPlayerBoardData(), this, this.mlp);
         this.enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), this, this.mlp);
 
-        //Logik zuweisen
-        if (this.mlp != null) { //Multiplayer
+        if (this.mlp != null) { //multiplayer
             this.player.setLogic(this.mlp);
             this.enemy.setLogic(this.mlp);
             this.mlp.setPl(this.player);
             this.mlp.setEn(this.enemy);
-            this.mlp.setTurn(loadedState.isPlayerTurn()); //Welcher Spieler ist am Zug
-        } else { // Singleplayer
+            this.mlp.setTurn(loadedState.isPlayerTurn());
+        } else { // singleplayer
             EnemyPlayer ki = new EnemyPlayer(this.player);
             this.enemy.setEnemy(ki);
         }
@@ -676,8 +662,6 @@ public class HelloController {
         return shipsPlaced[len] < shipsAllowed[len];
     }
 
-    // --- Getters und Setters ---
-
     public int getLength() {
         return length;
     }
@@ -712,7 +696,6 @@ public class HelloController {
     }
 
     public void setShipCountsFromNetwork(int[] lengths) {
-        // Diese Methode könnte jetzt setupClientPlacementUI aufrufen
         Platform.runLater(() -> setupClientPlacementUI(lengths));
     }
 
