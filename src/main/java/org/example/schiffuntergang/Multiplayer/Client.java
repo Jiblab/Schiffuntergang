@@ -60,6 +60,12 @@ public class Client implements Network {
         out.write("load " + id+"\n");
         out.flush();
     }
+
+    public void send(String message){
+        out.println(message+"\n");
+        out.flush();
+    }
+
     public void close() {
         try {
             clientSocket.close();

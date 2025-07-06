@@ -220,7 +220,11 @@ public class MultiplayerLogic {
         if (!loadedState.isMusikAktiv()) {
             BackgroundMusic.getInstance().stop();
         }
+        firstturn = false;
         startMultiplayerloop();
+        if(client){
+            cl.send("ok");
+        }
     }
     public void start() throws IOException {
         if (!client){ //man selber ist host
