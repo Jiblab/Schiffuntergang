@@ -105,7 +105,7 @@ public class MultiplayerLogic {
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
                                 } else if (!c.getShip().isAlive()) {
                                     maxShoot--;// Versenkt
-                                    if (maxShoot <= 0){
+                                    if (maxShoot <= 0 && kicontr == null){
                                         s.send("won");
                                         Platform.runLater(()-> contr.showGameOverScreen(false));
                                     }
@@ -115,7 +115,7 @@ public class MultiplayerLogic {
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                                 } else { // Treffer
                                     maxShoot--;
-                                    if (maxShoot <= 0){
+                                    if (maxShoot <= 0 && kicontr == null){
                                         s.send("won");
                                         Platform.runLater(()-> contr.showGameOverScreen(false));
 
@@ -151,6 +151,15 @@ public class MultiplayerLogic {
                                 //immer noch unser Zug -> myturn wieder auf true.
                                 System.out.println("[MultiplayerLogic] Treffer/Versenkt. Ich bin wieder dran.");
                                 myturn = true;
+                            }
+
+                            if (kicontr != null) {
+                                // Bereite die Parameter für processShotResult vor
+                                boolean wasHit = (p[1].equals("1")  || p[1].equals("2") );
+                                boolean wasSunk = (p[1].equals("2"));
+
+                                // Rufe die Methode auf
+                                kicontr.getKi().processShotResult(x, y, wasHit, wasSunk);
                             }
                             break;
 
@@ -327,7 +336,7 @@ public class MultiplayerLogic {
                             contr.setShipRules(finalCounts);
                             contr.setupClientPlacementUI(finalCounts);
                         });
-
+                        maxShoot = player.getUsedCells();
                         cl.sendDone();
                         break;
                 }
@@ -366,7 +375,7 @@ public class MultiplayerLogic {
                                 System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
                             } else if (!c.getShip().isAlive()) {
                                 maxShoot--;// Versenkt
-                                if (maxShoot <= 0){
+                                if (maxShoot <= 0 && kicontr == null){
                                     cl.send("won");
                                     Platform.runLater(()-> contr.showGameOverScreen(false));
                                 }
@@ -376,7 +385,7 @@ public class MultiplayerLogic {
                                 System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                             } else { // Treffer
                                 maxShoot--;
-                                if (maxShoot <= 0){
+                                if (maxShoot <= 0 && kicontr == null){
                                     cl.send("won");
                                     Platform.runLater(()-> contr.showGameOverScreen(false));
                                 }
@@ -405,6 +414,15 @@ public class MultiplayerLogic {
 
                             System.out.println("[MultiplayerLogic] Treffer/Versenkt. Ich bin wieder dran.");
                             myturn = true;
+                        }
+
+                        if (kicontr != null) {
+                            // Bereite die Parameter für processShotResult vor
+                            boolean wasHit = (p[1].equals("1")  || p[1].equals("2") );
+                            boolean wasSunk = (p[1].equals("2"));
+
+                            // Rufe die Methode auf
+                            kicontr.getKi().processShotResult(x, y, wasHit, wasSunk);
                         }
                         break;
 
@@ -613,6 +631,7 @@ public class MultiplayerLogic {
         if (!client) {
             int[] shipLengths = player.getShipLengths();
             s.sendShips(shipLengths);
+            maxShoot = player.getUsedCells();
             System.out.println("[MultiplayerLogic] Server: Schiffe an Client-KI gesendet.");
         }
     }
@@ -637,5 +656,9 @@ public class MultiplayerLogic {
             System.out.println("[MultiplayerLogic] [Server] 'Ready' gesendet. Starte Game-Loop.");
             startMultiplayerloop(); // Startet startGameFlow in einem neuen Thread
         }
+    }
+
+    public void setMaxShoot(int maxShoot) {
+        this.maxShoot = maxShoot;
     }
 }

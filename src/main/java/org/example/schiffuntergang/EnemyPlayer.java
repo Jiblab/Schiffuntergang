@@ -53,8 +53,8 @@ public class EnemyPlayer {
             else {
                 firstHit = null;
                 directionFound = false;
-                x = rand.nextInt(playerBoard.getBreit()); // Breite = Anzahl Spalten
-                y = rand.nextInt(playerBoard.getLang());  // Länge = Anzahl Reihen
+                x = rand.nextInt(playerBoard.getLang()); // Breite = Anzahl Spalten
+                y = rand.nextInt(playerBoard.getBreit());  // Länge = Anzahl Reihen
             }
 
             // shootAt gibt true bei Treffer, false bei nicht treffer
@@ -145,8 +145,8 @@ public class EnemyPlayer {
 
         do {
             // x = Spalte, y = Reihe
-            x = rand.nextInt(playerBoard.getBreit());
-            y = rand.nextInt(playerBoard.getLang());
+            x = rand.nextInt(playerBoard.getLang());
+            y = rand.nextInt(playerBoard.getBreit());
 
             targetCell = playerBoard.getCell(x, y);
 

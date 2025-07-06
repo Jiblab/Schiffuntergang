@@ -60,8 +60,8 @@ public class KiPlayerController implements Runnable {
         int retries = 0;
         final int maxRetries = 500;
 
-        while (playerBoard.getUsedCells() < maxCells && retries <= maxRetries) {
-            if (playerBoard.getUsedCells()-1 == maxCells -1){
+        while (playerBoard.getUsedCells() < maxCells-1) {
+            if (playerBoard.getUsedCells()-1 == maxCells -1 || playerBoard.getUsedCells() == maxCells){
                 break;
             }
             int shipLength = 2 + rand.nextInt(4);
@@ -72,8 +72,8 @@ public class KiPlayerController implements Runnable {
                 continue;
             }
 
-            int xMax = playerBoard.getBreit() - (vertical ? 1 : shipLength); // Spalten
-            int yMax = playerBoard.getLang() - (vertical ? shipLength : 1);  // Reihen
+            int xMax = playerBoard.getLang() - (vertical ? 1 : shipLength); // Spalten
+            int yMax = playerBoard.getBreit() - (vertical ? shipLength : 1);  // Reihen
 
             if (xMax < 0 || yMax < 0) {
                 retries++;
@@ -102,6 +102,8 @@ public class KiPlayerController implements Runnable {
         }
 
         playerBoard.redrawAllCells();
+
+
 
         System.out.println("[KiPlayerController] KI-Schiffsplatzierung beendet. Finale belegte Zellen: " + playerBoard.getUsedCells());
         // UI benachrichtigen, dass die Platzierung fertig ist (visuelles Update)
