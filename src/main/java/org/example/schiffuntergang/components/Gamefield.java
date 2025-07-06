@@ -49,7 +49,7 @@ public class Gamefield extends GridPane {
 
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < b; j++) {
-                Cell c = new Cell(j, i, this, 30, 30, controler);
+                Cell c = new Cell(i, j, this, 30, 30, controler);
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
@@ -74,7 +74,7 @@ public class Gamefield extends GridPane {
                         }
 
                     } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
-                        shoot(c.x, c.y);
+                        shoot(x, y);
                     }
                 });
                 add(c, j, i);
@@ -91,7 +91,7 @@ public class Gamefield extends GridPane {
         setupBackground();
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < b; j++) {
-                Cell c = new Cell(j, i, this, 30, 30, controler);
+                Cell c = new Cell(i, j, this, 30, 30, controler);
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
@@ -104,7 +104,7 @@ public class Gamefield extends GridPane {
 
                         if (getUsedCells() <= maxShipsC()) {
                             Ships ship = new Ships(control.getLength(), control.getLength());
-                            if (placeShip(ship, y, x, control.getDirection())) {
+                            if (placeShip(ship, x, y, control.getDirection())) {
                                 increaseCells(ship.getLength());
                             }
                         } else {
@@ -119,10 +119,10 @@ public class Gamefield extends GridPane {
                         }
                     }
                     else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
-                        shoot(y, x);
+                        shoot(x, y);
                     }
                 });
-                add(c, j, i);
+                add(c, i, j);
             }
         }
     }
@@ -138,7 +138,7 @@ public class Gamefield extends GridPane {
 
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < b; j++) {
-                Cell c = new Cell(j, i, this, 30, 30, controler);
+                Cell c = new Cell(i, j, this, 30, 30, controler);
                 cells[i][j] = c;
 
                 c.setStroke(Color.BLACK);
@@ -157,7 +157,7 @@ public class Gamefield extends GridPane {
                             if (getUsedCells() + len <= maxShipsC()) {
                                 Ships ship = new Ships(len, len);
 
-                                if (placeShip(ship, y, x, control.getDirection())) {
+                                if (placeShip(ship, x, y, control.getDirection())) {
                                     increaseCells(len);
                                     control.updateRemainingCellsDisplay();
                                 }
@@ -177,7 +177,7 @@ public class Gamefield extends GridPane {
                             if (control.canClientPlaceShip(len)) {
                                 Ships ship = new Ships(len, len);
 
-                                if (placeShip(ship, y, x, control.getDirection())) {
+                                if (placeShip(ship, x, y, control.getDirection())) {
                                     increaseCells(len); // Zählt trotzdem die Zellen für Konsistenz
                                     control.clientPlacedShip(len);
                                 }
@@ -197,9 +197,9 @@ public class Gamefield extends GridPane {
                     } else if (event.getButton() == MouseButton.PRIMARY && this.enemy) {
 
                         if (lo != null && control.getReady() && lo.getTurn()) {
-                            lo.setX(y);
-                            lo.setY(x);
-                            System.out.println("[Gamefield] Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
+                            lo.setX(x);
+                            lo.setY(y);
+                            System.out.println("[Gamefield] Schuss wird vorbereitet auf: X: " + x + ", Y: " + y);
                             try {
                                 lo.startShoot();
                             } catch (IOException e) {
@@ -211,7 +211,7 @@ public class Gamefield extends GridPane {
                         }
                     }
                 });
-                add(c, j, i);
+                add(c, i, j);
             }
         }
     }
@@ -341,7 +341,7 @@ public class Gamefield extends GridPane {
     }
     public Cell getCell(int x, int y) {
         if (x >= 0 && x < breit && y >= 0 && y < lang) {
-            return cells[y][x];
+            return cells[x][y];
         }
         return null;
     }
