@@ -376,6 +376,41 @@ public class MultiplayerLogic {
                         break;
 
                     //... andere cases
+
+                    case "save":
+                        try {
+                            System.out.println("\n[MultiplayerLogic] Remote-Speicherbefehl vom Gegner empfangen.");
+
+                            long saveId = Long.parseLong(p[1]);
+                            String filename = "mp_save_" + saveId + ".save";
+                            System.out.println("[MultiplayerLogic] Verarbeite Speicher-ID: " + saveId);
+
+                            GamefieldData playerData = player.toData();
+                            GamefieldData enemyData = enemy.toData();
+
+                            GameState remoteSaveState = new GameState();
+                            remoteSaveState.setPlayerBoardData(playerData);
+                            remoteSaveState.setEnemyBoardData(enemyData);
+                            remoteSaveState.setMultiplayer(true, saveId);
+                            remoteSaveState.setPlayerTurn(myturn);
+                            if (player != null) {
+                                remoteSaveState.setMusikAktiv(player.isMusicEnabled());
+                                remoteSaveState.setMusikVolume(player.getMusicVolume());
+                            }
+
+                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                            String json = gson.toJson(remoteSaveState);
+
+                            System.out.println("[MultiplayerLogic] Versuche, das Spiel lokal nach Remote-Befehl zu speichern...");
+                            FileManager fm = new FileManager(false);
+                            fm.saveGameData(json, filename);
+
+                            Platform.runLater(() -> contr.showNotification("Spiel vom Gegner gespeichert!", "info"));
+
+                        } catch (Exception e) {
+                            System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
+                        }
+                        break;
                 }
             } else {
                 if (kicontr != null) { // Prüfen, ob eine KI dieses Spiel steuert
