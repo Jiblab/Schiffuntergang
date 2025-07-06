@@ -54,16 +54,21 @@ public class MultiplayerLogic {
             startMultiplayerloop();
         }
         else {
-            int[] shipLengths = player.getShipLengths();
-            s.sendShips(shipLengths);
-            System.out.println("[MultiplayerLogic] Schiffe gesendet");
-            String messagedone = s.receiveMessage();
-            System.out.println(messagedone);
-            if (messagedone.contains("done")){
-                s.sendReady();
-                System.out.println("[MultiplayerLogic] Ready sent!");
+            if(firstturn){
+                int[] shipLengths = player.getShipLengths();
+                s.sendShips(shipLengths);
+                System.out.println("[MultiplayerLogic] Schiffe gesendet");
+                String messagedone = s.receiveMessage();
+                System.out.println(messagedone);
+                if (messagedone.contains("done")){
+                    s.sendReady();
+                    System.out.println("[MultiplayerLogic] Ready sent!");
+                    startMultiplayerloop();
+                }
+            }else{
                 startMultiplayerloop();
             }
+
         }
     }
     private void startGameFlow() throws IOException {
@@ -104,6 +109,17 @@ public class MultiplayerLogic {
                             }
                             break;
 
+                        case "load":
+                            long saveId = Long.parseLong(p[1]);
+                            try{
+                                FileManager fm = new FileManager(false);
+                                GameState loadedstate = fm.loadfromid(saveId);
+                                loadGameFromSave(loadedstate, null);
+                            }catch(Exception e){
+                                System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Loads"+e.getMessage());
+                            }
+                            break;
+
                         case "answer": // Wir haben eine Antwort auf unseren Schuss erhalten
                             Cell ce = enemy.getCell(x, y);
                             if (p[1].equals("0")) { // Fehlschuss
@@ -129,9 +145,9 @@ public class MultiplayerLogic {
                             try {
                                 System.out.println("\n[MultiplayerLogic] Remote-Speicherbefehl vom Gegner empfangen.");
 
-                                long saveId = Long.parseLong(p[1]);
-                                String filename = "mp_save_" + saveId + ".save";
-                                System.out.println("[MultiplayerLogic] Verarbeite Speicher-ID: " + saveId);
+                                long id = Long.parseLong(p[1]);
+                                String filename = "mp_save_" + id + ".save";
+                                System.out.println("[MultiplayerLogic] Verarbeite Speicher-ID: " + id);
 
                                 GamefieldData playerData = player.toData();
                                 GamefieldData enemyData = enemy.toData();
@@ -139,7 +155,7 @@ public class MultiplayerLogic {
                                 GameState remoteSaveState = new GameState();
                                 remoteSaveState.setPlayerBoardData(playerData);
                                 remoteSaveState.setEnemyBoardData(enemyData);
-                                remoteSaveState.setMultiplayer(true, saveId);
+                                remoteSaveState.setMultiplayer(true, id);
                                 remoteSaveState.setPlayerTurn(myturn);
                                 if (player != null) {
                                     remoteSaveState.setMusikAktiv(player.isMusicEnabled());
@@ -159,16 +175,8 @@ public class MultiplayerLogic {
                                 System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
                             }
                             break;
-                            case "load":
-                                long saveId = Long.parseLong(p[1]);
-                                try{
-                                    FileManager fm = new FileManager(false);
-                                    GameState loadedstate = fm.loadfromid(saveId);
-                                    loadGameFromSave(loadedstate, null);
-                                }catch(Exception e){
-                                    System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Loads"+e.getMessage());
-                                }
-                                break;
+
+
                     }
                 } else {
                     if (kicontr != null) { // Prüfen, ob eine KI dieses Spiel steuert
@@ -221,7 +229,7 @@ public class MultiplayerLogic {
             BackgroundMusic.getInstance().stop();
         }
         firstturn = false;
-        startMultiplayerloop();
+        //startMultiplayerloop();
         if(client){
             cl.send("ok");
         }
@@ -386,8 +394,6 @@ public class MultiplayerLogic {
                         // myturn bleibt false, da der Server beginnt.
                         break;
 
-                    //... andere cases
-
                     case "save":
                         try {
                             System.out.println("\n[MultiplayerLogic] Remote-Speicherbefehl vom Gegner empfangen.");
@@ -421,6 +427,10 @@ public class MultiplayerLogic {
                         } catch (Exception e) {
                             System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
                         }
+                        break;
+
+                    default:
+                        System.out.println("Iwas stimmt nicht!!");
                         break;
                 }
             } else {

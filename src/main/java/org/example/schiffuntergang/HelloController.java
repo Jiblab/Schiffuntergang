@@ -330,7 +330,7 @@ public class HelloController {
                 stage.setFullScreen(false);
                 GameState loadedState = fm.load();
                 long id = loadedState.getId();
-                stage.setFullScreen(true);
+                //stage.setFullScreen(true);
                 stage.setResizable(true);
                 mlp.loadGameFromSave(loadedState, this);
             } catch (IOException ex) {
