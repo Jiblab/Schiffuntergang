@@ -400,6 +400,12 @@ public class Gamefield extends GridPane {
                 return false;
             }
 
+            Cell ce = getCell(spaltenIndex, reihenIndex);
+            if(ce.getShip() != null){
+                System.out.println("[Gamefield] Fehler: Platzierung bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ")geht nix, weil da Schiff ist.");
+                return false;
+            }
+
         }
 
         for (int i = 0; i < length; i++) {
