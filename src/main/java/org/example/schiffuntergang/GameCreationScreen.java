@@ -108,6 +108,11 @@ public class GameCreationScreen {
         Button createAI = new Button("Host Game Computer");
         Button joinAi = new Button("Join Game Computer");
 
+        for (Button btn : List.of(createGame, findGame, backButton, createAI, joinAi)) {
+            btn.getStyleClass().add("option-button");
+            adjustFontSize(btn, 60);
+        }
+
         joinAi.setOnAction(e->{
             clickSound.play();
             showJoinGameScene(true);
@@ -135,7 +140,7 @@ public class GameCreationScreen {
             this.show();
         });
 
-        VBox layout = new VBox(20, createGame, findGame, backButton, createAI, joinAi);
+        VBox layout = new VBox(20, createGame, findGame, createAI, joinAi, backButton);
         layout.setAlignment(Pos.CENTER);
 
         layout.getStyleClass().add("background");
@@ -143,6 +148,7 @@ public class GameCreationScreen {
 
         Scene scene = new Scene(layout);
         scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/button.css").toExternalForm());
         setupEscapeKey(scene);
 
         stage.setScene(scene);
@@ -287,7 +293,6 @@ public class GameCreationScreen {
         return imageView;
 
     }
-
     private void showMultiplayerWindowAndCloseCurrent() {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
         Stage multiplayerStage = new Stage();
