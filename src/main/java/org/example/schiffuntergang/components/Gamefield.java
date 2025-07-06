@@ -532,6 +532,8 @@ public class Gamefield extends GridPane {
                     processedShips.add(ship);
                     boolean isVertical = false;
                     if (y + 1 >= breit) {
+                        //kann niemals vertikal sein
+                    }else{
                         if (getCell(x, y + 1).getShip() == ship) {
                             isVertical = true;
                         }
