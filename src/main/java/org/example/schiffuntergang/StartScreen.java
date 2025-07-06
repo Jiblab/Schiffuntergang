@@ -36,7 +36,7 @@ public class StartScreen {
         try {
             Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
         } catch (Exception e) {
-            System.err.println("Pixel-Schriftart konnte nicht geladen werden!");
+            System.err.println("[StartScreen] Pixel-Schriftart konnte nicht geladen werden!");
             e.printStackTrace();
         }
     }
@@ -87,11 +87,11 @@ public class StartScreen {
 
 
                 if (loadedState.isMultiplayer()) {
-                    System.out.println("Multiplayer-Spielstand wird geladen. Starte als Host...");
+                    System.out.println("[StartScreen] Multiplayer-Spielstand wird geladen. Starte als Host...");
                     controller.setupMultiS();
                     controller.loadGameFromSave(loadedState);
                 } else {
-                    System.out.println("Singleplayer-Spielstand wird geladen...");
+                    System.out.println("[StartScreen] Singleplayer-Spielstand wird geladen...");
                     controller.loadGameFromSave(loadedState); // Lädt die Daten und erstellt die Spielfelder
                 }
 

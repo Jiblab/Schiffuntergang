@@ -28,7 +28,7 @@ public class Boardsize {
         try {
             Font.loadFont(Boardsize.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
         } catch (Exception e) {
-            System.err.println("Pixel-Schriftart konnte nicht geladen werden");
+            System.err.println("[Boardsize] Pixel-Schriftart konnte nicht geladen werden");
             e.printStackTrace();
         }
     }
@@ -136,7 +136,7 @@ public class Boardsize {
                 stage.setFullScreen(true);
 
             } catch (IOException ex) {
-                System.err.println("Fehler beim Laden der Spielansicht (hello-view.fxml).");
+                System.err.println("[Boardsize] Fehler beim Laden der Spielansicht (hello-view.fxml).");
                 ex.printStackTrace();
             }
         });

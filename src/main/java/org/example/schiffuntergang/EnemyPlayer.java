@@ -81,11 +81,11 @@ public class EnemyPlayer {
         if (ship != null) { // treffer
             ship.hit();
             javafx.application.Platform.runLater(() -> cell.setFill(Color.RED));
-            System.out.println("KI trifft bei: (" + x + ", " + y + ")");
+            System.out.println("[EnemyPlayer] KI trifft bei: (" + x + ", " + y + ")");
 
 
             if (!ship.isAlive()) {
-                System.out.println("KI hat ein Schiff versenkt!");
+                System.out.println("[EnemyPlayer] KI hat ein Schiff versenkt!");
                 playerBoard.deleteShip();
                 priorityTargets.clear();
                 firstHit = null;
@@ -96,7 +96,7 @@ public class EnemyPlayer {
             return true;
         } else { // wasser
             javafx.application.Platform.runLater(() -> cell.setFill(Color.BLACK));
-            System.out.println("KI schießt Wasser bei: (" + x + ", " + y + ")");
+            System.out.println("[EnemyPlayer] KI schießt Wasser bei: (" + x + ", " + y + ")");
             return false; // fehlschuss
         }
     }

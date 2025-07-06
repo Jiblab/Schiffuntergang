@@ -14,13 +14,13 @@ public class Client implements Network {
 
     public void connect(String ip, int port) throws IOException {
         clientSocket = new Socket(ip, port);
-        System.out.println("Verbunden mit Server.");
+        System.out.println("[Client] Verbunden mit Server.");
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         out = new PrintWriter(clientSocket.getOutputStream(), true);
     }
 
     public void sendSize(int rows, int cols) {
-        out.println("size " + rows);
+        out.println("[Client] size " + rows);
     }
 
     public void sendShips(int[] lengths) {

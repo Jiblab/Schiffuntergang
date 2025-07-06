@@ -21,12 +21,12 @@ public class Logic {
 
         if (vertical) {
             if (y + length > board.getLang()) {
-                System.out.println("Schiff geht vertikal über den Rand.");
+                System.out.println("[Logic] Schiff geht vertikal über den Rand.");
                 return false;
             }
         } else {
             if (x + length > board.getBreit()) {
-                System.out.println("Schiff geht horizontal über den Rand.");
+                System.out.println("[Logic] Schiff geht horizontal über den Rand.");
                 return false;
             }
         }
@@ -45,7 +45,7 @@ public class Logic {
 
             Cell c = board.getCell(xi, yi);
             if (c.getShip() != null) {
-                System.out.println("Zelle (" + xi + ", " + yi + ") ist bereits belegt.");
+                System.out.println("[Logic] Zelle (" + xi + ", " + yi + ") ist bereits belegt.");
                 return false;
             }
         }
@@ -74,7 +74,7 @@ public class Logic {
             }
         }
 
-        System.out.println("Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
+        System.out.println("[Logic] Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
 
@@ -87,14 +87,14 @@ public class Logic {
             c.setFill(Color.RED);
 
             if (board.isEnemy()){
-                System.out.println("nix hier in der if abfrage");
+                System.out.println("[Logic] nix hier in der if abfrage");
                 en.revenge();
 
             }
         }
         else {
             c.setFill(Color.BLACK);
-            System.out.println("Koordinaten x, dann y: "+x+" "+y);
+            System.out.println("[Logic] Koordinaten x, dann y: "+x+" "+y);
             if (board.isEnemy()){
                 en.revenge();
             }

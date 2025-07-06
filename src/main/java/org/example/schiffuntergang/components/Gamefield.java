@@ -115,7 +115,7 @@ public class Gamefield extends GridPane {
                             }
                         } else {
                             System.out.println(maxShipsC());
-                            System.out.println("Maximale Anzahl an schiffen erreicht");
+                            System.out.println("[Gamefield] Maximale Anzahl an schiffen erreicht");
                             control.showNotification("No Buildpoints left!", "error");
                           /*  Alert alert = new Alert(Alert.AlertType.WARNING);
                             alert.setTitle("Limit erreicht");
@@ -172,7 +172,7 @@ public class Gamefield extends GridPane {
                                     control.updateRemainingCellsDisplay();
                                 }
                             } else {
-                                System.out.println("Limit an Bau-Punkten erreicht!");
+                                System.out.println("[Gamefield] Limit an Bau-Punkten erreicht!");
                                 control.showNotification("No Buildpoints left!", "error");
                                /* Platform.runLater(() -> {
                                     Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -192,7 +192,7 @@ public class Gamefield extends GridPane {
                                     control.clientPlacedShip(len);
                                 }
                             } else {
-                                System.out.println("Von Schiffslänge " + len + " können keine mehr platziert werden.");
+                                System.out.println("[Gamefield] Von Schiffslänge " + len + " können keine mehr platziert werden.");
                                 control.showNotification("No more of this ship length available ", "error");
                                 /*Platform.runLater(() -> {
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -209,7 +209,7 @@ public class Gamefield extends GridPane {
                         if (lo != null && control.getReady() && lo.getTurn()) {
                             lo.setX(y);
                             lo.setY(x);
-                            System.out.println("Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
+                            System.out.println("[Gamefield] Schuss wird vorbereitet auf: Spalte " + y + ", Reihe " + x);
                             try {
                                 lo.startShoot();
                             } catch (IOException e) {
@@ -231,7 +231,7 @@ public class Gamefield extends GridPane {
             board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth(), logic);
         } else {
 
-            System.out.println("height: " + data.getHeight() + " width: " + data.getWidth());
+            System.out.println("[Gamefield] height: " + data.getHeight() + " width: " + data.getWidth());
             board = new Gamefield(data.isEnemy(), controller, data.getHeight(), data.getWidth());
         }
 
@@ -297,7 +297,7 @@ public class Gamefield extends GridPane {
 
             this.setBackground(new Background(bgImage));
         } catch (Exception e) {
-            System.err.println("Failed to load background image for Gamefield.");
+            System.err.println("[Gamefield] Failed to load background image for Gamefield.");
         }
     }
 
@@ -327,7 +327,7 @@ public class Gamefield extends GridPane {
         if (c == null) return; // Sicherheitsprüfung
 
         if (c.isShot()) {
-            System.out.println("Bereits beschossen");
+            System.out.println("[Gamefield] Bereits beschossen");
             if (this.enemy && control != null) {
                 control.showNotification("Already shot that one, try again!", "info");
             }
@@ -356,7 +356,7 @@ public class Gamefield extends GridPane {
         }
 
         if (this.enemy && !multiplayer) {
-            System.out.println("Einzelspieler: Gegner ist am Zug.");
+            System.out.println("[Gamefield] Einzelspieler: Gegner ist am Zug.");
             en.revenge();
         }
     }
@@ -452,7 +452,7 @@ public class Gamefield extends GridPane {
             Cell cellToCheck = getCell(spaltenIndex, reihenIndex);
 
             if (cellToCheck == null || cellToCheck.getShip() != null) {
-                System.out.println("Fehler: Platzierung nicht möglich bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ").");
+                System.out.println("[Gamefield] Fehler: Platzierung nicht möglich bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ").");
                 return false;
             }
         }
@@ -527,14 +527,14 @@ public class Gamefield extends GridPane {
                         this.add(shipView, startX, startY, fcolSpan, frowSpan);
                     });
                 } catch (Exception e) {
-                    System.err.println("Fehler beim Laden des Schiff-Bildes: " + imagePath);
+                    System.err.println("[Gamefield] Fehler beim Laden des Schiff-Bildes: " + imagePath);
                     e.printStackTrace();
                 }
             }
         }
         ship.setDirection(vertical);
         addShip(ship);
-        System.out.println("Schiff platziert: Start(Reihe " + startX + ", Spalte " + startY + "), " + (vertical ? "vertikal" : "horizontal"));
+        System.out.println("[Gamefield] Schiff platziert: Start(Reihe " + startX + ", Spalte " + startY + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
 
@@ -627,7 +627,7 @@ public class Gamefield extends GridPane {
 
     public void redrawAllCells() {
         Platform.runLater(() -> {
-            System.out.println("DEBUG: Redraw für " + (isEnemy() ? "Gegner" : "Spieler") + "-Feld wird ausgeführt.");
+            System.out.println("[Gamefield] DEBUG: Redraw für " + (isEnemy() ? "Gegner" : "Spieler") + "-Feld wird ausgeführt.");
             for (int y = 0; y < lang; y++) {
                 for (int x = 0; x < breit; x++) {
                     Cell cell = getCell(x, y);

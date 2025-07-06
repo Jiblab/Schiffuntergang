@@ -18,9 +18,9 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     }
     public void start(int port) throws IOException {
         s = new ServerSocket(port);
-        System.out.println("Warte auf Verbindung...");
+        System.out.println("[Server] Warte auf Verbindung...");
         cl = s.accept();
-        System.out.println("Client verbunden.");
+        System.out.println("[Server] Client verbunden.");
         in = new BufferedReader(new InputStreamReader(cl.getInputStream()));
         out = new PrintWriter(cl.getOutputStream(), true);
     }

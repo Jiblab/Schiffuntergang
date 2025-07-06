@@ -57,12 +57,12 @@ public class MultiplayerLogic {
         else {
             int[] shipLengths = player.getShipLengths();
             s.sendShips(shipLengths);
-            System.out.println("Schiffe gesendet");
+            System.out.println("[MultiplayerLogic] Schiffe gesendet");
             String messagedone = s.receiveMessage();
             System.out.println(messagedone);
             if (messagedone.contains("done")){
                 s.sendReady();
-                System.out.println("Ready sent!");
+                System.out.println("[MultiplayerLogic] Ready sent!");
                 startMultiplayerloop();
             }
         }
@@ -90,19 +90,19 @@ public class MultiplayerLogic {
                             //Zelle wurde bereits beschossen
                             if (c.isShot()) {
                                 s.sendAnswer(0);
-                                System.out.println("Schon getroffen, sende 0");
+                                System.out.println("[MultiplayerLogic] Schon getroffen, sende 0");
                             } else {
                                 player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
                                 if (c.getShip() == null) { // Fehlschuss
                                     s.sendAnswer(0);
-                                    System.out.println("Antwort gesendet: 0 (Miss)");
+                                    System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
                                 } else if (!c.getShip().isAlive()) { // Versenkt
                                     player.deleteShip();
                                     s.sendAnswer(2);
-                                    System.out.println("Antwort gesendet: 2 (Sunk)");
+                                    System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                                 } else { // Treffer
                                     s.sendAnswer(1);
-                                    System.out.println("Antwort gesendet: 1 (Hit)");
+                                    System.out.println("[MultiplayerLogic] Antwort gesendet: 1 (Hit)");
                                 }
                             }
                             break;
@@ -112,18 +112,18 @@ public class MultiplayerLogic {
                             if (p[1].equals("0")) { // Fehlschuss
                                 Platform.runLater(() -> ce.setFill(Color.BLACK));
                                 // Unser Zug ist vorbei -> übergeben mit "pass"
-                                System.out.println("Fehlschuss. Sende pass.");
+                                System.out.println("[MultiplayerLogic] Fehlschuss. Sende pass.");
                                 s.sendPass();
                             } else { // Treffer (1) oder versenkt (2)
                                 Platform.runLater(() -> ce.setFill(Color.RED));
                                 //immer noch unser Zug -> myturn wieder auf true.
-                                System.out.println("Treffer/Versenkt. Ich bin wieder dran.");
+                                System.out.println("[MultiplayerLogic] Treffer/Versenkt. Ich bin wieder dran.");
                                 myturn = true;
                             }
                             break;
 
                         case "pass": // Der Client übergibt den Zug an uns
-                            System.out.println("habe pass bekommen");
+                            System.out.println("[MultiplayerLogic] habe pass bekommen");
                             myturn = true; // Jetzt sind wir dran
                             break;
                         //andere cases
@@ -170,7 +170,7 @@ public class MultiplayerLogic {
 
                             // KI entscheidet und schießt
                             int[] coords = kicontr.getKi().getShotCoordinates();
-                            System.out.println("KI-LOGIC: Schieße auf (" + coords[0] + ", " + coords[1] + ")");
+                            System.out.println("[MultiplayerLogic] KI-LOGIC: Schieße auf (" + coords[0] + ", " + coords[1] + ")");
                             kiShoot(coords[0], coords[1]);
 
                         } catch (Exception e) {
@@ -192,13 +192,13 @@ public class MultiplayerLogic {
     public void start() throws IOException {
         if (!client){ //man selber ist host
             s.start(5000);
-            System.out.println("Multiplayer connected!");
+            System.out.println("[MultiplayerLogic] Multiplayer connected!");
             s.sendSize(player.getBreit(), player.getLang());
-            System.out.println("Server: Größen geschickt mit Werten von: "+player.getBreit()+" "+player.getLang());
+            System.out.println("[MultiplayerLogic] Server: Größen geschickt mit Werten von: "+player.getBreit()+" "+player.getLang());
             String message = s.receiveMessage();
             System.out.println(message);
 
-            System.out.println("While schleife fürs warten verlassen");
+            System.out.println("[MultiplayerLogic] While schleife fürs warten verlassen");
             /*if (contr.getKi()){
                 kicontr.start();
             }*/
@@ -208,7 +208,7 @@ public class MultiplayerLogic {
             cl.connect(contr.getIP(), contr.getPort());
             boolean temp = true;
 
-            System.out.println("nachricht wurde gesplitet");
+            System.out.println("[MultiplayerLogic] Nachricht wurde gesplitet");
             int rows = 0;
             int cols = 0;
             for (int i = 0; i <= 1; i++) {
@@ -222,7 +222,7 @@ public class MultiplayerLogic {
                         temp = false;
                         break;*/
                     case "size":
-                        System.out.println("bin in case size");
+                        System.out.println("[MultiplayerLogic] bin in case size");
                         rows = Integer.parseInt(p1[1]);
                         cols = Integer.parseInt(p1[2]);
                         player = new Gamefield(false, contr, cols, rows, this);
@@ -265,7 +265,7 @@ public class MultiplayerLogic {
         if (firstturn){
             String f = cl.receiveMessage();
             if (f.equals("ready")) {
-                System.out.println("hab ready bekommen");
+                System.out.println("[MultiplayerLogic] hab ready bekommen");
                 cl.sendReady();
                 firstturn = false;
             }
@@ -284,21 +284,21 @@ public class MultiplayerLogic {
                         if (c.isShot()) {
                             // Sende "miss", da es keine Auswirkung hat. Der Server ist weiterhin dran.
                             cl.sendAnswer(0);
-                            System.out.println("Schon getroffen, sende 0");
+                            System.out.println("[MultiplayerLogic] Schon getroffen, sende 0");
                         } else {
                             // Ansonsten, schieße auf die Zelle
                             player.shoot(Integer.parseInt(p[1]), Integer.parseInt(p[2]));
                             if (c.getShip() == null) { // Fehlschuss
                                 cl.sendAnswer(0);
-                                System.out.println("Antwort gesendet: 0 (Miss)");
+                                System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
                             } else if (!c.getShip().isAlive()) { // Versenkt
                                 player.deleteShip();
                                 cl.sendAnswer(2);
-                                System.out.println("Antwort gesendet: 2 (Sunk)");
+                                System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                             } else { // Treffer
                                 cl.sendAnswer(1);
                                 // WICHTIG: myturn wird hier NICHT geändert. Der Server ist weiterhin dran.
-                                System.out.println("Antwort gesendet: 1 (Hit)");
+                                System.out.println("[MultiplayerLogic] Antwort gesendet: 1 (Hit)");
                             }
                         }
                         break;
@@ -308,35 +308,35 @@ public class MultiplayerLogic {
                         if (p[1].equals("0")) { // Fehlschuss
                             Platform.runLater(() -> ce.setFill(Color.BLACK));
                             // Unser Zug ist vorbei. Wir übergeben mit "pass".
-                            System.out.println("Fehlschuss. Sende pass.");
+                            System.out.println("[MultiplayerLogic] Fehlschuss. Sende pass.");
                             cl.sendPass();
                         } else { // Treffer (1) oder Versenkt (2)
                             Platform.runLater(() -> ce.setFill(Color.RED));
                             // Es ist immer noch unser Zug! Wir müssen myturn wieder auf true setzen,
                             // damit die UI einen neuen Schuss erlaubt.
-                            System.out.println("Treffer/Versenkt. Ich bin wieder dran.");
+                            System.out.println("[MultiplayerLogic] Treffer/Versenkt. Ich bin wieder dran.");
                             myturn = true;
                         }
                         break;
 
                     case "pass": // Der Server übergibt den Zug an uns
-                        System.out.println("habe pass bekommen");
+                        System.out.println("[MultiplayerLogic] habe pass bekommen");
                         myturn = true; // Jetzt sind wir dran
                         break;
 
                     case "ships":
-                        System.out.println("[Client] 'ships' empfangen.");
+                        System.out.println("[MultiplayerLogic] [Client] 'ships' empfangen.");
                         // Der KiPlayerController des Clients hat bereits seine Schiffe platziert
                         // und wartet quasi darauf, dass diese Nachricht ankommt.
                         // Jetzt, wo sie da ist, kann er "done" senden.
                         if (kicontr != null) { // Wenn es eine KI ist
-                            System.out.println("[Client-KI] Sende 'done' als Antwort auf 'ships'.");
+                            System.out.println("[MultiplayerLogic] [Client-KI] Sende 'done' als Antwort auf 'ships'.");
                             cl.sendDone();
                         }
                         break;
 
                     case "ready":
-                        System.out.println("[Client] 'ready' empfangen. Spiel kann beginnen.");
+                        System.out.println("[MultiplayerLogic] [Client] 'ready' empfangen. Spiel kann beginnen.");
                         firstturn = false; // Spiel hat begonnen
                         // myturn bleibt false, da der Server beginnt.
                         break;
@@ -351,7 +351,7 @@ public class MultiplayerLogic {
 
                         // KI entscheidet und schießt
                         int[] coords = kicontr.getKi().getShotCoordinates();
-                        System.out.println("KI-LOGIC: Schieße auf (" + coords[0] + ", " + coords[1] + ")");
+                        System.out.println("[MultiplayerLogic] KI-LOGIC: Schieße auf (" + coords[0] + ", " + coords[1] + ")");
                         kiShoot(coords[0], coords[1]);
 
                     } catch (Exception e) {
@@ -395,7 +395,7 @@ public class MultiplayerLogic {
         if (!client){
             s.sendShot(x, y);
             myturn = false;
-            System.out.println(x+" "+y);
+            System.out.println("[MultiplayerLogic] "+x+" "+y);
         }
         else {
             cl.sendShot(x, y);
@@ -450,12 +450,12 @@ public class MultiplayerLogic {
      */
     public void setTurn(boolean isMyTurn) {
         this.myturn = isMyTurn;
-        System.out.println("Spielzug nach Laden gesetzt: " + (isMyTurn ? "Ich bin dran." : "Gegner ist dran."));
+        System.out.println("[MultiplayerLogic] Spielzug nach Laden gesetzt: " + (isMyTurn ? "Ich bin dran." : "Gegner ist dran."));
     }
 
     public void kiShoot(int targetX, int targetY) throws IOException {
         if (!myturn) {
-            System.err.println("WARNUNG: KI versucht zu schießen, obwohl sie nicht am Zug ist.");
+            System.err.println("[MultiplayerLogic] WARNUNG: KI versucht zu schießen, obwohl sie nicht am Zug ist.");
             return;
         }
         // Die globalen x und y Koordinaten setzen, die von `startShoot` verwendet werden
@@ -470,25 +470,25 @@ public class MultiplayerLogic {
         try {
             if (client) {
                 clientKiReady = true;
-                System.out.println("MultiplayerLogic: Client-KI ist bereit.");
+                System.out.println("[MultiplayerLogic] MultiplayerLogic: Client-KI ist bereit.");
                 // Der Client hat seine Schiffe platziert, jetzt sendet er "done" als Antwort
                 // auf die "ships"-Nachricht, die er vom Server erhalten haben muss.
                 cl.sendDone();
             } else {
                 serverKiReady = true;
-                System.out.println("MultiplayerLogic: Server-KI ist bereit.");
+                System.out.println("[MultiplayerLogic] MultiplayerLogic: Server-KI ist bereit.");
                 // Der Server ist bereit. Er kann jetzt seine Schiffe senden.
                 sendShipsForKi(); // <- NEUE, nicht-blockierende Sendemethode
             }
 
             // Wenn beide KIs bereit sind, startet das eigentliche Spiel.
             if (serverKiReady && clientKiReady) {
-                System.out.println("MultiplayerLogic: Beide KIs sind bereit. Starte Spiel-Loop.");
+                System.out.println("[MultiplayerLogic] MultiplayerLogic: Beide KIs sind bereit. Starte Spiel-Loop.");
                 s.sendReady(); // Server sagt dem Client, dass es losgeht.
                 startMultiplayerloop();
             }
         } catch (IOException e) {
-            System.err.println("Fehler in kiIsReady: " + e.getMessage());
+            System.err.println("[MultiplayerLogic] Fehler in kiIsReady: " + e.getMessage());
         }
     }
 
@@ -497,7 +497,7 @@ public class MultiplayerLogic {
         if (!client) {
             int[] shipLengths = player.getShipLengths();
             s.sendShips(shipLengths);
-            System.out.println("Server: Schiffe an Client-KI gesendet.");
+            System.out.println("[MultiplayerLogic] Server: Schiffe an Client-KI gesendet.");
         }
     }
 
@@ -514,14 +514,14 @@ public class MultiplayerLogic {
 
         int[] shipLengths = player.getShipLengths();
         s.sendShips(shipLengths);
-        System.out.println("[Server] 'ships' gesendet. Warte auf 'done'...");
+        System.out.println("[MultiplayerLogic] [Server] 'ships' gesendet. Warte auf 'done'...");
 
         String messagedone = s.receiveMessage(); // Blockiert hier
-        System.out.println("[Server] Nachricht empfangen: " + messagedone);
+        System.out.println("[MultiplayerLogic] [Server] Nachricht empfangen: " + messagedone);
 
         if (messagedone.contains("done")) {
             s.sendReady();
-            System.out.println("[Server] 'Ready' gesendet. Starte Game-Loop.");
+            System.out.println("[MultiplayerLogic] [Server] 'Ready' gesendet. Starte Game-Loop.");
             startMultiplayerloop(); // Startet startGameFlow in einem neuen Thread
         }
     }

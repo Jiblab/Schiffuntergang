@@ -399,7 +399,7 @@ public class HelloController {
             try {
                 mlp.start();
             } catch (IOException e) {
-                System.out.println("IOException im Client-Thread: " + e.getMessage());
+                System.out.println("[Gamefield] IOException im Client-Thread: " + e.getMessage());
             }
         }).start();
     }
@@ -422,7 +422,7 @@ public class HelloController {
             try {
                 mlp.start();
             } catch (IOException e) {
-                System.out.println("IOException im Server-Thread: " + e.getMessage());
+                System.out.println("[Gamefield] IOException im Server-Thread: " + e.getMessage());
             }
         }).start();
     }
@@ -460,8 +460,6 @@ public class HelloController {
                 kiController.start();
             }
         }
-
-
     }
 
     public void setupClientPlacementUI(int[] shipCounts) {
@@ -550,7 +548,7 @@ public class HelloController {
         }
 
         if (asHost) {
-            System.out.println("[Host] setupKivsKi: Erstelle Host KI-Controller.");
+            System.out.println("[Gamefield] [Host] setupKivsKi: Erstelle Host KI-Controller.");
             EnemyPlayer ki = new EnemyPlayer(enemy);
             kiController = new KiPlayerController(mlp, ki, player, enemy, this);
             mlp.setKicontroler(kiController);
@@ -565,25 +563,25 @@ public class HelloController {
         Thread gameSetupThread = new Thread(() -> {
             try {
                 //start handshake
-                System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: Rufe mlp.start() auf...");
+                System.out.println("[Gamefield] [" + (asHost ? "Host" : "Client") + "] gameSetupThread: Rufe mlp.start() auf...");
                 mlp.start();
-                System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: mlp.start() ist beendet.");
+                System.out.println("[Gamefield] [" + (asHost ? "Host" : "Client") + "] gameSetupThread: mlp.start() ist beendet.");
 
                 if (this.kiController != null) {
-                    System.out.println("[" + (asHost ? "Host" : "Client") + "] gameSetupThread: kiController gefunden. Starte ihn jetzt.");
+                    System.out.println("[Gamefield] [" + (asHost ? "Host" : "Client") + "] gameSetupThread: kiController gefunden. Starte ihn jetzt.");
                     this.kiController.start();
                 } else {
-                    System.err.println("[" + (asHost ? "Host" : "Client") + "] FEHLER: kiController ist nach mlp.start() immer noch null!");
+                    System.err.println("[Gamefield] [" + (asHost ? "Host" : "Client") + "] FEHLER: kiController ist nach mlp.start() immer noch null!");
                 }
 
             } catch (IOException e) {
-                System.err.println("Fehler im Haupt-Setup-Thread: " + e.getMessage());
+                System.err.println("[Gamefield] Fehler im Haupt-Setup-Thread: " + e.getMessage());
                 e.printStackTrace();
             }
         });
         gameSetupThread.setDaemon(true);
 
-        System.out.println("[" + (asHost ? "Host" : "Client") + "] setupKivsKi: Starte gameSetupThread.");
+        System.out.println("[Gamefield] [" + (asHost ? "Host" : "Client") + "] setupKivsKi: Starte gameSetupThread.");
         gameSetupThread.start();
 
     }
@@ -610,7 +608,7 @@ public class HelloController {
 
             }
         }
-        System.out.println("Schiffe auf Board platziert. Anzahl Zellen: " + board.getUsedCells());
+        System.out.println("[Gamefield] Schiffe auf Board platziert. Anzahl Zellen: " + board.getUsedCells());
     }
 
 
@@ -659,7 +657,7 @@ public class HelloController {
         readyToSendShips = true;
         if (mlp != null) {
             mlp.sendShips();
-            System.out.println("Fertig! Schiffe werden gesendet.");
+            System.out.println("[Gamefield] Fertig! Schiffe werden gesendet.");
             if (messageLabel != null) messageLabel.setText("Warte auf Gegner...");
         }
     }
