@@ -147,6 +147,10 @@ public class HelloController {
                 case "miss":
                     notificationLabel.setStyle("-fx-text-fill: #ea7b20; -fx-font-family: 'Press Start 2P'; -fx-font-size: 50px;"); // orange für Fehlschuss
                     break;
+                case "error":
+                    notificationLabel.setStyle("-fx-text-fill: #ea2020; -fx-font-family: 'Press Start 2P'; -fx-font-size: 50px;");
+                    break;
+
                 default: // "info" oder unbekannt
                     notificationLabel.setStyle("-fx-text-fill: #f3070b; -fx-font-family: 'Press Start 2P'; -fx-font-size: 30px;");
                     break;
@@ -220,7 +224,7 @@ public class HelloController {
                 SaveDataClass singleplayerSaveData = new SaveDataClass(player, enemy);
                 FileManager fileManager = new FileManager(true);
                 fileManager.save(singleplayerSaveData);
-                showNotification("Spiel gespeichert!", "info");
+                showNotification("Game Saved!", "info");
             }
 
         });
@@ -586,7 +590,7 @@ public class HelloController {
             int xPos = rand.nextInt(xMax + 1);
             int yPos = rand.nextInt(yMax + 1);
 
-            Ships ship = new Ships(shipLength, shipLength); // Annahme: Konstruktor ist (length, health)
+            Ships ship = new Ships(shipLength, shipLength); //Konstruktor ist (length, health)
             if (board.placeShip(ship, xPos, yPos, vertical)) {
 
             }

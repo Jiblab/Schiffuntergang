@@ -52,18 +52,18 @@ public class Boardsize {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
 
 
-        Label widthLabel = new Label("Breite: 10");
+        Label widthLabel = new Label("Width: 10");
         Slider widthSlider = new Slider(5, 30, 10); // Mindestgröße 5 für sinnvolles Spiel
 
-        Label heightLabel = new Label("Höhe: 10");
+        Label heightLabel = new Label("Height: 10");
         Slider heightSlider = new Slider(5, 30, 10);
 
 
         widthSlider.valueProperty().addListener((obs, oldVal, newVal) ->
-                widthLabel.setText("Breite: " + newVal.intValue())
+                widthLabel.setText("Width: " + newVal.intValue())
         );
         heightSlider.valueProperty().addListener((obs, oldVal, newVal) ->
-                heightLabel.setText("Höhe: " + newVal.intValue())
+                heightLabel.setText("Height: " + newVal.intValue())
         );
 
         Button startButton = new Button("Start Game");
@@ -81,7 +81,7 @@ public class Boardsize {
 
 
         if (isMultiplayerHost) {
-            Label ipInfoLabel = new Label("Deine IP-Adresse (für deine Freunde):");
+            Label ipInfoLabel = new Label("Your IP-Address (for your friends):");
             TextField ipField = new TextField();
             ipField.setEditable(false); // Nicht bearbeitbar
             ipField.setFocusTraversable(false); // Kann nicht mit Tab ausgewählt werden
@@ -90,7 +90,7 @@ public class Boardsize {
             try {
                 ipField.setText(InetAddress.getLocalHost().getHostAddress());
             } catch (UnknownHostException e) {
-                ipField.setText("IP-Adresse konnte nicht ermittelt werden");
+                ipField.setText("IP-Address could not be determined");
             }
 
 
@@ -164,7 +164,7 @@ public class Boardsize {
         });
 
         stage.setScene(scene);
-        stage.setTitle("Spielfeldgröße wählen");
+        stage.setTitle("Select Boardsize");
         stage.setFullScreen(true);
         stage.show();
     }

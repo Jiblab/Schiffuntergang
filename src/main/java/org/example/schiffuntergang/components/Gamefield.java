@@ -71,6 +71,7 @@ public class Gamefield extends GridPane {
                         } else {
                             System.out.println(maxShipsC());
                             System.out.println("Maximale Anzahl an schiffen erreicht");
+                            control.showNotification("No Buildpoints left!", "error");
                         }
 
 
@@ -115,11 +116,12 @@ public class Gamefield extends GridPane {
                         } else {
                             System.out.println(maxShipsC());
                             System.out.println("Maximale Anzahl an schiffen erreicht");
-                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            control.showNotification("No Buildpoints left!", "error");
+                          /*  Alert alert = new Alert(Alert.AlertType.WARNING);
                             alert.setTitle("Limit erreicht");
                             alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
                             alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
-                            alert.show();
+                            alert.show();*/
                         }
 
 
@@ -171,13 +173,14 @@ public class Gamefield extends GridPane {
                                 }
                             } else {
                                 System.out.println("Limit an Bau-Punkten erreicht!");
-                                Platform.runLater(() -> {
+                                control.showNotification("No Buildpoints left!", "error");
+                               /* Platform.runLater(() -> {
                                     Alert alert = new Alert(Alert.AlertType.WARNING);
                                     alert.setTitle("Limit erreicht");
                                     alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
                                     alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
                                     alert.showAndWait();
-                                });
+                                });*/
                             }
                         } else {
 
@@ -190,13 +193,14 @@ public class Gamefield extends GridPane {
                                 }
                             } else {
                                 System.out.println("Von Schiffslänge " + len + " können keine mehr platziert werden.");
-                                Platform.runLater(() -> {
+                                control.showNotification("No more of this ship length available ", "error");
+                                /*Platform.runLater(() -> {
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                     alert.setTitle("Limit für diese Länge erreicht");
                                     alert.setHeaderText(null);
                                     alert.setContentText("Sie haben bereits die maximale Anzahl an Schiffen der Länge " + len + " platziert.");
                                     alert.showAndWait();
-                                });
+                                });*/
                             }
                         }
 
@@ -211,6 +215,8 @@ public class Gamefield extends GridPane {
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
+                        } else {
+                            control.showNotification("Wait for your turn!", "error");
                         }
                     }
                 });
@@ -323,7 +329,7 @@ public class Gamefield extends GridPane {
         if (c.isShot()) {
             System.out.println("Bereits beschossen");
             if (this.enemy && control != null) {
-                control.showNotification("Dieses Feld wurde bereits beschossen!", "info");
+                control.showNotification("Already shot that one, try again!", "info");
             }
             return;
         }
@@ -337,16 +343,16 @@ public class Gamefield extends GridPane {
             // SoundEffect.play("hit.wav");
 
             if (s.getHealth() == 0) {
-                if (control != null) control.showNotification("Schiff versenkt!", "sunk");
+                if (control != null) control.showNotification("Yay, ship is down!", "sunk");
                 deleteShip();
             } else {
-                if (control != null) control.showNotification("Treffer!", "hit");
+                if (control != null) control.showNotification("Successful hit!", "hit");
             }
         }
         else {
             c.setFill(Color.BLACK);
             // SoundEffect.play("miss.wav");
-            if (control != null) control.showNotification("Verfehlt!", "miss");
+            if (control != null) control.showNotification("Oops, you missed!", "miss");
         }
 
         if (this.enemy && !multiplayer) {
@@ -389,12 +395,13 @@ public class Gamefield extends GridPane {
         if (placedShip.isEmpty()) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Spiel beendet");
+                alert.setTitle("Game Over");
                 alert.setHeaderText(null);
                 if (enemy) {
-                    alert.setContentText("Du gewinnst");
+                    alert.setContentText("You Won! Congrats :)");
                 } else {
-                    alert.setContentText("Gegner gewinnt");
+                    alert.setContentText("Uh-oh, you lost :(");
+
                 }
 
                 alert.showAndWait();
