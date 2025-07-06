@@ -244,13 +244,11 @@ public class Gamefield extends GridPane {
             }
         }
 
+        //Sonderkondition für Multiplayer
         for (Position pos : data.getHitVariables()) {
             Cell cell = board.getCell(pos.getX(), pos.getY());
             if (cell != null) {
-                if(cell.getShip() != null) {
-                    cell.setFill(Color.RED);
-                }
-
+                cell.setFill(Color.RED);
             }
         }
         return board;
