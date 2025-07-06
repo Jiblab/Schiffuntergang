@@ -1,5 +1,9 @@
 package org.example.schiffuntergang;
 
+import org.example.schiffuntergang.sounds.BackgroundMusic;
+import org.example.schiffuntergang.sounds.SoundEffect;
+import org.example.schiffuntergang.ui.ParallaxLayer;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -16,12 +20,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.ToggleSwitch;
-import org.example.schiffuntergang.sounds.BackgroundMusic;
-import org.example.schiffuntergang.sounds.SoundEffect;
-import org.example.schiffuntergang.ui.ParallaxLayer;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class Options {
     private final Stage stage;
@@ -70,7 +72,6 @@ public class Options {
         stage.show();
         startParallaxAnimation(animatedLayers);
     }
-
     private VBox createControls() {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
         ToggleSwitch musictoggle = new ToggleSwitch("MUTE MUSIC");
@@ -112,7 +113,6 @@ public class Options {
 
         return layout;
     }
-
     private List<ParallaxLayer> createAndAddBackgroundLayers(StackPane root) {
         ImageView background = createFullscreenImageView("/images/0.png");
         ImageView ocean = createFullscreenImageView("/images/1.png");
@@ -142,10 +142,8 @@ public class Options {
                 palm,
                 rocks
         );
-
         return new ArrayList<>(animatedLayers);
     }
-
     private void startParallaxAnimation(List<ParallaxLayer> layers) {
         this.parallaxTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
             for (ParallaxLayer layer : layers) {
@@ -155,8 +153,7 @@ public class Options {
         this.parallaxTimeline.setCycleCount(Timeline.INDEFINITE);
         this.parallaxTimeline.play();
     }
-
-    void adjustFontSize(Button button, double baseWidth) {
+    public void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
         button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';" +
                 "-fx-background-color: #8b6248; " +
@@ -167,7 +164,6 @@ public class Options {
                 "-fx-border-radius: 5;");
 
     }
-
     private ImageView createFullscreenImageView(String path) {
         Image image = new Image(getClass().getResourceAsStream(path));
         ImageView imageView = new ImageView(image);

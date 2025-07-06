@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+
 public class Client implements Network {
     private Socket clientSocket;
     private BufferedReader in;
@@ -18,11 +19,9 @@ public class Client implements Network {
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         out = new PrintWriter(clientSocket.getOutputStream(), true);
     }
-
     public void sendSize(int rows, int cols) {
         out.println("[Client] size " + rows);
     }
-
     public void sendShips(int[] lengths) {
         out.write("ships\n");
         out.flush();
@@ -30,53 +29,37 @@ public class Client implements Network {
         for (int l : lengths) {
             out.write(" " + l);
             out.flush();
-
         }
         out.println();
     }
-
     public void sendShot(int row, int col) {
         out.write("shot " + row + " " + col+"\n");
         out.flush();
-
     }
-
     public void sendAnswer(int result) {
         out.write("answer " +result+"\n");
         out.flush();
-
     }
-
     public void sendPass() {
         out.write("pass\n");
         out.flush();
-
     }
-
     public void sendReady() {
         out.write("ready\n");
         out.flush();
-
     }
-
     public void sendDone() {
         out.write("done\n");
         out.flush();
-
     }
-
     public void sendSave(long id) {
         out.write("save " + id+"\n");
         out.flush();
-
     }
-
     public void sendLoad(long id) {
         out.write("load " + id+"\n");
         out.flush();
-
     }
-
     public void close() {
         try {
             clientSocket.close();
@@ -85,8 +68,7 @@ public class Client implements Network {
             e.printStackTrace();
         }
     }
-
     public String receiveMessage() throws IOException {
-        return in.readLine();  // Nutze das in deinem GameLoop
+        return in.readLine();
     }
 }

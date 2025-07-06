@@ -2,21 +2,17 @@ package org.example.schiffuntergang.Multiplayer;
 
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
-import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.components.Cell;
 import org.example.schiffuntergang.components.Gamefield;
-import org.example.schiffuntergang.components.Ships;
-
-import javax.imageio.IIOException;
-import java.io.IOException;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.example.schiffuntergang.filemanagement.FileManager;
 import org.example.schiffuntergang.filemanagement.GamefieldData;
 import org.example.schiffuntergang.filemanagement.GameState;
 import org.example.schiffuntergang.sounds.BackgroundMusic;
+import java.io.IOException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 public class MultiplayerLogic {
@@ -25,8 +21,6 @@ public class MultiplayerLogic {
     private final boolean client;
     private Gamefield enemy;
     private Gamefield player;
-    private int merkx;
-    private int merky;
     private int x;
     private int y;
     private HelloController contr;
@@ -36,6 +30,7 @@ public class MultiplayerLogic {
     private boolean clientKiReady = false;
     private KiPlayerController kicontr;
 
+
     public MultiplayerLogic(Client c, boolean client1, Gamefield en, Gamefield pl){
         cl = c;
         player = pl;
@@ -43,7 +38,6 @@ public class MultiplayerLogic {
         client = client1;
         myturn = false;
     }
-
     public MultiplayerLogic(Server se, boolean client1, Gamefield en, Gamefield pl){
         s = se;
         player = pl;
@@ -68,9 +62,7 @@ public class MultiplayerLogic {
                 startMultiplayerloop();
             }
         }
-
     }
-
     private void startGameFlow() throws IOException {
         if(!client) { // This check is good
             String yeye = s.receiveMessage();
@@ -163,7 +155,6 @@ public class MultiplayerLogic {
                                 System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
                             }
                             break;
-
                             case "load":
                                 long saveId = Long.parseLong(p[1]);
                                 try{
@@ -171,7 +162,7 @@ public class MultiplayerLogic {
                                     GameState loadedstate = fm.loadfromid(saveId);
                                     loadGameFromSave(loadedstate, null);
                                 }catch(Exception e){
-                                    System.err.println("Fehler beim Verarbeiten des Loads"+e.getMessage());
+                                    System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Loads"+e.getMessage());
                                 }
                                 break;
                     }
@@ -213,11 +204,11 @@ public class MultiplayerLogic {
         player = Gamefield.fromData(loadedState.getPlayerBoardData(), this.contr, this);
         enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), this.contr, this);
 
-            player.setLogic(this);
-            enemy.setLogic(this);
-            setPl(this.player);
-            setEn(this.enemy);
-            setTurn(loadedState.isPlayerTurn());
+        player.setLogic(this);
+        enemy.setLogic(this);
+        setPl(this.player);
+        setEn(this.enemy);
+        setTurn(loadedState.isPlayerTurn());
 
         contr.setup(this.player, this.enemy);
 
@@ -226,9 +217,6 @@ public class MultiplayerLogic {
             BackgroundMusic.getInstance().stop();
         }
     }
-
-
-
     public void start() throws IOException {
         if (!client){ //man selber ist host
             s.start(5000);
@@ -236,13 +224,9 @@ public class MultiplayerLogic {
             s.sendSize(player.getBreit(), player.getLang());
             System.out.println("[MultiplayerLogic] Server: Größen geschickt mit Werten von: "+player.getBreit()+" "+player.getLang());
             String message = s.receiveMessage();
-            System.out.println(message);
+            System.out.println("[MultiplayerLogic] "+message);
 
             System.out.println("[MultiplayerLogic] While schleife fürs warten verlassen");
-            /*if (contr.getKi()){
-                kicontr.start();
-            }*/
-
         }
         else {// man ist client und joined
             cl.connect(contr.getIP(), contr.getPort());
@@ -307,13 +291,10 @@ public class MultiplayerLogic {
 
                         cl.sendDone();
                         break;
-
                 }
             }
-
         }
     }
-
     public void clientGame() throws IOException {
         if (firstturn){
             String f = cl.receiveMessage();
@@ -421,7 +402,6 @@ public class MultiplayerLogic {
             }
         }
     }
-
     public void setX(int x1){
         x = x1;
     }
@@ -439,11 +419,9 @@ public class MultiplayerLogic {
     public void setController(HelloController c ){
         contr = c;
     }
-
     public boolean getClient(){
         return client;
     }
-
     public void startShoot() throws IOException {
         if (!client){
             s.sendShot(x, y);
@@ -454,13 +432,10 @@ public class MultiplayerLogic {
             cl.sendShot(x, y);
             myturn = false;
         }
-
     }
-
     public boolean getTurn(){
         return myturn;
     }
-
     public void startMultiplayerloop() throws IOException {
         if (!client){
             Thread t = new Thread(() -> {
@@ -493,19 +468,10 @@ public class MultiplayerLogic {
         else
             s.sendSave(id);
     }
-
-    /**
-     * Setzt den Zugstatus (turn) direkt.
-     * Diese Methode wird hauptsächlich beim Laden eines Multiplayer-Spielstands verwendet,
-     * um den korrekten Spielzug wiederherzustellen.
-     *
-     * @param isMyTurn true, wenn dieser Spieler nach dem Laden am Zug ist, andernfalls false.
-     */
     public void setTurn(boolean isMyTurn) {
         this.myturn = isMyTurn;
         System.out.println("[MultiplayerLogic] Spielzug nach Laden gesetzt: " + (isMyTurn ? "Ich bin dran." : "Gegner ist dran."));
     }
-
     public void kiShoot(int targetX, int targetY) throws IOException {
         if (!myturn) {
             System.err.println("[MultiplayerLogic] WARNUNG: KI versucht zu schießen, obwohl sie nicht am Zug ist.");
@@ -518,7 +484,6 @@ public class MultiplayerLogic {
         // Die existierende Methode aufrufen, die "shot x y" an den Gegner sendet.
         startShoot();
     }
-
     public synchronized void kiIsReady() {
         try {
             if (client) {
@@ -553,15 +518,12 @@ public class MultiplayerLogic {
             System.out.println("[MultiplayerLogic] Server: Schiffe an Client-KI gesendet.");
         }
     }
-
     public void setKicontroler(KiPlayerController ki){
         kicontr = ki;
     }
-
     public Client getClientObj() {
         return this.cl;
     }
-
     public void sendShipsAndWaitForDone() throws IOException {
         if (client) return; // Nur für Server
 
@@ -578,5 +540,4 @@ public class MultiplayerLogic {
             startMultiplayerloop(); // Startet startGameFlow in einem neuen Thread
         }
     }
-
 }

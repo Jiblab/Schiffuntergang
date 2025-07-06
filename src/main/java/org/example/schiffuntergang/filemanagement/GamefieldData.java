@@ -1,5 +1,3 @@
-// File: GamefieldData.java
-// Put this in your 'filemanagement' package, since it's related to saving/loading.
 package org.example.schiffuntergang.filemanagement;
 
 import org.example.schiffuntergang.components.Position;
@@ -9,7 +7,6 @@ import java.util.ArrayList;
 
 
 public class GamefieldData {
-
     private int width;
     private int height;
     private boolean isEnemy;

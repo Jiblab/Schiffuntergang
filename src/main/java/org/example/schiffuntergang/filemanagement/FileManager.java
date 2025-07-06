@@ -1,33 +1,19 @@
 package org.example.schiffuntergang.filemanagement;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import org.example.schiffuntergang.components.Gamefield;
-import org.example.schiffuntergang.sounds.BackgroundMusic;
-
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import java.lang.reflect.Type;
-import java.util.Map;
+
 
 public class FileManager {
-
     JFileChooser fileChooser = new JFileChooser();
     private final boolean newSave;
     private SaveDataClass saveData;
 
     public FileManager(boolean newFile){
         newSave = newFile;
-
-    }
-
-    public void getAction(String action) {
-
     }
     public GameState loadFromURI(String filepath) throws IOException {
-
             File file = new File(filepath);
             if(!file.exists()){
                 return null;
@@ -44,15 +30,13 @@ public class FileManager {
             SaveDataClass save = new SaveDataClass();
             GameState gameState = save.loadData(jsonString);
             return gameState;
-
     }
-
-
     public GameState load() throws IOException {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Spielstand laden");
         fileChooser.setFileFilter(new FileNameExtensionFilter("Spielstand", "save"));
         int returnvalue = fileChooser.showOpenDialog(null);
+
         if (returnvalue == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             FileReader fileReader = new FileReader(file.getAbsolutePath());
@@ -70,8 +54,6 @@ public class FileManager {
         }
         return null;
     }
-
-
     public void save(SaveDataClass saveData){
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Spielstand laden/speichern");
@@ -93,7 +75,6 @@ public class FileManager {
             }
         }
     }
-
     public GameState loadfromid(long id){
         String userHome = System.getProperty("user.home");
         File saveDir = new File(userHome, "SchiffUntergangSaves");
@@ -122,7 +103,6 @@ public class FileManager {
         }
         return gameState;
     }
-
     //multiplayer
     public void saveGameData(String jsonData, String filename) throws IOException {
         String userHome = System.getProperty("user.home");
@@ -152,5 +132,4 @@ public class FileManager {
             throw e;
         }
     }
-
 }

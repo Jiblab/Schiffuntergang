@@ -1,16 +1,14 @@
 package org.example.schiffuntergang;
 
-
-import javafx.scene.paint.Color;
 import org.example.schiffuntergang.components.Cell;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
 
+import javafx.scene.paint.Color;
 import java.util.*;
-import java.util.random.RandomGenerator;
+
 
 public class EnemyPlayer {
-
     private final Gamefield playerBoard;
     private final Random rand = new Random();
     private final List<int[]> priorityTargets = new ArrayList<>();
@@ -67,7 +65,6 @@ public class EnemyPlayer {
             }
         }
     }
-
     private boolean shootAt(int x, int y) {
         Cell cell = playerBoard.getCell(x, y);
 
@@ -82,7 +79,6 @@ public class EnemyPlayer {
             ship.hit();
             javafx.application.Platform.runLater(() -> cell.setFill(Color.RED));
             System.out.println("[EnemyPlayer] KI trifft bei: (" + x + ", " + y + ")");
-
 
             if (!ship.isAlive()) {
                 System.out.println("[EnemyPlayer] KI hat ein Schiff versenkt!");
@@ -100,7 +96,6 @@ public class EnemyPlayer {
             return false; // fehlschuss
         }
     }
-
     private void handleHit(int x, int y) {
         if (firstHit == null) {
             firstHit = new int[]{x, y};
@@ -119,7 +114,6 @@ public class EnemyPlayer {
             }
         }
     }
-
     private void addNeighborsToPriorityList(int x, int y) {
         List<int[]> neighbors = new ArrayList<>();
         neighbors.add(new int[]{x + 1, y});
@@ -132,17 +126,14 @@ public class EnemyPlayer {
             addTarget(neighbor[0], neighbor[1]);
         }
     }
-
     private void addTarget(int x, int y) {
         Cell targetCell = playerBoard.getCell(x, y);
         if (targetCell != null && !targetCell.isShot()) {
             priorityTargets.add(new int[]{x, y});
         }
     }
-
     public int[] getShotCoordinates() {
         if (!priorityTargets.isEmpty()) {
-
             return priorityTargets.remove(priorityTargets.size() - 1);
         }
 
@@ -163,7 +154,6 @@ public class EnemyPlayer {
 
         return new int[]{x, y};
     }
-
     public void processShotResult(int x, int y, boolean hit, boolean sunk) {
         if (sunk) {
             System.out.println("KI-INFO: Gegnerisches Schiff versenkt! Setze Zielliste zurück.");
@@ -177,7 +167,4 @@ public class EnemyPlayer {
         }
         // Bei einem Fehlschuss muss nichts getan werden.
     }
-
 }
-
-

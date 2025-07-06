@@ -20,10 +20,10 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundSize;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+
 
 public class Gamefield extends GridPane {
     private final List<Ships> placedShip = new ArrayList<>();
@@ -35,8 +35,8 @@ public class Gamefield extends GridPane {
     private HelloController control;
     private EnemyPlayer en;
     private MultiplayerLogic lo;
-
     private boolean multiplayer = false;
+    private boolean turn;
 
 
     public Gamefield(boolean enemy, HelloController controler, int h, int b) {
@@ -48,7 +48,6 @@ public class Gamefield extends GridPane {
         setupBackground();
 
         for (int i = 0; i < h; i++) {
-
             for (int j = 0; j < b; j++) {
                 Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
@@ -74,17 +73,14 @@ public class Gamefield extends GridPane {
                             control.showNotification("No Buildpoints left!", "error");
                         }
 
-
                     } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
                         shoot(c.x, c.y);
                     }
                 });
-
                 add(c, j, i);
             }
         }
     }
-
     public Gamefield(boolean enemy, HelloController controler, int h, int b, EnemyPlayer e) {
         en = e;
         lang = h;
@@ -94,7 +90,6 @@ public class Gamefield extends GridPane {
         this.control = controler;
         setupBackground();
         for (int i = 0; i < h; i++) {
-
             for (int j = 0; j < b; j++) {
                 Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
@@ -111,7 +106,6 @@ public class Gamefield extends GridPane {
                             Ships ship = new Ships(control.getLength(), control.getLength());
                             if (placeShip(ship, y, x, control.getDirection())) {
                                 increaseCells(ship.getLength());
-
                             }
                         } else {
                             System.out.println(maxShipsC());
@@ -123,18 +117,15 @@ public class Gamefield extends GridPane {
                             alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
                             alert.show();*/
                         }
-
-
-                    } else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
+                    }
+                    else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
                         shoot(y, x);
                     }
                 });
-
                 add(c, j, i);
             }
         }
     }
-
     public Gamefield(boolean enemy, HelloController controler, int h, int b, MultiplayerLogic l) {
         lang = h;
         breit = b;
@@ -146,7 +137,6 @@ public class Gamefield extends GridPane {
         setupBackground();
 
         for (int i = 0; i < h; i++) {
-
             for (int j = 0; j < b; j++) {
                 Cell c = new Cell(j, i, this, 30, 30, controler);
                 cells[i][j] = c;
@@ -215,7 +205,8 @@ public class Gamefield extends GridPane {
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
-                        } else {
+                        }
+                        else {
                             control.showNotification("Wait for your turn!", "error");
                         }
                     }
@@ -252,14 +243,9 @@ public class Gamefield extends GridPane {
                 }
             }
         }
-
         return board;
     }
-
-
-
     public static Gamefield fromGameState(GameState state, boolean isEnemy) {
-
         HelloController dummyController = new HelloController();
         Gamefield board = new Gamefield(isEnemy, dummyController,
                 state.getPlayerBoardData().getHeight(), state.getPlayerBoardData().getWidth());
@@ -278,14 +264,12 @@ public class Gamefield extends GridPane {
                     ? Color.RED
                     : Color.BLACK);
         }
-
         return board;
     }
 
     public boolean getStatus() {
         return enemy;
     }
-
     private void setupBackground() {
         try {
             Image backgroundImage = new Image(getClass().getResource("/images/Boardbg.png").toExternalForm());
@@ -302,29 +286,22 @@ public class Gamefield extends GridPane {
             System.err.println("[Gamefield] Failed to load background image for Gamefield.");
         }
     }
-
     public boolean isEnemy() {
         return enemy;
     }
-
     public double maxShipsC() {
         return (double) lang * (double) breit * 0.3;
     }
-
     public void addShip(Ships ship) {
         placedShip.add(ship);
     }
-
     public int getUsedCells() {
         return usedCells;
     }
-
     public void increaseCells(int laenge) {
         usedCells += laenge;
     }
-
     public void shoot(int x, int y) {
-
         Cell c = getCell(x, y);
         if (c == null) return; // Sicherheitsprüfung
 
@@ -362,29 +339,21 @@ public class Gamefield extends GridPane {
             en.revenge();
         }
     }
-
     public Cell getCell(int x, int y) {
-
         if (x >= 0 && x < breit && y >= 0 && y < lang) {
             return cells[y][x];
         }
         return null;
     }
-
     public boolean inBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < getWidth() && y < getHeight();
     }
-
     public int getLang() {
         return lang;
     }
-
     public int getBreit() {
         return breit;
     }
-
-    private boolean turn;
-
     public void deleteShip() {
         Iterator<Ships> iterator = placedShip.listIterator();
         while (iterator.hasNext()) {
@@ -406,22 +375,18 @@ public class Gamefield extends GridPane {
                     alert.setContentText("You Won! Congrats :)");
                 } else {
                     alert.setContentText("Uh-oh, you lost :(");
-
                 }
 
                 alert.showAndWait();
             });*/
         }
     }
-
     public void setTurn(boolean t) {
         turn = t;
     }
-
     public void setLogic(MultiplayerLogic l) {
         lo = l;
     }
-
     public int[] getShipLengths() {
         int[] lengths = new int[placedShip.size()];
         for (int i = 0; i < placedShip.size(); i++) {
@@ -429,28 +394,22 @@ public class Gamefield extends GridPane {
         }
         return lengths;
     }
-
     public double getMusicVolume() {
         return BackgroundMusic.getInstance().getVolume();
     }
-
     public boolean isMusicEnabled() {
         return BackgroundMusic.getInstance().isPlaying();
     }
-
     public List<Ships> getShips() {
         return placedShip;
     }
-
     public void increaseUsedCells(int length) {
         this.usedCells += length;
     }
-
     public boolean placeShip(Ships ship, int startX, int startY, boolean vertical) {
         int length = ship.getLength();
 
         for (int i = 0; i < length; i++) {
-
             int reihenIndex = vertical ? startY + i : startY;
             int spaltenIndex = vertical ? startX : startX + i;
 
@@ -542,37 +501,30 @@ public class Gamefield extends GridPane {
         System.out.println("[Gamefield] Schiff platziert: Start(Reihe " + startX + ", Spalte " + startY + "), " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
-
     public HelloController getControl() {
         return control;
     }
-
     public void clearShips() {
         placedShip.clear();
     }
-
     public void setEnemy(EnemyPlayer e) {
         en = e;
     }
-
     public boolean hasShip() {
-        System.out.println(placedShip.isEmpty());
+        System.out.println("[Gamefield] "+placedShip.isEmpty());
         return !placedShip.isEmpty();
     }
-
     public GamefieldData toData() {
         GamefieldData data = new GamefieldData();
         data.setWidth(this.breit);
         data.setHeight(this.lang);
         data.setEnemy(this.enemy);
 
-
         List<SerializableShip> shipDataList = new ArrayList<>();
         Set<Ships> processedShips = new HashSet<>();
 
         for (int y = 0; y < breit; y++) {
             for (int x = 0; x < lang; x++) {
-
                 Cell cell = getCell(x, y);
                 Ships ship = cell.getShip();
 
@@ -584,7 +536,6 @@ public class Gamefield extends GridPane {
                             isVertical = true;
                         }
                     }
-
 
                     SerializableShip serializableShip = new SerializableShip();
                     serializableShip.setLength(ship.getLength());
@@ -607,10 +558,8 @@ public class Gamefield extends GridPane {
             }
         }
         data.setShotPositions(shotPositions);
-
         return data;
     }
-
     private Cell findShipStartCell(Ships ship) {
         for (int y = 0; y < lang; y++) {
             for (int x = 0; x < breit; x++) {
@@ -621,15 +570,12 @@ public class Gamefield extends GridPane {
         }
         return null; //Sollte nie passieren, wenn das Schiff auf dem Feld ist
     }
-
     public void setController(HelloController controller) {
         this.control = controller;
     }
-
     public int getShipCount() {
         return placedShip.size();
     }
-
     public void redrawAllCells() {
         Platform.runLater(() -> {
             System.out.println("[Gamefield] DEBUG: Redraw für " + (isEnemy() ? "Gegner" : "Spieler") + "-Feld wird ausgeführt.");
@@ -651,6 +597,5 @@ public class Gamefield extends GridPane {
             }
         });
     }
-
 }
 

@@ -1,10 +1,10 @@
 package org.example.schiffuntergang;
 
 import javafx.scene.paint.Color;
-import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.components.Cell;
 import org.example.schiffuntergang.components.Gamefield;
 import org.example.schiffuntergang.components.Ships;
+
 
 public class Logic {
     private final Gamefield board;
@@ -13,9 +13,7 @@ public class Logic {
     public Logic(Gamefield b, EnemyPlayer p){
         board = b;
         en = p;
-
     }
-
     public boolean placeShip(Ships ship, int x, int y, boolean vertical) {
         int length = ship.getLength();
 
@@ -64,7 +62,6 @@ public class Logic {
             Cell c = board.getCell(xi, yi);
             c.setShip(ship);
 
-
             if (!board.isEnemy()) {
                 c.setFill(Color.WHITE);
                 c.setStroke(Color.GREEN);
@@ -77,7 +74,6 @@ public class Logic {
         System.out.println("[Logic] Schiff erfolgreich platziert bei Start (" + x + ", " + y + "), Richtung: " + (vertical ? "vertikal" : "horizontal"));
         return true;
     }
-
     public void shoot(int x, int y){
         Cell c = board.getCell(x, y);
         Ships s = c.getShip();
@@ -89,7 +85,6 @@ public class Logic {
             if (board.isEnemy()){
                 System.out.println("[Logic] nix hier in der if abfrage");
                 en.revenge();
-
             }
         }
         else {
@@ -98,8 +93,6 @@ public class Logic {
             if (board.isEnemy()){
                 en.revenge();
             }
-
         }
-
     }
 }

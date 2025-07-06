@@ -1,5 +1,10 @@
 package org.example.schiffuntergang;
 
+import org.example.schiffuntergang.filemanagement.FileManager;
+import org.example.schiffuntergang.filemanagement.GameState;
+import org.example.schiffuntergang.sounds.SoundEffect;
+import org.example.schiffuntergang.ui.ParallaxLayer;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
@@ -15,15 +20,6 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.example.schiffuntergang.filemanagement.FileManager;
-import org.example.schiffuntergang.filemanagement.GameState;
-import org.example.schiffuntergang.sounds.SoundEffect;
-import org.example.schiffuntergang.ui.ParallaxLayer;
-
-import javafx.stage.FileChooser;
-import org.example.schiffuntergang.components.Gamefield;
-import javafx.util.Pair;
-
 import java.io.IOException;
 
 
@@ -183,8 +179,7 @@ public class StartScreen {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
-
-    void adjustFontSize(Button button, double baseWidth) {
+    public void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
         button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';" +
                 "-fx-background-color: #8b6248; " +
@@ -194,7 +189,6 @@ public class StartScreen {
                 "-fx-background-radius: 5; " +
                 "-fx-border-radius: 5;");
     }
-
     private ImageView createFullscreenImageView(String path) {
         Image image = new Image(getClass().getResourceAsStream(path));
         ImageView imageView = new ImageView(image);

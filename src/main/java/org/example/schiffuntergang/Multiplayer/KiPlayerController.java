@@ -1,15 +1,13 @@
 package org.example.schiffuntergang.Multiplayer;
 
-import javafx.application.Platform;
 import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
-import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import org.example.schiffuntergang.components.Gamefield;
-import java.io.IOException;
 import java.util.Random;
+import javafx.application.Platform;
+
 
 public class KiPlayerController implements Runnable {
-
     private final MultiplayerLogic logic;
     private final EnemyPlayer ki;
     private final Gamefield playerBoard;
@@ -18,6 +16,7 @@ public class KiPlayerController implements Runnable {
     private final Random rand = new Random();
     private final boolean gameRunning = true;
 
+
     public KiPlayerController(MultiplayerLogic logic, EnemyPlayer ki, Gamefield playerBoard, Gamefield enemyBoard, HelloController uiController) {
         this.logic = logic;
         this.ki = ki;
@@ -25,7 +24,6 @@ public class KiPlayerController implements Runnable {
         this.enemyBoard = enemyBoard;
         this.uiController = uiController;
     }
-
     public void start() {
         Thread thread = new Thread(this);
         thread.setDaemon(true);
@@ -55,7 +53,6 @@ public class KiPlayerController implements Runnable {
         }
 
     }
-
     private void placeShipsRandomly() {
         double maxCells = playerBoard.maxShipsC();
         if (maxCells <= 0) maxCells = 17;
@@ -110,7 +107,6 @@ public class KiPlayerController implements Runnable {
         // UI benachrichtigen, dass die Platzierung fertig ist (visuelles Update)
         Platform.runLater(()->{uiController.updateRemainingCellsDisplay();});
     }
-
     public EnemyPlayer getKi() {
         return ki;
     }

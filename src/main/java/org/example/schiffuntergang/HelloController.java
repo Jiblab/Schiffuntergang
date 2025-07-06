@@ -1,5 +1,17 @@
 package org.example.schiffuntergang;
 
+import org.example.schiffuntergang.Multiplayer.Client;
+import org.example.schiffuntergang.Multiplayer.KiPlayerController;
+import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
+import org.example.schiffuntergang.Multiplayer.Server;
+import org.example.schiffuntergang.components.Gamefield;
+import org.example.schiffuntergang.components.Ships;
+import org.example.schiffuntergang.filemanagement.FileManager;
+import org.example.schiffuntergang.filemanagement.GameState;
+import org.example.schiffuntergang.filemanagement.SaveDataClass;
+import org.example.schiffuntergang.sounds.BackgroundMusic;
+import org.example.schiffuntergang.sounds.SoundEffect;
+
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import org.controlsfx.control.ToggleSwitch;
@@ -16,20 +28,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.example.schiffuntergang.Multiplayer.Client;
-import org.example.schiffuntergang.Multiplayer.KiPlayerController;
-import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
-import org.example.schiffuntergang.Multiplayer.Server;
-import org.example.schiffuntergang.components.Gamefield;
-import org.example.schiffuntergang.components.Ships;
-import org.example.schiffuntergang.filemanagement.FileManager;
-import org.example.schiffuntergang.filemanagement.GameState;
-import org.example.schiffuntergang.filemanagement.SaveDataClass;
-import org.example.schiffuntergang.sounds.BackgroundMusic;
-import org.example.schiffuntergang.sounds.SoundEffect;
-
 import java.io.IOException;
 import java.util.Random;
+
 
 public class HelloController {
     private final int[] shipsPlaced = new int[6];
@@ -41,20 +42,16 @@ public class HelloController {
     private boolean playerturn = true;
     private Client c;
     private Server s;
-    private final int maxPerShipLength = 3;
     // Member-Variablen (unverändert)
     private int length;
-    private final Label[] shipCounters = new Label[6];
     private boolean ishost = false;
     private boolean readyToSendShips = false;
     private Gamefield enemy;
     private Gamefield player;
-    private final boolean temp = true;
     private String ipa;
     private int porta;
     private int[] shipsAllowed = new int[6];
     private Label remainingCell;
-
     private Label notificationLabel;
     private PauseTransition notificationTimer;
     MultiplayerLogic mlp;
@@ -66,8 +63,6 @@ public class HelloController {
     private boolean ki = false;
 
     Button ladenButton;
-
-    private SaveDataClass savedata;
 
     @FXML
     private AnchorPane anker;
@@ -87,7 +82,6 @@ public class HelloController {
         backgroundImage.fitHeightProperty().bind(anker.heightProperty());
         anker.getStylesheets().add(getClass().getResource("/button.css").toExternalForm());
     }
-
     public void updateRemainingCellsDisplay() {
         // Sicherheitsprüfung, falls die Methode zu früh aufgerufen wird
         if (player == null || remainingCell == null) {
@@ -144,7 +138,6 @@ public class HelloController {
 
         rootPane.setBottom(notificationBox);
     }
-
     public void showNotification(String message, String type) {
         Platform.runLater(() -> {
 
@@ -178,8 +171,6 @@ public class HelloController {
             notificationTimer.play();
         });
     }
-
-
     private BorderPane createHeader() {
 
         BorderPane headerPane = new BorderPane();
@@ -211,7 +202,6 @@ public class HelloController {
 
         return headerPane;
     }
-
     private VBox createPauseMenu() {
 
         Button resumeButton = new Button("Resume Game");
@@ -274,7 +264,6 @@ public class HelloController {
 
         return menuLayout;
     }
-
     private void togglePauseMenu() {
         if (pauseMenu == null) {
             pauseMenu = createPauseMenu();
@@ -297,7 +286,6 @@ public class HelloController {
             enemy.setDisable(true);
         }
     }
-
     private VBox createControlPanel() {
         VBox controlPanel = new VBox(15);
         controlPanel.setPadding(new Insets(20));
@@ -374,7 +362,6 @@ public class HelloController {
         );
         return controlPanel;
     }
-
     public void setup() {
         player = new Gamefield(false, this, (int) x, (int) y);
         EnemyPlayer en = new EnemyPlayer(player);
@@ -454,7 +441,6 @@ public class HelloController {
             }
         }).start();
     }
-
     public void setupMultiplayerBoards(Gamefield playerBoard, Gamefield enemyBoard) {
 
         if (!ki){
@@ -489,7 +475,6 @@ public class HelloController {
             }
         }
     }
-
     public void setupClientPlacementUI(int[] shipCounts) {
         this.shipsAllowed = shipCounts;
 
@@ -558,7 +543,6 @@ public class HelloController {
 
         Platform.runLater(() -> rootPane.setLeft(controlPanel));
     }
-
     public void setupKivsKi(boolean asHost, String ip, int port) {
         this.ishost = asHost;
         this.ki = true;
@@ -638,8 +622,6 @@ public class HelloController {
         }
         System.out.println("[Gamefield] Schiffe auf Board platziert. Anzahl Zellen: " + board.getUsedCells());
     }
-
-
     private void placeEnemyShipsRandomly() {
         while (enemy.getUsedCells() <= enemy.maxShipsC()) {
             int shipLength = 2 + rand.nextInt(4);
@@ -732,7 +714,6 @@ public class HelloController {
             if (messageLabel != null) messageLabel.setText("Warte auf Gegner...");
         }
     }
-
     public void clientPlacedShip(int len) {
         if (len <= 0 || len >= shipsPlaced.length) return;
         shipsPlaced[len]++;
@@ -744,65 +725,50 @@ public class HelloController {
             shipLengthButtons[len].setDisable(true);
         }
     }
-
     public boolean canClientPlaceShip(int len) {
         if (len <= 0 || len >= shipsAllowed.length) return false;
         return shipsPlaced[len] < shipsAllowed[len];
     }
-
     public int getLength() {
         return length;
     }
-
     public boolean getDirection() {
         return direction;
     }
-
     public void setSize(double x1, double y1) {
         x = x1;
         y = y1;
     }
-
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
     public boolean getPlayerturn() {
         return playerturn;
     }
-
     public void setPlayerturn() {
         playerturn = !playerturn;
     }
-
     public void shipPlaced(int len) {
         shipsPlaced[len]++;
     }
-
     public boolean getHost() {
         return ishost;
     }
-
     public void setShipCountsFromNetwork(int[] lengths) {
         Platform.runLater(() -> setupClientPlacementUI(lengths));
     }
-
     public boolean getReady() {
         return readyToSendShips;
     }
-
     public String getIP() {
         return ipa;
     }
-
     public int getPort() {
         return porta;
     }
-
     public void setShipRules(int[] shipCounts) {
         this.shipsAllowed = shipCounts;
     }
-
     public boolean getKi(){
         return ki;
     }

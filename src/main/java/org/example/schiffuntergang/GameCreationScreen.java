@@ -1,5 +1,8 @@
 package org.example.schiffuntergang;
 
+import org.example.schiffuntergang.ui.ParallaxLayer;
+import org.example.schiffuntergang.sounds.SoundEffect;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
@@ -17,19 +20,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.example.schiffuntergang.ui.ParallaxLayer;
-import org.example.schiffuntergang.sounds.SoundEffect;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class GameCreationScreen {
     private final Stage stage;
     private double x;
     private double y;
-
     private final SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
+    private Timeline parallaxTimeline;
+
+
     static {
         try {
             Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
@@ -42,11 +46,7 @@ public class GameCreationScreen {
     public GameCreationScreen(Stage stage) {
         this.stage = stage;
     }
-
-    private Timeline parallaxTimeline;
-
     public void show() {
-
         List<ParallaxLayer> parallaxLayers = new ArrayList<>();
         StackPane parallaxRoot = createParallaxBackground(parallaxLayers);
 
@@ -63,7 +63,6 @@ public class GameCreationScreen {
 
         startParallaxAnimation(parallaxLayers);
     }
-
     private VBox createMenuButtons() {
         Button singleP = new Button("SINGLE PLAYER");
         Button multiP = new Button("MULTIPLAYER");
@@ -99,8 +98,6 @@ public class GameCreationScreen {
         buttonBox.setAlignment(Pos.CENTER);
         return buttonBox;
     }
-
-
     private void showMultiplayerMenuScene() {
         Button createGame = new Button("Host Game");
         Button findGame = new Button("Join Game");
@@ -155,7 +152,6 @@ public class GameCreationScreen {
         stage.setTitle("Multiplayer");
         stage.setFullScreen(true);
     }
-
     private void showJoinGameScene(boolean ki) {
         Stage connectStage = new Stage();
         connectStage.setTitle("Mit Server verbinden");
@@ -226,7 +222,6 @@ public class GameCreationScreen {
         stage.setTitle("Join Game");
         stage.setFullScreen(true);
     }
-
     private void startParallaxAnimation(List<ParallaxLayer> layers) {
         this.parallaxTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
             for (ParallaxLayer layer : layers) {
@@ -236,7 +231,6 @@ public class GameCreationScreen {
         this.parallaxTimeline.setCycleCount(Timeline.INDEFINITE);
         this.parallaxTimeline.play();
     }
-
     private StackPane createParallaxBackground(List<ParallaxLayer> parallaxLayers) {
         StackPane parallaxRoot = new StackPane(
                 createFullscreenImageView("/images/0.png"),
@@ -261,7 +255,6 @@ public class GameCreationScreen {
         parallaxRoot.setAlignment(Pos.CENTER);
         return parallaxRoot;
     }
-
     private void setupEscapeKey(Scene scene) {
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
@@ -272,7 +265,6 @@ public class GameCreationScreen {
             }
         });
     }
-
     private void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
         button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';" +
@@ -283,7 +275,6 @@ public class GameCreationScreen {
                 "-fx-background-radius: 5; " +
                 "-fx-border-radius: 5;");
     }
-
     private ImageView createFullscreenImageView(String path) {
         Image image = new Image(getClass().getResourceAsStream(path));
         ImageView imageView = new ImageView(image);
@@ -377,6 +368,5 @@ public class GameCreationScreen {
         multiplayerStage.show();
 
         stage.close();
-
     }
 }

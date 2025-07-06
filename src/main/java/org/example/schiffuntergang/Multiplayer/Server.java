@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+
 public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     private ServerSocket s;
     private Socket cl;
@@ -16,6 +17,7 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
     public Server(){
 
     }
+
     public void start(int port) throws IOException {
         s = new ServerSocket(port);
         System.out.println("[Server] Warte auf Verbindung...");
@@ -24,12 +26,10 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
         in = new BufferedReader(new InputStreamReader(cl.getInputStream()));
         out = new PrintWriter(cl.getOutputStream(), true);
     }
-
     public void sendSize(int rows, int cols) {
         out.write("size " +rows+ " " +cols+" \n");
         out.flush();
     }
-
     public void sendShips(int[] lengths) {
         out.write("ships");
         out.flush();
@@ -39,47 +39,34 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
         }
         out.println();
     }
-
     public void sendShot(int row, int col) {
         out.write("shot " + row + " " + col+"\n");
         out.flush();
     }
-
     public void sendAnswer(int result) {
         out.write("answer " + result+"\n");
         out.flush();
     }
-
     public void sendPass() {
         out.write("pass\n");
         out.flush();
-
     }
-
     public void sendReady() {
         out.write("ready\n");
         out.flush();
-
     }
-
     public void sendDone() {
         out.write("done\n");
         out.flush();
-
     }
-
     public void sendSave(long id) {
         out.write("save " + id+"\n");
         out.flush();
-
     }
-
     public void sendLoad(long id) {
         out.write("load " + id+"\n");
         out.flush();
-
     }
-
     public void close() {
         try {
             cl.close();
@@ -88,7 +75,6 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
             e.printStackTrace();
         }
     }
-
     public String receiveMessage() throws IOException {
         return in.readLine();
     }

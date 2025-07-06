@@ -13,6 +13,7 @@ public class ParallaxLayer {
     private final Pane layer = new Pane();
     private final Stage stage;
 
+
     public ParallaxLayer(String imagePath, double speed, Stage stage) {
         this.speed = speed;
         this.stage = stage;
@@ -43,7 +44,6 @@ public class ParallaxLayer {
     public Pane getNode() {
         return layer;
     }
-
     public void update() {
         double dx = -speed;
 

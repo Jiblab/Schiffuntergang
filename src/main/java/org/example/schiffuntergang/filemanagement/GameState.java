@@ -1,7 +1,5 @@
 package org.example.schiffuntergang.filemanagement;
 
-import org.jetbrains.annotations.Nullable;
-
 public class GameState {
 
     private GamefieldData playerBoardData;
@@ -11,13 +9,8 @@ public class GameState {
     private boolean musikAktiv;
     private boolean soundEffekteAktiv;
     private boolean isPlayerTurn;
-
     private long id;
-
-
-    //mulitplayer
     private boolean isMultiplayer;
-
 
     public GameState() {
     }
@@ -30,7 +23,6 @@ public class GameState {
         this.soundEffekteAktiv = soundEffekteAktiv;
         this.isPlayerTurn = isPlayerTurn;
     }
-
 
     public GamefieldData getPlayerBoardData() {
         return playerBoardData;
@@ -62,14 +54,6 @@ public class GameState {
 
     public void setMusikAktiv(boolean musikAktiv) {
         this.musikAktiv = musikAktiv;
-    }
-
-    public boolean isSoundEffekteAktiv() {
-        return soundEffekteAktiv;
-    }
-
-    public void setSoundEffekteAktiv(boolean soundEffekteAktiv) {
-        this.soundEffekteAktiv = soundEffekteAktiv;
     }
 
     public boolean isPlayerTurn() {

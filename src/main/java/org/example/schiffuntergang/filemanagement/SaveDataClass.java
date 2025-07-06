@@ -3,34 +3,25 @@ package org.example.schiffuntergang.filemanagement;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.example.schiffuntergang.components.Gamefield;
+import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-
-import org.example.schiffuntergang.Multiplayer.MultiplayerLogic;
 import java.io.IOException;
 
-public class SaveDataClass {
 
+public class SaveDataClass {
     private Gamefield spieler, gegner;
     private Map<String, Object> datenzumspeichern = new HashMap<String, Object>();
-
-    //multiplayer
     private MultiplayerLogic logic;
 
-    //Fürs Speichern
     public SaveDataClass(Gamefield spielergamefield, Gamefield gegnergamefield) {
         spieler = spielergamefield;
         gegner = gegnergamefield;
     }
-
-    //Fürs Laden
     public SaveDataClass(){
 
     }
-
     //multiplayer
     public SaveDataClass(Gamefield spielergamefield, Gamefield gegnergamefield, MultiplayerLogic logic) {
         this.spieler = spielergamefield;
@@ -45,7 +36,6 @@ public class SaveDataClass {
         datenzumspeichern.put("shipsgegner",gegner.getShips());
 
     }*/
-
     public GameState loadData(String json){
         GameState completeGameState;
 
@@ -54,7 +44,6 @@ public class SaveDataClass {
 
         return completeGameState;
     }
-
     public String getDatenzumspeichern() {
         GameState completeGameState = createGameState();
         completeGameState.setMultiplayer(false, 0); // Explizit als Singleplayer markieren
@@ -62,14 +51,13 @@ public class SaveDataClass {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(completeGameState);
     }
-
     public void saveMultiplayerGame() {
         if (this.logic == null) {
             System.err.println("[SaveDataClass] FEHLER: Multiplayer-Spiel kann nicht gespeichert werden. MultiplayerLogic fehlt.");
             return;
         }
 
-        System.out.println("\n[SaveDataClass] Multiplayer-Speichervorgang wird gestartet...");
+        System.out.println("[SaveDataClass] Multiplayer-Speichervorgang wird gestartet...");
 
         long saveId = System.currentTimeMillis();
         String filename = "mp_save_" + saveId + ".save";
@@ -101,19 +89,18 @@ public class SaveDataClass {
             System.err.println("[SaveDataClass] FEHLER: Senden des Speicherbefehls an den Gegner fehlgeschlagen: " + e.getMessage());
         }
     }
+    private GameState createGameState() {
+        GamefieldData playerData = spieler.toData();
+        GamefieldData enemyData = gegner.toData();
 
-        private GameState createGameState() {
-            GamefieldData playerData = spieler.toData();
-            GamefieldData enemyData = gegner.toData();
+        GameState state = new GameState();
+        state.setPlayerBoardData(playerData);
+        state.setEnemyBoardData(enemyData);
 
-            GameState state = new GameState();
-            state.setPlayerBoardData(playerData);
-            state.setEnemyBoardData(enemyData);
-
-            if (spieler != null) {
-                state.setMusikAktiv(spieler.isMusicEnabled());
-                state.setMusikVolume(spieler.getMusicVolume());
-            }
-            return state;
+        if (spieler != null) {
+            state.setMusikAktiv(spieler.isMusicEnabled());
+            state.setMusikVolume(spieler.getMusicVolume());
         }
+        return state;
     }
+}

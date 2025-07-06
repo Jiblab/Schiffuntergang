@@ -3,6 +3,7 @@ package org.example.schiffuntergang.components;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
 
+
 public class Ships extends Parent {
     private final int length;
     private int health;
@@ -34,11 +35,9 @@ public class Ships extends Parent {
     public int getHealth() {
         return health;
     }
-
     public ImageView getShipImageView() {
         return shipImageView;
     }
-
     public void setShipImageView(ImageView shipImageView) {
         this.shipImageView = shipImageView;
     }
