@@ -111,11 +111,6 @@ public class Gamefield extends GridPane {
                             System.out.println(maxShipsC());
                             System.out.println("[Gamefield] Maximale Anzahl an schiffen erreicht");
                             control.showNotification("No Buildpoints left!", "error");
-                          /*  Alert alert = new Alert(Alert.AlertType.WARNING);
-                            alert.setTitle("Limit erreicht");
-                            alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
-                            alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
-                            alert.show();*/
                         }
                     }
                     else if (event.getButton() == MouseButton.PRIMARY && enemy && control.getReady()) {
@@ -164,13 +159,6 @@ public class Gamefield extends GridPane {
                             } else {
                                 System.out.println("[Gamefield] Limit an Bau-Punkten erreicht!");
                                 control.showNotification("No Buildpoints left!", "error");
-                               /* Platform.runLater(() -> {
-                                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                                    alert.setTitle("Limit erreicht");
-                                    alert.setHeaderText("Maximale Anzahl an Schiffen platziert.");
-                                    alert.setContentText("Sie können keine weiteren Schiffe hinzufügen.");
-                                    alert.showAndWait();
-                                });*/
                             }
                         } else {
 
@@ -184,13 +172,6 @@ public class Gamefield extends GridPane {
                             } else {
                                 System.out.println("[Gamefield] Von Schiffslänge " + len + " können keine mehr platziert werden.");
                                 control.showNotification("No more of this ship length available ", "error");
-                                /*Platform.runLater(() -> {
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                    alert.setTitle("Limit für diese Länge erreicht");
-                                    alert.setHeaderText(null);
-                                    alert.setContentText("Sie haben bereits die maximale Anzahl an Schiffen der Länge " + len + " platziert.");
-                                    alert.showAndWait();
-                                });*/
                             }
                         }
 
@@ -367,18 +348,6 @@ public class Gamefield extends GridPane {
             if (control != null) {
                 control.showGameOverScreen(this.enemy);
             }
-          /*  Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Game Over");
-                alert.setHeaderText(null);
-                if (enemy) {
-                    alert.setContentText("You Won! Congrats :)");
-                } else {
-                    alert.setContentText("Uh-oh, you lost :(");
-                }
-
-                alert.showAndWait();
-            });*/
         }
     }
     public void setTurn(boolean t) {

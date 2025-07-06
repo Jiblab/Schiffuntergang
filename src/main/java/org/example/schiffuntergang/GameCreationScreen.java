@@ -1,5 +1,6 @@
 package org.example.schiffuntergang;
 
+import javafx.geometry.Insets;
 import org.example.schiffuntergang.ui.ParallaxLayer;
 import org.example.schiffuntergang.sounds.SoundEffect;
 
@@ -153,17 +154,29 @@ public class GameCreationScreen {
         stage.setFullScreen(true);
     }
     private void showJoinGameScene(boolean ki) {
-        Stage connectStage = new Stage();
-        connectStage.setTitle("Mit Server verbinden");
-        Label ipLabel = new Label("Server-IP:");
+
+        Label ipLabel = new Label("Server-IP from Host:");
         TextField ipField = new TextField();
         ipField.setPromptText("e.g., 192.168.0.10");
         ipField.setMaxWidth(200);
-
+        Label portInfoLabel = new Label("Enter Port:");
+        TextField portField = new TextField("5000");
         Button connectButton = new Button("Connect");
         Button backButton = new Button("Back");
         Label statusLabel = new Label();
 
+        for (Label label : List.of(ipLabel, portInfoLabel)) {
+            label.setStyle("-fx-font-family: 'Press Start 2P'; -fx-text-fill: white;");
+        }
+        for (TextField field : List.of(ipField, portField)) {
+            field.setStyle("-fx-font-family: 'Press Start 2P';");
+            field.setMaxWidth(300);
+        }
+        statusLabel.setStyle("-fx-text-fill: #ff6347; -fx-font-family: 'Press Start 2P';");
+
+        for (Button btn : List.of(connectButton, backButton)) {
+            btn.getStyleClass().add("control-button");
+        }
         connectButton.setOnAction(e -> {
             clickSound.play();
             String ip = ipField.getText();
@@ -212,10 +225,20 @@ public class GameCreationScreen {
 
         VBox layout = new VBox(15, ipLabel, ipField, connectButton, backButton, statusLabel);
         layout.setAlignment(Pos.CENTER);
-        layout.getStyleClass().add("background");
+        layout.setPadding(new Insets(50));
+        layout.maxWidthProperty().bind(stage.widthProperty().multiply(0.5));
 
-        Scene scene = new Scene(layout);
-        scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
+        VBox.setMargin(connectButton, new Insets(40, 0, 0, 0));
+
+        StackPane rootPane = new StackPane(layout);
+        rootPane.getStyleClass().add("background");
+
+        Scene scene = new Scene(rootPane);
+        scene.getStylesheets().addAll(
+                getClass().getResource("/background.css").toExternalForm(),
+                getClass().getResource("/button.css").toExternalForm(),
+                getClass().getResource("/slider.css").toExternalForm()
+        );
         setupEscapeKey(scene);
 
         stage.setScene(scene);
