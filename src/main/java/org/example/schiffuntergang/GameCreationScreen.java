@@ -26,7 +26,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Diese Klasse repräsentiert den Bildschirm zur Auswahl des Spielmodus.
+ * Sie bietet dem Spieler die Möglichkeit, zwischen Einzelspieler und verschiedenen
+ * Multiplayer-Modi (Host, Join, KI) zu wählen.
+ * Die Klasse ist verantwortlich für das Erstellen der Menü-Buttons und das
+ * Weiterleiten zur entsprechenden nächsten Szene (z.B. {@link Boardsize} oder Join-Game-Dialog).
+ */
 public class GameCreationScreen {
     private final Stage stage;
     private double x;
@@ -34,9 +40,9 @@ public class GameCreationScreen {
     private final SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
     private Timeline parallaxTimeline;
 
-
     static {
         try {
+            // Lädt die benutzerdefinierte Schriftart für die UI.
             Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
         } catch (Exception e) {
             System.err.println("[GameCreationScreen] Pixel-Schriftart konnte nicht geladen werden!");
@@ -44,9 +50,19 @@ public class GameCreationScreen {
         }
     }
 
+    /**
+     * Erstellt eine neue Instanz des Spielmodus-Auswahlbildschirms.
+     *
+     * @param stage Die Haupt-Stage der Anwendung.
+     */
     public GameCreationScreen(Stage stage) {
         this.stage = stage;
     }
+
+    /**
+     * Baut die Szene für die Spielmodus-Auswahl auf und zeigt sie an.
+     * Initialisiert den Parallax-Hintergrund und die Menü-Buttons.
+     */
     public void show() {
         List<ParallaxLayer> parallaxLayers = new ArrayList<>();
         StackPane parallaxRoot = createParallaxBackground(parallaxLayers);
@@ -64,6 +80,12 @@ public class GameCreationScreen {
 
         startParallaxAnimation(parallaxLayers);
     }
+
+    /**
+     * Erstellt die VBox, die die Hauptmenü-Buttons (Single Player, Multiplayer, Back) enthält.
+     *
+     * @return Eine {@link VBox} mit den konfigurierten Buttons.
+     */
     private VBox createMenuButtons() {
         Button singleP = new Button("SINGLE PLAYER");
         Button multiP = new Button("MULTIPLAYER");
@@ -99,6 +121,11 @@ public class GameCreationScreen {
         buttonBox.setAlignment(Pos.CENTER);
         return buttonBox;
     }
+
+    /**
+     * Zeigt das Untermenü für die Multiplayer-Modi an.
+     * Bietet Optionen zum Hosten und Beitreten eines Spiels, sowohl für menschliche Spieler als auch für KIs.
+     */
     private void showMultiplayerMenuScene() {
         Button createGame = new Button("Host Game");
         Button findGame = new Button("Join Game");
@@ -140,9 +167,7 @@ public class GameCreationScreen {
 
         VBox layout = new VBox(20, createGame, findGame, createAI, joinAi, backButton);
         layout.setAlignment(Pos.CENTER);
-
         layout.getStyleClass().add("background");
-
 
         Scene scene = new Scene(layout);
         scene.getStylesheets().add(getClass().getResource("/background.css").toExternalForm());
@@ -153,8 +178,14 @@ public class GameCreationScreen {
         stage.setTitle("Multiplayer");
         stage.setFullScreen(true);
     }
-    private void showJoinGameScene(boolean ki) {
 
+    /**
+     * Zeigt den Bildschirm zum Beitreten eines Multiplayer-Spiels an.
+     * Der Spieler kann hier die IP-Adresse und den Port des Servers eingeben.
+     *
+     * @param ki True, wenn eine KI dem Spiel beitritt, sonst false.
+     */
+    private void showJoinGameScene(boolean ki) {
         Label ipLabel = new Label("Server-IP from Host:");
         TextField ipField = new TextField();
         ipField.setPromptText("e.g., 192.168.0.10");
@@ -190,7 +221,6 @@ public class GameCreationScreen {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/schiffuntergang/hello-view.fxml"));
                 Parent gameRoot = loader.load();
-
                 HelloController gameController = loader.getController();
 
                 gameController.setStage(this.stage);
@@ -203,7 +233,6 @@ public class GameCreationScreen {
                 }
 
                 Scene gameScene = new Scene(gameRoot);
-
                 gameScene.setOnKeyPressed(event -> {
                     if (event.getCode() == KeyCode.ESCAPE) {
                         stage.setIconified(true);
@@ -227,7 +256,6 @@ public class GameCreationScreen {
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(50));
         layout.maxWidthProperty().bind(stage.widthProperty().multiply(0.5));
-
         VBox.setMargin(connectButton, new Insets(40, 0, 0, 0));
 
         StackPane rootPane = new StackPane(layout);
@@ -245,6 +273,11 @@ public class GameCreationScreen {
         stage.setTitle("Join Game");
         stage.setFullScreen(true);
     }
+
+    /**
+     * Startet die Parallax-Bewegungsanimation für die Hintergrundebenen.
+     * @param layers Eine Liste von {@link ParallaxLayer}, die animiert werden sollen.
+     */
     private void startParallaxAnimation(List<ParallaxLayer> layers) {
         this.parallaxTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
             for (ParallaxLayer layer : layers) {
@@ -254,6 +287,13 @@ public class GameCreationScreen {
         this.parallaxTimeline.setCycleCount(Timeline.INDEFINITE);
         this.parallaxTimeline.play();
     }
+
+    /**
+     * Erstellt den mehrschichtigen Parallax-Hintergrund.
+     *
+     * @param parallaxLayers Eine leere Liste, die mit den animierten Ebenen gefüllt wird.
+     * @return Ein {@link StackPane}, das alle Hintergrundebenen enthält.
+     */
     private StackPane createParallaxBackground(List<ParallaxLayer> parallaxLayers) {
         StackPane parallaxRoot = new StackPane(
                 createFullscreenImageView("/images/0.png"),
@@ -278,6 +318,11 @@ public class GameCreationScreen {
         parallaxRoot.setAlignment(Pos.CENTER);
         return parallaxRoot;
     }
+
+    /**
+     * Richtet einen Key-Listener für die Escape-Taste ein, um den Vollbildmodus zu verlassen.
+     * @param scene Die Szene, der der Listener hinzugefügt wird.
+     */
     private void setupEscapeKey(Scene scene) {
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
@@ -288,6 +333,12 @@ public class GameCreationScreen {
             }
         });
     }
+
+    /**
+     * Passt die Schriftgröße eines Buttons dynamisch an die Fensterbreite an.
+     * @param button Der anzupassende Button.
+     * @param baseWidth Ein Teiler, der die Skalierung der Schriftgröße steuert.
+     */
     private void adjustFontSize(Button button, double baseWidth) {
         double size = stage.getWidth() / baseWidth;
         button.setStyle("-fx-font-size:" + size + "px; -fx-font-family: 'Press Start 2P';" +
@@ -298,6 +349,12 @@ public class GameCreationScreen {
                 "-fx-background-radius: 5; " +
                 "-fx-border-radius: 5;");
     }
+
+    /**
+     * Erstellt eine {@link ImageView}, die sich immer an die volle Größe des Fensters anpasst.
+     * @param path Der Ressourcenpfad zum Bild.
+     * @return eine konfigurierte {@link ImageView}.
+     */
     private ImageView createFullscreenImageView(String path) {
         Image image = new Image(getClass().getResourceAsStream(path));
         ImageView imageView = new ImageView(image);
@@ -305,8 +362,12 @@ public class GameCreationScreen {
         imageView.fitWidthProperty().bind(stage.widthProperty());
         imageView.fitHeightProperty().bind(stage.heightProperty());
         return imageView;
-
     }
+
+    /**
+     * Veraltete Methode zum Anzeigen eines separaten Multiplayer-Fensters.
+     * @deprecated Die Logik wurde durch {@link #showMultiplayerMenuScene()} ersetzt, die die Szenen auf der Haupt-Stage austauscht.
+     */
     private void showMultiplayerWindowAndCloseCurrent() {
         SoundEffect clickSound = new SoundEffect("/music/ButtonBeepmp3.mp3");
         Stage multiplayerStage = new Stage();
@@ -322,16 +383,13 @@ public class GameCreationScreen {
         vbox.setPrefHeight(200);
 
         findGame.setOnAction(e -> {
-
             Stage connectStage = new Stage();
             connectStage.setTitle("Mit Server verbinden");
-
             Label ipLabel = new Label("Server-IP:");
             TextField ipField = new TextField();
             ipField.setPromptText("z.B. 192.168.0.10");
             Button connectButton = new Button("Verbinden");
             Label statusLabel = new Label();
-
             connectButton.setOnAction(ev -> {
                 clickSound.play();
                 String ip = ipField.getText();
@@ -342,34 +400,26 @@ public class GameCreationScreen {
                     Parent root = loader.load();
                     HelloController controller1 = loader.getController();
                     controller1.setStage(connectStage);
-
                     controller1.setSize(x, y);
                     controller1.setupMultiC(ip, port);
-
                     Scene scene = new Scene(root);
                     connectStage.setScene(scene);
                     connectStage.setFullScreen(true);
-
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-
             });
-
             VBox vbox2 = new VBox(15, ipLabel, ipField, connectButton, statusLabel);
             vbox2.setAlignment(Pos.CENTER);
             vbox2.setPrefWidth(350);
             vbox2.setPrefHeight(200);
-
             Scene scene = new Scene(vbox2);
             connectStage.setScene(scene);
             connectStage.setFullScreen(true);
             connectStage.show();
-
         });
 
         createGame.setOnAction(e -> {
-
             clickSound.play();
             Boardsize boardsize = new Boardsize(stage, true);
             boardsize.showMulti(false);
@@ -378,18 +428,14 @@ public class GameCreationScreen {
 
         close.setOnAction(e -> {
             StartScreen startScreen = new StartScreen(stage);
-
             clickSound.play();
             startScreen.show();
         });
 
         Scene scene = new Scene(vbox);
         multiplayerStage.setScene(scene);
-
         multiplayerStage.setFullScreen(true);
-
         multiplayerStage.show();
-
         stage.close();
     }
 }
