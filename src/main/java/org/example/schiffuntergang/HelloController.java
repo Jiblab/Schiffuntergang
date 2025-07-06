@@ -514,7 +514,7 @@ public class HelloController {
         d_horizontal.setMaxWidth(Double.MAX_VALUE);
         d_vertical.setMaxWidth(Double.MAX_VALUE);
 
-        Button readyButton = new Button("Fertig platziert");
+        Button readyButton = new Button("Done Placing");
         readyButton.getStyleClass().add("control-button");
         readyButton.setMaxWidth(Double.MAX_VALUE);
         readyButton.setOnAction(e -> {
@@ -524,7 +524,7 @@ public class HelloController {
                 ioException.printStackTrace();
             }
         });
-        Button fertigButton = new Button("Fertig platziert");
+        Button fertigButton = new Button("Done Placing");
         fertigButton.getStyleClass().add("control-button");
         fertigButton.setMaxWidth(Double.MAX_VALUE);
         fertigButton.setOnAction(e -> {
