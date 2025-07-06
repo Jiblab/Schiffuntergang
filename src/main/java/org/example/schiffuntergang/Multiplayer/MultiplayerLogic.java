@@ -402,6 +402,7 @@ public class MultiplayerLogic {
                             // Es ist immer noch unser Zug! Wir müssen myturn wieder auf true setzen,
                             // damit die UI einen neuen Schuss erlaubt.
                             ce.setShipHit(true);
+
                             System.out.println("[MultiplayerLogic] Treffer/Versenkt. Ich bin wieder dran.");
                             myturn = true;
                         }

@@ -421,6 +421,7 @@ public class HelloController {
         enemy = new Gamefield(true, this, (int) x, (int) y, mlp);
         mlp.setEn(enemy);
         mlp.setPl(player);
+        mlp.setController(this);
 
         buildUI(player, enemy, createControlPanel());
         updateRemainingCellsDisplay();
