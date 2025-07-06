@@ -1,5 +1,7 @@
 package org.example.schiffuntergang.filemanagement;
 
+import org.jetbrains.annotations.Nullable;
+
 public class GameState {
 
     private GamefieldData playerBoardData;
@@ -9,6 +11,8 @@ public class GameState {
     private boolean musikAktiv;
     private boolean soundEffekteAktiv;
     private boolean isPlayerTurn;
+
+    private long id;
 
 
     //mulitplayer
@@ -81,7 +85,10 @@ public class GameState {
         return isMultiplayer;
     }
 
-    public void setMultiplayer(boolean multiplayer) {
+    public void setMultiplayer(boolean multiplayer, long createdid) {
         isMultiplayer = multiplayer;
+        if(isMultiplayer){
+            id = createdid;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package org.example.schiffuntergang;
 
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import org.controlsfx.control.ToggleSwitch;
 import javafx.animation.PauseTransition;
@@ -113,9 +114,23 @@ public class HelloController {
         HBox gameFieldsBox = new HBox(30, playerBox, enemyBox);
         gameFieldsBox.setAlignment(Pos.CENTER);
         gameFieldsBox.setPadding(new Insets(20));
-        rootPane.setCenter(gameFieldsBox);
+        //rootPane.setCenter(gameFieldsBox);
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(gameFieldsBox);
 
+        // WICHTIG: Sagt der ScrollPane, dass sie sich an die Größe des Fensters anpassen soll.
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        // Optional: Den Hintergrund der ScrollPane transparent machen, damit man dein Hintergrundbild sieht.
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        // Setze die ScrollPane (statt der HBox) in die Mitte des BorderPane.
+        rootPane.setCenter(scrollPane);
+
+        // 3. Steuerleiste (links) - unverändert
         rootPane.setLeft(controlNode);
+        //rootPane.setLeft(controlNode);
 
         //Messages für treffer, verfehlt, etc
         notificationLabel = new Label();
