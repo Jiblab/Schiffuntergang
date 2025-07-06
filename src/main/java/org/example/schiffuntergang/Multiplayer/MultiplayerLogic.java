@@ -106,7 +106,7 @@ public class MultiplayerLogic {
                                 } else if (!c.getShip().isAlive()) {
                                     if (maxShoot == 0){
                                         s.send("won");
-                                       contr.showGameOverScreen(false);
+                                        Platform.runLater(()-> contr.showGameOverScreen(false));
                                     }
                                     maxShoot--;// Versenkt
                                     player.deleteShip();
@@ -115,7 +115,7 @@ public class MultiplayerLogic {
                                 } else { // Treffer
                                     if (maxShoot == 0){
                                         s.send("won");
-                                        contr.showGameOverScreen(false);
+                                        Platform.runLater(()-> contr.showGameOverScreen(false));
 
                                     }
                                     maxShoot--;
@@ -193,7 +193,7 @@ public class MultiplayerLogic {
                             break;
 
                         case "won":
-                            contr.showGameOverScreen(true);
+                            Platform.runLater(()-> contr.showGameOverScreen(true));
                             break;
 
 
@@ -365,7 +365,7 @@ public class MultiplayerLogic {
                             } else if (!c.getShip().isAlive()) {
                                 if (maxShoot == 0){
                                     cl.send("won");
-                                    contr.showGameOverScreen(false);
+                                    Platform.runLater(()-> contr.showGameOverScreen(false));
                                 }
                                 maxShoot--;// Versenkt
                                 player.deleteShip();
@@ -374,7 +374,7 @@ public class MultiplayerLogic {
                             } else { // Treffer
                                 if (maxShoot == 0){
                                     cl.send("won");
-                                   contr.showGameOverScreen(false);
+                                    Platform.runLater(()-> contr.showGameOverScreen(false));
                                 }
                                 maxShoot--;
                                 cl.sendAnswer(1);
@@ -461,7 +461,7 @@ public class MultiplayerLogic {
                         break;
 
                     case "won":
-                        contr.showGameOverScreen(true);
+                        Platform.runLater(()-> contr.showGameOverScreen(true));
                         break;
 
                     default:
