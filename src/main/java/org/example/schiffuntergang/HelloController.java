@@ -653,6 +653,46 @@ public class HelloController {
             BackgroundMusic.getInstance().stop();
         }
     }
+    // In HelloController.java
+
+    public void showGameOverScreen(boolean playerWon) {
+        player.setDisable(true);
+        enemy.setDisable(true);
+
+        Label titleLabel = new Label(playerWon ? "YOU WON!" : "GAME OVER");
+        Label messageLabel = new Label(playerWon ? "Congratulations!" : "All your ships have been sunk");
+        Button backToMenuButton = new Button("Back to Main Menu");
+
+        String imagePath = playerWon ? "/images/trophy.png" : "/images/skull.png";
+        ImageView resultImage = new ImageView(new Image(getClass().getResource(imagePath).toExternalForm()));
+        resultImage.setFitHeight(80);
+        resultImage.setPreserveRatio(true);
+
+        titleLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 48px; -fx-text-fill: " + (playerWon ? "#ffbf00;" : "#e04f4f;"));
+        messageLabel.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: white;");
+        backToMenuButton.getStyleClass().add("option-button");
+
+        backToMenuButton.setOnAction(e -> {
+            StartScreen startScreen = new StartScreen(stage);
+            startScreen.show();
+        });
+
+        VBox gameOverLayout = new VBox(20, titleLabel, resultImage, messageLabel, backToMenuButton);
+        gameOverLayout.setAlignment(Pos.CENTER);
+        gameOverLayout.setPadding(new Insets(40));
+        gameOverLayout.setStyle(
+                "-fx-background-color: rgba(0, 0, 0, 0.85); " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-border-color: #ffbf00; " +
+                        "-fx-border-width: 3; " +
+                        "-fx-border-radius: 10;"
+        );
+        gameOverLayout.setMaxSize(600, 400);
+
+        anker.getChildren().add(gameOverLayout);
+        AnchorPane.setTopAnchor(gameOverLayout, (anker.getHeight() - gameOverLayout.getMaxHeight()) / 2);
+        AnchorPane.setLeftAnchor(gameOverLayout, (anker.getWidth() - gameOverLayout.getMaxWidth()) / 2);
+    }
 
     @FXML
     private void onReadyClicked() throws IOException {

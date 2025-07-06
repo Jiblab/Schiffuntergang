@@ -393,7 +393,10 @@ public class Gamefield extends GridPane {
         }
 
         if (placedShip.isEmpty()) {
-            Platform.runLater(() -> {
+            if (control != null) {
+                control.showGameOverScreen(this.enemy);
+            }
+          /*  Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Game Over");
                 alert.setHeaderText(null);
@@ -405,7 +408,7 @@ public class Gamefield extends GridPane {
                 }
 
                 alert.showAndWait();
-            });
+            });*/
         }
     }
 
