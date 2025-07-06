@@ -35,45 +35,37 @@ public class KiPlayerController implements Runnable {
     @Override
     public void run() {
         try {
-            // 1. Schiffe zufällig platzieren
+            // Schritt 1: Schiffe platzieren (unverändert)
             placeShipsRandomly();
-            System.out.println("KI: Schiffe platziert. Sende an Gegner...");
+            System.out.println("KI-Controller [" + (logic.getClient() ? "Client" : "Server") + "]: Schiffe platziert.");
 
-            // 2. "Fertig"-Signal über MultiplayerLogic senden (startet den Handshake)
-            logic.kiIsReady();
+            // Schritt 2: Den zweiten Handshake und den Start der Game-Loops koordinieren
+            if (logic.getClient()) {
+                // *** CLIENT-LOGIK ***
+                // Der Client muss warten, bis der Server ihm die "ships" schickt.
+                // Der einzige Ort, an dem er lauschen kann, ist sein clientGame-Loop.
+                // Deshalb starten wir ihn hier.
+                logic.startMultiplayerloop();
+                System.out.println("[Client-KI] clientGame-Loop gestartet und lauscht auf 'ships'.");
 
-            // 3. Hauptschleife: Warten, bis die KI am Zug ist
-            while (gameRunning) {
-                if (logic.getTurn()) {
-                    System.out.println("KI-Controller: Ich bin am Zug.");
+                // Der clientGame-Loop wird jetzt die "ships"-Nachricht empfangen.
+                // Im "case ships": muss dann "done" gesendet werden.
 
-                    // Kurze Pause für die Optik
-                    Thread.sleep(500);
-
-                    // KI entscheidet, wohin sie schießt
-                    int[] coords = ki.getShotCoordinates();
-                    int x = coords[0];
-                    int y = coords[1];
-
-                    System.out.println("KI-Controller: Schieße auf (" + x + ", " + y + ")");
-
-                    // Schuss über MultiplayerLogic auslösen
-                    logic.kiShoot(x, y);
-                }
-
-                // Kurze Pause, um die CPU nicht zu überlasten
-                Thread.sleep(100);
-
-                // Spielende-Bedingung (optional, da die UI dies auch anzeigt)
-                if (playerBoard.getShipCount() == 0 || enemyBoard.getShipCount() == 0) {
-                    System.out.println("KI-Controller: Spiel beendet.");
-                    gameRunning = false;
-                }
+            } else {
+                // *** SERVER-LOGIK ***
+                // Der Server initiiert den Handshake.
+                logic.sendShipsAndWaitForDone();
             }
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Fehler im KIPlayerController: " + e.getMessage());
-            Thread.currentThread().interrupt();
+
+            // Der KiPlayerController-Thread hat seine Aufgabe erfüllt und kann sich beenden.
+            // Die Steuerung liegt jetzt vollständig bei den Threads von `startGameFlow` und `clientGame`.
+            System.out.println("KI-Controller [" + (logic.getClient() ? "Client" : "Server") + "]: Initialisierung übergeben. Thread beendet sich.");
+
+        } catch (Exception e) {
+            System.err.println("Fehler im KiPlayerController.run(): " + e.getMessage());
+            e.printStackTrace();
         }
+
     }
 
     private void placeShipsRandomly() {
@@ -83,7 +75,10 @@ public class KiPlayerController implements Runnable {
         int retries = 0; // KORREKTUR 2: Zähler für Fehlversuche
         final int maxRetries = 500; // Breche nach 500 Fehlversuchen ab
 
-        while (playerBoard.getUsedCells() < maxCells) {
+        while (playerBoard.getUsedCells() < maxCells && retries <= maxRetries) {
+            if (playerBoard.getUsedCells() -1 == maxCells){
+                break;
+            }
             int shipLength = 2 + rand.nextInt(4);
             boolean vertical = rand.nextBoolean();
 
@@ -133,5 +128,9 @@ public class KiPlayerController implements Runnable {
         System.out.println("KI-Schiffsplatzierung beendet. Finale belegte Zellen: " + playerBoard.getUsedCells());
         // UI benachrichtigen, dass die Platzierung fertig ist (visuelles Update)
         Platform.runLater(()->{uiController.updateRemainingCellsDisplay();});
+    }
+
+    public EnemyPlayer getKi() {
+        return ki;
     }
 }

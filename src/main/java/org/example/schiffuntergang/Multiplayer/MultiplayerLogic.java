@@ -167,11 +167,26 @@ public class MultiplayerLogic {
                             break;
                     }
                 } else {
-                    // Wenn wir am Zug sind, warten wir auf eine UI-Aktion.
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                    if (kicontr != null) { // Prüfen, ob eine KI dieses Spiel steuert
+                        try {
+                            // Kurze Pause für die Optik
+                            Thread.sleep(500);
+
+                            // KI entscheidet und schießt
+                            int[] coords = kicontr.getKi().getShotCoordinates();
+                            System.out.println("KI-LOGIC: Schieße auf (" + coords[0] + ", " + coords[1] + ")");
+                            kiShoot(coords[0], coords[1]);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // Wenn es keine KI ist, warte einfach (auf Klick des Menschen)
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
                     }
                 }
             }
@@ -317,15 +332,46 @@ public class MultiplayerLogic {
                         myturn = true; // Jetzt sind wir dran
                         break;
 
+                    case "ships":
+                        System.out.println("[Client] 'ships' empfangen.");
+                        // Der KiPlayerController des Clients hat bereits seine Schiffe platziert
+                        // und wartet quasi darauf, dass diese Nachricht ankommt.
+                        // Jetzt, wo sie da ist, kann er "done" senden.
+                        if (kicontr != null) { // Wenn es eine KI ist
+                            System.out.println("[Client-KI] Sende 'done' als Antwort auf 'ships'.");
+                            cl.sendDone();
+                        }
+                        break;
+
+                    case "ready":
+                        System.out.println("[Client] 'ready' empfangen. Spiel kann beginnen.");
+                        firstturn = false; // Spiel hat begonnen
+                        // myturn bleibt false, da der Server beginnt.
+                        break;
+
                     //... andere cases
                 }
             } else {
-                // Wenn wir am Zug sind, warten wir auf eine UI-Aktion.
-                // Ein kurzer Sleep verhindert, dass die Schleife die CPU voll auslastet.
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                if (kicontr != null) { // Prüfen, ob eine KI dieses Spiel steuert
+                    try {
+                        // Kurze Pause für die Optik
+                        Thread.sleep(500);
+
+                        // KI entscheidet und schießt
+                        int[] coords = kicontr.getKi().getShotCoordinates();
+                        System.out.println("KI-LOGIC: Schieße auf (" + coords[0] + ", " + coords[1] + ")");
+                        kiShoot(coords[0], coords[1]);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    // Wenn es keine KI ist, warte einfach (auf Klick des Menschen)
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         }
@@ -466,4 +512,26 @@ public class MultiplayerLogic {
     public void setKicontroler(KiPlayerController ki){
         kicontr = ki;
     }
+
+    public Client getClientObj() {
+        return this.cl;
+    }
+
+    public void sendShipsAndWaitForDone() throws IOException {
+        if (client) return; // Nur für Server
+
+        int[] shipLengths = player.getShipLengths();
+        s.sendShips(shipLengths);
+        System.out.println("[Server] 'ships' gesendet. Warte auf 'done'...");
+
+        String messagedone = s.receiveMessage(); // Blockiert hier
+        System.out.println("[Server] Nachricht empfangen: " + messagedone);
+
+        if (messagedone.contains("done")) {
+            s.sendReady();
+            System.out.println("[Server] 'Ready' gesendet. Starte Game-Loop.");
+            startMultiplayerloop(); // Startet startGameFlow in einem neuen Thread
+        }
+    }
+
 }

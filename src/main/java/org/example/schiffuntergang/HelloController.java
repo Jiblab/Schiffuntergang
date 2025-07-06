@@ -491,6 +491,7 @@ public class HelloController {
             if (kiController == null && !ishost) { // Prüfen, ob der Controller noch nicht existiert
                 EnemyPlayer ki = new EnemyPlayer(enemyBoard);
                 kiController = new KiPlayerController(mlp, ki, playerBoard, enemyBoard, this);
+                mlp.setKicontroler(kiController);
                 kiController.start();
             }
         }
@@ -591,6 +592,19 @@ public class HelloController {
             mlp = new MultiplayerLogic(c, true, null, null);
         }
 
+        // Erstelle den KI-Controller für den Host, BEVOR der Thread gestartet wird.
+        if (asHost) {
+            System.out.println("[Host] setupKivsKi: Erstelle Host KI-Controller.");
+            EnemyPlayer ki = new EnemyPlayer(enemy);
+            kiController = new KiPlayerController(mlp, ki, player, enemy, this);
+            mlp.setKicontroler(kiController);
+
+            // UI sofort aufbauen
+            buildUI(player, enemy, createControlPanel());
+            player.setDisable(true);
+            enemy.setDisable(true);
+        }
+
         mlp.setController(this);
 
         // Der zentrale Thread, der die gesamte Initialisierung steuert
@@ -619,18 +633,7 @@ public class HelloController {
         });
         gameSetupThread.setDaemon(true);
 
-        // Erstelle den KI-Controller für den Host, BEVOR der Thread gestartet wird.
-        if (asHost) {
-            System.out.println("[Host] setupKivsKi: Erstelle Host KI-Controller.");
-            EnemyPlayer ki = new EnemyPlayer(enemy);
-            this.kiController = new KiPlayerController(mlp, ki, player, enemy, this);
-            mlp.setKicontroler(this.kiController);
 
-            // UI sofort aufbauen
-            buildUI(player, enemy, createControlPanel());
-            player.setDisable(true);
-            enemy.setDisable(true);
-        }
         // Für den Client wird der kiController erst in setupMultiplayerBoards erstellt.
         // Das ist richtig so.
 
