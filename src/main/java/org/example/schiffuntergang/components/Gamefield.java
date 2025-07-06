@@ -329,7 +329,7 @@ public class Gamefield extends GridPane {
         }
     }
     public Cell getCell(int x, int y) {
-        if (x >= 0 && x < breit && y >= 0 && y < lang) {
+        if (x >= 0 && x < lang && y >= 0 && y < breit) {
             return cells[x][y];
         }
         return null;
@@ -390,12 +390,16 @@ public class Gamefield extends GridPane {
             int reihenIndex = vertical ? startY + i : startY;
             int spaltenIndex = vertical ? startX : startX + i;
 
-            Cell cellToCheck = getCell(spaltenIndex, reihenIndex);
-
-            if (cellToCheck == null || cellToCheck.getShip() != null) {
-                System.out.println("[Gamefield] Fehler: Platzierung nicht möglich bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + ").");
+            if(reihenIndex >= breit || reihenIndex < 0) {
+                System.out.println("[Gamefield] Fehler: Platzierung breit bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + "). geht outofbounds");
                 return false;
             }
+
+            if(spaltenIndex >= lang || spaltenIndex < 0) {
+                System.out.println("[Gamefield] Fehler: Platzierung lang bei (Reihe " + reihenIndex + ", Spalte " + spaltenIndex + "). geht outofbounds");
+                return false;
+            }
+
         }
 
         for (int i = 0; i < length; i++) {
