@@ -698,7 +698,7 @@ public class HelloController {
         );
         gameOverLayout.setMaxSize(600, 400);
 
-        anker.getChildren().add(gameOverLayout);
+        Platform.runLater(()->anker.getChildren().add(gameOverLayout));
         AnchorPane.setTopAnchor(gameOverLayout, (anker.getHeight() - gameOverLayout.getMaxHeight()) / 2);
         AnchorPane.setLeftAnchor(gameOverLayout, (anker.getWidth() - gameOverLayout.getMaxWidth()) / 2);
     }

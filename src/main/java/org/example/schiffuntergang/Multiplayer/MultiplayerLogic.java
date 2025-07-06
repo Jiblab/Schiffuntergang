@@ -104,21 +104,23 @@ public class MultiplayerLogic {
                                     s.sendAnswer(0);
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
                                 } else if (!c.getShip().isAlive()) {
-                                    if (maxShoot == 0){
+                                    maxShoot--;// Versenkt
+                                    if (maxShoot <= 0){
                                         s.send("won");
                                         Platform.runLater(()-> contr.showGameOverScreen(false));
                                     }
-                                    maxShoot--;// Versenkt
+
                                     player.deleteShip();
                                     s.sendAnswer(2);
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                                 } else { // Treffer
-                                    if (maxShoot == 0){
+                                    maxShoot--;
+                                    if (maxShoot <= 0){
                                         s.send("won");
                                         Platform.runLater(()-> contr.showGameOverScreen(false));
 
                                     }
-                                    maxShoot--;
+
                                     s.sendAnswer(1);
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 1 (Hit)");
                                 }
@@ -363,20 +365,22 @@ public class MultiplayerLogic {
                                 cl.sendAnswer(0);
                                 System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
                             } else if (!c.getShip().isAlive()) {
-                                if (maxShoot == 0){
+                                maxShoot--;// Versenkt
+                                if (maxShoot <= 0){
                                     cl.send("won");
                                     Platform.runLater(()-> contr.showGameOverScreen(false));
                                 }
-                                maxShoot--;// Versenkt
+
                                 player.deleteShip();
                                 cl.sendAnswer(2);
                                 System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                             } else { // Treffer
-                                if (maxShoot == 0){
+                                maxShoot--;
+                                if (maxShoot <= 0){
                                     cl.send("won");
                                     Platform.runLater(()-> contr.showGameOverScreen(false));
                                 }
-                                maxShoot--;
+
                                 cl.sendAnswer(1);
 
                                 // WICHTIG: myturn wird hier NICHT geändert. Der Server ist weiterhin dran.
