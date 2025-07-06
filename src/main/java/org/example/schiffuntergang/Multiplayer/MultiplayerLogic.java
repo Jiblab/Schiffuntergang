@@ -169,7 +169,7 @@ public class MultiplayerLogic {
                                 try{
                                     FileManager fm = new FileManager(false);
                                     GameState loadedstate = fm.loadfromid(saveId);
-                                    loadGameFromSave(loadedstate);
+                                    loadGameFromSave(loadedstate, null);
                                 }catch(Exception e){
                                     System.err.println("Fehler beim Verarbeiten des Loads"+e.getMessage());
                                 }
@@ -202,8 +202,13 @@ public class MultiplayerLogic {
         }
     }
 
-    public void loadGameFromSave(GameState loadedState) {
-
+    public void loadGameFromSave(GameState loadedState, HelloController ctr) {
+        if(ctr != null){
+            setController(ctr);
+        }
+        if(s != null){
+            s.sendLoad(loadedState.getId());
+        }
 
         player = Gamefield.fromData(loadedState.getPlayerBoardData(), this.contr, this);
         enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), this.contr, this);
@@ -221,6 +226,8 @@ public class MultiplayerLogic {
             BackgroundMusic.getInstance().stop();
         }
     }
+
+
 
     public void start() throws IOException {
         if (!client){ //man selber ist host

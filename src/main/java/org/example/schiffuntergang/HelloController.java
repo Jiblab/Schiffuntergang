@@ -65,6 +65,8 @@ public class HelloController {
     private KiPlayerController kiController;
     private boolean ki = false;
 
+    Button ladenButton;
+
     private SaveDataClass savedata;
 
     @FXML
@@ -332,7 +334,22 @@ public class HelloController {
             btn.getStyleClass().add("option-button");
             btn.setMaxWidth(Double.MAX_VALUE);
         }
-        Button fertigButton = new Button("Done Placing");
+        ladenButton = new Button("Spiel laden");
+        ladenButton.getStyleClass().add("control-button");
+        ladenButton.setOnAction(e->{
+            FileManager fm = new FileManager(true);
+            try {
+                stage.setFullScreen(false);
+                GameState loadedState = fm.load();
+                long id = loadedState.getId();
+                stage.setFullScreen(true);
+                mlp.loadGameFromSave(loadedState, this);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        ladenButton.setVisible(false);
+        Button fertigButton = new Button("Fertig platziert");
         fertigButton.getStyleClass().add("control-button");
         fertigButton.setOnAction(e -> {
             try {
@@ -352,6 +369,7 @@ public class HelloController {
                 shipLengthLabel, b2, b3, b4, b5,
                 directionLabel, d_horizontal, d_vertical,
                 spacer,
+                ladenButton,
                 fertigButton
         );
         return controlPanel;
@@ -420,7 +438,17 @@ public class HelloController {
         updateRemainingCellsDisplay();
         new Thread(() -> {
             try {
+                // mlp.start() wartet hier auf eine Client-Verbindung und führt den Handshake durch.
                 mlp.start();
+
+                // Sobald mlp.start() abgeschlossen ist, ist der Client verbunden.
+                // Jetzt geben wir dem Host die Möglichkeit, ein Spiel zu laden.
+                // Wir verwenden Platform.runLater, um die UI sicher aus diesem Thread zu aktualisieren.
+                Platform.runLater(() -> {
+                    if (ladenButton != null) {
+                        ladenButton.setVisible(true);
+                    }
+                });
             } catch (IOException e) {
                 System.out.println("[Gamefield] IOException im Server-Thread: " + e.getMessage());
             }
@@ -500,7 +528,7 @@ public class HelloController {
         d_horizontal.setMaxWidth(Double.MAX_VALUE);
         d_vertical.setMaxWidth(Double.MAX_VALUE);
 
-        Button readyButton = new Button("Done Placing");
+        Button readyButton = new Button("Fertig platziert");
         readyButton.getStyleClass().add("control-button");
         readyButton.setMaxWidth(Double.MAX_VALUE);
         readyButton.setOnAction(e -> {
@@ -510,7 +538,7 @@ public class HelloController {
                 ioException.printStackTrace();
             }
         });
-        Button fertigButton = new Button("Done Placing");
+        Button fertigButton = new Button("Fertig platziert");
         fertigButton.getStyleClass().add("control-button");
         fertigButton.setMaxWidth(Double.MAX_VALUE);
         fertigButton.setOnAction(e -> {
@@ -694,6 +722,9 @@ public class HelloController {
 
     @FXML
     private void onReadyClicked() throws IOException {
+        if(ladenButton != null){
+            ladenButton.setVisible(false);
+        }
         readyToSendShips = true;
         if (mlp != null) {
             mlp.sendShips();

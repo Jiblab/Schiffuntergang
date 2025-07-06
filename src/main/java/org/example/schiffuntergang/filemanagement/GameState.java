@@ -85,6 +85,10 @@ public class GameState {
         return isMultiplayer;
     }
 
+    public long getId(){
+        return id;
+    }
+
     public void setMultiplayer(boolean multiplayer, long createdid) {
         isMultiplayer = multiplayer;
         if(isMultiplayer){
