@@ -75,6 +75,11 @@ public class Server implements org.example.schiffuntergang.Multiplayer.Network {
             e.printStackTrace();
         }
     }
+
+    public void send(String message){
+        out.println(message+"\n");
+        out.flush();
+    }
     public String receiveMessage() throws IOException {
         return in.readLine();
     }

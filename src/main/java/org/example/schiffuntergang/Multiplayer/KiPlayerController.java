@@ -61,7 +61,7 @@ public class KiPlayerController implements Runnable {
         final int maxRetries = 500;
 
         while (playerBoard.getUsedCells() < maxCells && retries <= maxRetries) {
-            if (playerBoard.getUsedCells() -1 == maxCells){
+            if (playerBoard.getUsedCells()-1 == maxCells -1){
                 break;
             }
             int shipLength = 2 + rand.nextInt(4);

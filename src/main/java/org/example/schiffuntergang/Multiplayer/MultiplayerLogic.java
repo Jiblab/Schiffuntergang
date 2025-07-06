@@ -32,6 +32,7 @@ public class MultiplayerLogic {
     private KiPlayerController kicontr;
 
     private int[][] shotEnemyPositions;
+    private int maxShoot;
 
 
     public MultiplayerLogic(Client c, boolean client1, Gamefield en, Gamefield pl){
@@ -40,6 +41,8 @@ public class MultiplayerLogic {
         enemy = en;
         client = client1;
         myturn = false;
+
+
     }
     public MultiplayerLogic(Server se, boolean client1, Gamefield en, Gamefield pl){
         s = se;
@@ -51,12 +54,14 @@ public class MultiplayerLogic {
 
     public void sendShips() throws IOException {
         if (client){
+            maxShoot = player.getUsedCells();
             startMultiplayerloop();
         }
         else {
             if(firstturn){
                 int[] shipLengths = player.getShipLengths();
                 s.sendShips(shipLengths);
+                maxShoot = player.getUsedCells();
                 System.out.println("[MultiplayerLogic] Schiffe gesendet");
                 String messagedone = s.receiveMessage();
                 System.out.println(messagedone);
@@ -98,11 +103,22 @@ public class MultiplayerLogic {
                                 if (c.getShip() == null) { // Fehlschuss
                                     s.sendAnswer(0);
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
-                                } else if (!c.getShip().isAlive()) { // Versenkt
+                                } else if (!c.getShip().isAlive()) {
+                                    if (maxShoot == 0){
+                                        s.send("won");
+                                       contr.showGameOverScreen(false);
+                                    }
+                                    maxShoot--;// Versenkt
                                     player.deleteShip();
                                     s.sendAnswer(2);
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                                 } else { // Treffer
+                                    if (maxShoot == 0){
+                                        s.send("won");
+                                        contr.showGameOverScreen(false);
+
+                                    }
+                                    maxShoot--;
                                     s.sendAnswer(1);
                                     System.out.println("[MultiplayerLogic] Antwort gesendet: 1 (Hit)");
                                 }
@@ -174,6 +190,10 @@ public class MultiplayerLogic {
                             } catch (Exception e) {
                                 System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
                             }
+                            break;
+
+                        case "won":
+                            contr.showGameOverScreen(true);
                             break;
 
 
@@ -342,12 +362,23 @@ public class MultiplayerLogic {
                             if (c.getShip() == null) { // Fehlschuss
                                 cl.sendAnswer(0);
                                 System.out.println("[MultiplayerLogic] Antwort gesendet: 0 (Miss)");
-                            } else if (!c.getShip().isAlive()) { // Versenkt
+                            } else if (!c.getShip().isAlive()) {
+                                if (maxShoot == 0){
+                                    cl.send("won");
+                                    contr.showGameOverScreen(false);
+                                }
+                                maxShoot--;// Versenkt
                                 player.deleteShip();
                                 cl.sendAnswer(2);
                                 System.out.println("[MultiplayerLogic] Antwort gesendet: 2 (Sunk)");
                             } else { // Treffer
+                                if (maxShoot == 0){
+                                    cl.send("won");
+                                   contr.showGameOverScreen(false);
+                                }
+                                maxShoot--;
                                 cl.sendAnswer(1);
+
                                 // WICHTIG: myturn wird hier NICHT geändert. Der Server ist weiterhin dran.
                                 System.out.println("[MultiplayerLogic] Antwort gesendet: 1 (Hit)");
                             }
@@ -427,6 +458,10 @@ public class MultiplayerLogic {
                         } catch (Exception e) {
                             System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
                         }
+                        break;
+
+                    case "won":
+                        contr.showGameOverScreen(true);
                         break;
 
                     default:

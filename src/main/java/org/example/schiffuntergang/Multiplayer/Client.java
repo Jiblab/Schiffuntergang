@@ -77,4 +77,6 @@ public class Client implements Network {
     public String receiveMessage() throws IOException {
         return in.readLine();
     }
+
+
 }
