@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.components.Cell;
 import org.example.schiffuntergang.components.Gamefield;
+import org.example.schiffuntergang.components.Ships;
 import org.example.schiffuntergang.filemanagement.FileManager;
 import org.example.schiffuntergang.filemanagement.GamefieldData;
 import org.example.schiffuntergang.filemanagement.GameState;
@@ -29,6 +30,8 @@ public class MultiplayerLogic {
     private boolean serverKiReady = false;
     private boolean clientKiReady = false;
     private KiPlayerController kicontr;
+
+    private int[][] shotEnemyPositions;
 
 
     public MultiplayerLogic(Client c, boolean client1, Gamefield en, Gamefield pl){
@@ -110,6 +113,7 @@ public class MultiplayerLogic {
                                 s.sendPass();
                             } else { // Treffer (1) oder versenkt (2)
                                 Platform.runLater(() -> ce.setFill(Color.RED));
+                                ce.setShipHit(true);
                                 //immer noch unser Zug -> myturn wieder auf true.
                                 System.out.println("[MultiplayerLogic] Treffer/Versenkt. Ich bin wieder dran.");
                                 myturn = true;
@@ -193,7 +197,7 @@ public class MultiplayerLogic {
         }
     }
 
-    public void loadGameFromSave(GameState loadedState, HelloController ctr) {
+    public void loadGameFromSave(GameState loadedState, HelloController ctr) throws IOException {
         if(ctr != null){
             setController(ctr);
         }
@@ -216,6 +220,7 @@ public class MultiplayerLogic {
         if (!loadedState.isMusikAktiv()) {
             BackgroundMusic.getInstance().stop();
         }
+        startMultiplayerloop();
     }
     public void start() throws IOException {
         if (!client){ //man selber ist host
@@ -341,6 +346,7 @@ public class MultiplayerLogic {
                         Cell ce = enemy.getCell(x, y);
                         if (p[1].equals("0")) { // Fehlschuss
                             Platform.runLater(() -> ce.setFill(Color.BLACK));
+
                             // Unser Zug ist vorbei. Wir übergeben mit "pass".
                             System.out.println("[MultiplayerLogic] Fehlschuss. Sende pass.");
                             cl.sendPass();
@@ -348,6 +354,7 @@ public class MultiplayerLogic {
                             Platform.runLater(() -> ce.setFill(Color.RED));
                             // Es ist immer noch unser Zug! Wir müssen myturn wieder auf true setzen,
                             // damit die UI einen neuen Schuss erlaubt.
+                            ce.setShipHit(true);
                             System.out.println("[MultiplayerLogic] Treffer/Versenkt. Ich bin wieder dran.");
                             myturn = true;
                         }
@@ -460,11 +467,13 @@ public class MultiplayerLogic {
     public void startShoot() throws IOException {
         if (!client){
             s.sendShot(x, y);
+            enemy.getCell(x,y).setShot(true);
             myturn = false;
             System.out.println("[MultiplayerLogic] "+x+" "+y);
         }
         else {
             cl.sendShot(x, y);
+            enemy.getCell(x,y).setShot(true);
             myturn = false;
         }
     }

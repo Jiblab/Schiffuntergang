@@ -331,6 +331,7 @@ public class HelloController {
                 GameState loadedState = fm.load();
                 long id = loadedState.getId();
                 stage.setFullScreen(true);
+                stage.setMaximized(true);
                 mlp.loadGameFromSave(loadedState, this);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);

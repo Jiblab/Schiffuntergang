@@ -12,10 +12,12 @@ public class GamefieldData {
     private boolean isEnemy;
     private List<SerializableShip> ships;
     private List<Position> shotPositions;
+    private List<Position> hitVariables;
 
     public GamefieldData() {
         this.ships = new ArrayList<>();
         this.shotPositions = new ArrayList<>();
+        this.hitVariables = new ArrayList<>();
     }
 
 
@@ -33,4 +35,8 @@ public class GamefieldData {
 
     public List<Position> getShotPositions() { return shotPositions; }
     public void setShotPositions(List<Position> shotPositions) { this.shotPositions = shotPositions; }
+
+    public List<Position> getHitVariables() { return hitVariables; }
+    public void setHitVariables(List<Position> hitVariables) { this.hitVariables = hitVariables; }
+
 }

@@ -1,6 +1,7 @@
 package org.example.schiffuntergang.components;
 
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
@@ -37,7 +38,6 @@ public class Gamefield extends GridPane {
     private MultiplayerLogic lo;
     private boolean multiplayer = false;
     private boolean turn;
-
 
     public Gamefield(boolean enemy, HelloController controler, int h, int b) {
         lang = h;
@@ -222,6 +222,14 @@ public class Gamefield extends GridPane {
                 } else {
                     cell.setFill(Color.BLACK);
                 }
+            }
+        }
+
+        //Sonderkondition für Multiplayer
+        for (Position pos : data.getHitVariables()) {
+            Cell cell = board.getCell(pos.getX(), pos.getY());
+            if (cell != null) {
+                cell.setFill(Color.RED);
             }
         }
         return board;
@@ -529,6 +537,16 @@ public class Gamefield extends GridPane {
             }
         }
         data.setShotPositions(shotPositions);
+
+        List<Position> hitVariables = new ArrayList<>();
+        for (int y = 0; y < breit; y++) {
+            for (int x = 0; x < lang; x++) {
+                if(getCell(x,y).isShot() && getCell(x,y).getShipHit()){
+                    hitVariables.add(new Position(x, y));
+                }
+            }
+        }
+        data.setHitVariables(hitVariables);
         return data;
     }
     private Cell findShipStartCell(Ships ship) {
