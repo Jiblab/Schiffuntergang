@@ -36,21 +36,21 @@ public class KiPlayerController implements Runnable {
     public void run() {
         try {
             placeShipsRandomly();
-            System.out.println("KI-Controller [" + (logic.getClient() ? "Client" : "Server") + "]: Schiffe platziert.");
+            System.out.println("[KiPlayerController] KI-Controller [" + (logic.getClient() ? "Client" : "Server") + "]: Schiffe platziert.");
 
             if (logic.getClient()) {
                 // Der Client muss warten, bis der Server ihm die ships schickt.
                 logic.startMultiplayerloop();
-                System.out.println("[Client-KI] clientGame-Loop gestartet und lauscht auf 'ships'.");
+                System.out.println("[KiPlayerController] [Client-KI] clientGame-Loop gestartet und lauscht auf 'ships'.");
 
             } else {
                 logic.sendShipsAndWaitForDone();
             }
 
-            System.out.println("KI-Controller [" + (logic.getClient() ? "Client" : "Server") + "]: Initialisierung übergeben. Thread beendet sich.");
+            System.out.println("[KiPlayerController] KI-Controller [" + (logic.getClient() ? "Client" : "Server") + "]: Initialisierung übergeben. Thread beendet sich.");
 
         } catch (Exception e) {
-            System.err.println("Fehler im KiPlayerController.run(): " + e.getMessage());
+            System.err.println("[KiPlayerController] Fehler im KiPlayerController.run(): " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -81,7 +81,7 @@ public class KiPlayerController implements Runnable {
             if (xMax < 0 || yMax < 0) {
                 retries++;
                 if (retries > maxRetries) {
-                    System.out.println("WARNUNG: Konnte keine passenden Schiffe mehr finden (xMax/yMax < 0). Breche Platzierung ab.");
+                    System.out.println("[KiPlayerController] WARNUNG: Konnte keine passenden Schiffe mehr finden (xMax/yMax < 0). Breche Platzierung ab.");
                     break;
                 }
                 continue;
@@ -93,20 +93,20 @@ public class KiPlayerController implements Runnable {
             if (playerBoard.placeShip(new org.example.schiffuntergang.components.Ships(shipLength, shipLength), xPos, yPos, vertical)) {
 
                 playerBoard.increaseCells(shipLength);
-                System.out.println("KI hat Schiff der Länge " + shipLength + " platziert. Belegte Zellen: " + playerBoard.getUsedCells());
+                System.out.println("[KiPlayerController] KI hat Schiff der Länge " + shipLength + " platziert. Belegte Zellen: " + playerBoard.getUsedCells());
                 retries = 0;
             } else {
                 retries++;
             }
             if (retries > maxRetries) {
-                System.out.println("WARNUNG: Maximale Anzahl an Fehlversuchen erreicht. Breche Schiffsplatzierung ab.");
+                System.out.println("[KiPlayerController] WARNUNG: Maximale Anzahl an Fehlversuchen erreicht. Breche Schiffsplatzierung ab.");
                 break;
             }
         }
 
         playerBoard.redrawAllCells();
 
-        System.out.println("KI-Schiffsplatzierung beendet. Finale belegte Zellen: " + playerBoard.getUsedCells());
+        System.out.println("[KiPlayerController] KI-Schiffsplatzierung beendet. Finale belegte Zellen: " + playerBoard.getUsedCells());
         // UI benachrichtigen, dass die Platzierung fertig ist (visuelles Update)
         Platform.runLater(()->{uiController.updateRemainingCellsDisplay();});
     }

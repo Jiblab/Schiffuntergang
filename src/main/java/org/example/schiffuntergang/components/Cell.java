@@ -29,7 +29,7 @@ public class Cell extends Rectangle {
 
     public void setShip(Ships ships){
         ship = ships;
-        System.out.println("auf "+x+"und "+y+" liegt ein schiff");
+        System.out.println("[Cell] auf "+x+"und "+y+" liegt ein schiff");
     }
     public Ships getShip(){
         return ship;

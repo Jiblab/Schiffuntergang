@@ -81,11 +81,11 @@ public class EnemyPlayer {
         if (ship != null) { // treffer
             ship.hit();
             javafx.application.Platform.runLater(() -> cell.setFill(Color.RED));
-            System.out.println("KI trifft bei: (" + x + ", " + y + ")");
+            System.out.println("[EnemyPlayer] KI trifft bei: (" + x + ", " + y + ")");
 
 
             if (!ship.isAlive()) {
-                System.out.println("KI hat ein Schiff versenkt!");
+                System.out.println("[EnemyPlayer] KI hat ein Schiff versenkt!");
                 playerBoard.deleteShip();
                 priorityTargets.clear();
                 firstHit = null;
@@ -96,7 +96,7 @@ public class EnemyPlayer {
             return true;
         } else { // wasser
             javafx.application.Platform.runLater(() -> cell.setFill(Color.BLACK));
-            System.out.println("KI schießt Wasser bei: (" + x + ", " + y + ")");
+            System.out.println("[EnemyPlayer] KI schießt Wasser bei: (" + x + ", " + y + ")");
             return false; // fehlschuss
         }
     }
@@ -162,6 +162,20 @@ public class EnemyPlayer {
         } while (targetCell == null || targetCell.isShot());
 
         return new int[]{x, y};
+    }
+
+    public void processShotResult(int x, int y, boolean hit, boolean sunk) {
+        if (sunk) {
+            System.out.println("KI-INFO: Gegnerisches Schiff versenkt! Setze Zielliste zurück.");
+            priorityTargets.clear();
+            firstHit = null;
+            directionFound = false;
+        } else if (hit) {
+            System.out.println("KI-INFO: Treffer bei (" + x + ", " + y + "). Aktualisiere Prioritätsziele.");
+            // Ruft die bestehende Logik auf, um Nachbarfelder zu Zielen zu machen.
+            handleHit(x, y);
+        }
+        // Bei einem Fehlschuss muss nichts getan werden.
     }
 
 }

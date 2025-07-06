@@ -34,7 +34,7 @@ public class GameCreationScreen {
         try {
             Font.loadFont(Options.class.getResourceAsStream("/fonts/PressStart2P-Regular.ttf"), 10);
         } catch (Exception e) {
-            System.err.println("Pixel-Schriftart konnte nicht geladen werden!");
+            System.err.println("[GameCreationScreen] Pixel-Schriftart konnte nicht geladen werden!");
             e.printStackTrace();
         }
     }

@@ -20,17 +20,17 @@ public class PingPongTest {
 
 
     public static void main(String[] args) throws IOException {
-        System.out.println("PingPongTest: Test\n");
-        System.out.println("c für client, s für server: ");
+        System.out.println("[PingPongTest] PingPongTest: Test\n");
+        System.out.println("[PingPongTest] c für client, s für server: ");
         String methode = usr.readLine();
         if(methode.equals("c")) {
             client = true;
             c = new Client();
-            System.out.println("PingPongTest: IP eingeben: ");
+            System.out.println("[PingPongTest] PingPongTest: IP eingeben: ");
             String ip = usr.readLine();
             try {
                 c.connect(ip, 5000);
-                System.out.println("PingPongTest: Erfolgreich verbunden!");
+                System.out.println("[PingPongTest] PingPongTest: Erfolgreich verbunden!");
 
             }catch(IOException e) {
                 e.printStackTrace();
@@ -39,7 +39,7 @@ public class PingPongTest {
             client = false;
             s = new Server();
             String ip = InetAddress.getLocalHost().getHostAddress();
-            System.out.println("PingPongTest: IP lautet: "+ip);
+            System.out.println("[PingPongTest] PingPongTest: IP lautet: "+ip);
             s.start(5000);
         }
     }
