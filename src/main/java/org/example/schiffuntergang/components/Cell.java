@@ -13,6 +13,8 @@ public class Cell extends Rectangle {
     private final Gamefield board;
     private final HelloController control;
 
+    //Fürn Multiplayer
+    private boolean shipHit = false;
 
     public Cell(int x, int y, Gamefield board, int h, int w, HelloController controler){
         super(h, w);
@@ -32,6 +34,14 @@ public class Cell extends Rectangle {
     public Ships getShip(){
         return ship;
     }
+
+    public void setShipHit(boolean hit){
+        shipHit = hit;
+    }
+    public boolean getShipHit(){
+        return shipHit;
+    }
+
     public void setShot(boolean s){
         this.shot = s;
         if (s) {
