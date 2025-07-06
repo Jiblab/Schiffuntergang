@@ -256,6 +256,8 @@ public class Gamefield extends GridPane {
         return board;
     }
 
+
+
     public static Gamefield fromGameState(GameState state, boolean isEnemy) {
 
         HelloController dummyController = new HelloController();

@@ -94,8 +94,33 @@ public class FileManager {
         }
     }
 
-    public void saveFromRemote(String id){
-
+    public GameState loadfromid(long id){
+        String userHome = System.getProperty("user.home");
+        File saveDir = new File(userHome, "SchiffUntergangSaves");
+        if(!saveDir.exists()){
+            return null;
+        }
+        String filename = "mp_save_" + id + ".save";
+        File filetoLoad = new File(saveDir, filename);
+        if(!filetoLoad.exists()){
+            return null;
+        }
+        GameState gameState = null;
+        try {
+            FileReader fileReader = new FileReader(filetoLoad.getAbsolutePath());
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            String jsonString = stringBuilder.toString();
+            SaveDataClass save = new SaveDataClass();
+            gameState = save.loadData(jsonString);
+        }catch(IOException e){
+            System.err.println(e);
+        }
+        return gameState;
     }
 
     //multiplayer

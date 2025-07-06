@@ -2,6 +2,7 @@ package org.example.schiffuntergang.Multiplayer;
 
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import org.example.schiffuntergang.EnemyPlayer;
 import org.example.schiffuntergang.HelloController;
 import org.example.schiffuntergang.components.Cell;
 import org.example.schiffuntergang.components.Gamefield;
@@ -15,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import org.example.schiffuntergang.filemanagement.FileManager;
 import org.example.schiffuntergang.filemanagement.GamefieldData;
 import org.example.schiffuntergang.filemanagement.GameState;
+import org.example.schiffuntergang.sounds.BackgroundMusic;
 
 
 public class MultiplayerLogic {
@@ -161,6 +163,17 @@ public class MultiplayerLogic {
                                 System.err.println("[MultiplayerLogic] Fehler beim Verarbeiten des Remote-Save-Befehls: " + e.getMessage());
                             }
                             break;
+
+                            case "load":
+                                long saveId = Long.parseLong(p[1]);
+                                try{
+                                    FileManager fm = new FileManager(false);
+                                    GameState loadedstate = fm.loadfromid(saveId);
+                                    loadGameFromSave(loadedstate);
+                                }catch(Exception e){
+                                    System.err.println("Fehler beim Verarbeiten des Loads"+e.getMessage());
+                                }
+                                break;
                     }
                 } else {
                     if (kicontr != null) { // Prüfen, ob eine KI dieses Spiel steuert
@@ -186,6 +199,26 @@ public class MultiplayerLogic {
                     }
                 }
             }
+        }
+    }
+
+    public void loadGameFromSave(GameState loadedState) {
+
+
+        player = Gamefield.fromData(loadedState.getPlayerBoardData(), this.contr, this);
+        enemy = Gamefield.fromData(loadedState.getEnemyBoardData(), this.contr, this);
+
+            player.setLogic(this);
+            enemy.setLogic(this);
+            setPl(this.player);
+            setEn(this.enemy);
+            setTurn(loadedState.isPlayerTurn());
+
+        contr.setup(this.player, this.enemy);
+
+        BackgroundMusic.getInstance().setVolume(loadedState.getMusikVolume());
+        if (!loadedState.isMusikAktiv()) {
+            BackgroundMusic.getInstance().stop();
         }
     }
 

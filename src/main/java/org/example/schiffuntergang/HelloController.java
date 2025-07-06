@@ -87,7 +87,7 @@ public class HelloController {
     }
 
     public void updateRemainingCellsDisplay() {
-        // Sicherheitsprüfung falls die Methode zu früh aufgerufen wird
+        // Sicherheitsprüfung, falls die Methode zu früh aufgerufen wird
         if (player == null || remainingCell == null) {
             return;
         }
