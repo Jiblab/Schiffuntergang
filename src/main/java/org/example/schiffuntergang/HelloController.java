@@ -380,6 +380,9 @@ public class HelloController {
         this.enemy.setController(this);
         buildUI(player, enemy, createControlPanel());
         updateRemainingCellsDisplay();
+        if (stage != null){
+            stage.setResizable(true);
+        }
     }
 
     //setup multiplayer-client

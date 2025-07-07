@@ -9,33 +9,55 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
 
-
+/**
+ * Verantwortlich für das Sammeln, Formatieren und Initiieren des Speicher- und Ladevorgangs.
+ * Diese Klasse arbeitet als Brücke zwischen dem aktuellen Spielzustand (repräsentiert durch
+ * die {@link Gamefield}-Objekte) und dem serialisierbaren {@link GameState}-Format.
+ * Sie nutzt Gson für die Konvertierung von und zu JSON.
+ */
 public class SaveDataClass {
     private Gamefield spieler, gegner;
     private Map<String, Object> datenzumspeichern = new HashMap<String, Object>();
     private MultiplayerLogic logic;
 
+    /**
+     * Konstruktor für das Speichern eines Einzelspieler-Spiels.
+     *
+     * @param spielergamefield Das Spielfeld des Spielers.
+     * @param gegnergamefield  Das Spielfeld des Gegners.
+     */
     public SaveDataClass(Gamefield spielergamefield, Gamefield gegnergamefield) {
         spieler = spielergamefield;
         gegner = gegnergamefield;
     }
+
+    /**
+     * Leerer Standardkonstruktor.
+     * Nützlich für Instanzen, die hauptsächlich zum Laden von Daten verwendet werden.
+     */
     public SaveDataClass(){
 
     }
-    //multiplayer
+
+    /**
+     * Konstruktor für das Speichern eines Multiplayer-Spiels.
+     *
+     * @param spielergamefield Das Spielfeld des Spielers.
+     * @param gegnergamefield  Das Spielfeld des Gegners.
+     * @param logic            Die Instanz der {@link MultiplayerLogic}, die für den Spielzustand benötigt wird.
+     */
     public SaveDataClass(Gamefield spielergamefield, Gamefield gegnergamefield, MultiplayerLogic logic) {
         this.spieler = spielergamefield;
         this.gegner = gegnergamefield;
         this.logic = logic;
     }
 
-    /*public void prepareData() {
-        datenzumspeichern.put("breit", spieler.getBreit());
-        datenzumspeichern.put("lang", spieler.getLang());
-        datenzumspeichern.put("shipsspieler", spieler.getShips());
-        datenzumspeichern.put("shipsgegner",gegner.getShips());
-
-    }*/
+    /**
+     * Deserialisiert einen JSON-String in ein {@link GameState}-Objekt.
+     *
+     * @param json Der JSON-String, der den vollständigen Spielzustand repräsentiert.
+     * @return Ein {@link GameState}-Objekt, das aus dem JSON-String erstellt wurde.
+     */
     public GameState loadData(String json){
         GameState completeGameState;
 
@@ -44,6 +66,12 @@ public class SaveDataClass {
 
         return completeGameState;
     }
+
+    /**
+     * Erstellt einen JSON-String aus dem aktuellen Spielzustand für ein Einzelspieler-Spiel.
+     *
+     * @return Ein JSON-formatierter String, der den Spielzustand repräsentiert.
+     */
     public String getDatenzumspeichern() {
         GameState completeGameState = createGameState();
         completeGameState.setMultiplayer(false, 0); // Explizit als Singleplayer markieren
@@ -51,6 +79,12 @@ public class SaveDataClass {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(completeGameState);
     }
+
+    /**
+     * Koordiniert den vollständigen Speichervorgang für ein Multiplayer-Spiel.
+     * Dies beinhaltet das Erstellen eines lokalen Spielstands und das Senden eines
+     * Speicherbefehls an den gegnerischen Spieler über das Netzwerk.
+     */
     public void saveMultiplayerGame() {
         if (this.logic == null) {
             System.err.println("[SaveDataClass] FEHLER: Multiplayer-Spiel kann nicht gespeichert werden. MultiplayerLogic fehlt.");
@@ -89,6 +123,13 @@ public class SaveDataClass {
             System.err.println("[SaveDataClass] FEHLER: Senden des Speicherbefehls an den Gegner fehlgeschlagen: " + e.getMessage());
         }
     }
+
+    /**
+     * Private Hilfsmethode, die ein {@link GameState}-Objekt aus den aktuellen
+     * Spielfeld- und Audio-Daten erstellt.
+     *
+     * @return Ein neues {@link GameState}-Objekt.
+     */
     private GameState createGameState() {
         GamefieldData playerData = spieler.toData();
         GamefieldData enemyData = gegner.toData();

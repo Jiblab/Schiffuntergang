@@ -93,7 +93,7 @@ public class StartScreen {
 
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
-                stage.setFullScreen(true);
+                stage.setResizable(true);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
